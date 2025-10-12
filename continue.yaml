@@ -8,7 +8,7 @@ project:
 
 # Source du plan initial pour générer epics et user stories
 plan:
-  path: ./PROJECT_PLAN.md
+  path: .continue/rules/PROJECT_PLAN.md
 
 # GitHub
 repository:
