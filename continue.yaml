@@ -19,7 +19,8 @@ repository:
 # Project github kanban
 github_project:
   name: "batala-vitrine"
-  columsns:
+  repo: Jean-Charles-Audebert/batala-vitrine.git
+  columns:
     - Backlog
     - In Progress
     - In Review
