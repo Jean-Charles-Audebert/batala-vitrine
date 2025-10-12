@@ -22,8 +22,7 @@ root/
 │
 ├── migrations/           # Scripts SQL et migration de schéma
 │
-├── docker/
-│   └── docker-compose.yml
+├── docker-compose.yml
 │
 ├── .env.example          # Variables d’environnement (jamais commit le vrai .env)
 ├── CONTRIBUTING.md
