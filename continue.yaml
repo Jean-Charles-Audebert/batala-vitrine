@@ -1,0 +1,87 @@
+version: "1.0"
+
+project:
+  name: Batala LR - Site Vitrine PWA
+  description: >
+    Site institutionnel PWA pour l'association Batala LR avec Node.js SSR,
+    PostgreSQL, dashboard admin, TDD, tests E2E, PWA, CI/CD et audit qualité.
+
+# Source du plan initial pour générer epics et user stories
+plan:
+  path: ./PROJECT_PLAN.md
+
+# GitHub
+repository:
+  url: git@github.com:Jean-Charles-Audebert/batala-vitrine.git
+  main_branch: main
+  release_branch: release
+
+# Project github kanban
+github_project:
+  name: "batala-vitrine"
+  columsns:
+    - Backlog
+    - In Progress
+    - In Review
+    - Done
+  auto_create_cards: true
+  auto_move_cards: true
+  auto_close_issues: true
+
+  
+# Branches feature automatiques
+branches:
+  prefix: feature/
+  auto_create: true
+
+# Pull requests
+pull_requests:
+  auto_create: true
+  require_approval: true
+  run_tests: true
+  run_lighthouse: true
+  run_sonarcloud: true
+
+# CI/CD
+ci:
+  test: 
+    unit: jest
+    e2e: playwright
+  lint: eslint
+  lhci:
+    collect: lhci collect
+    assert: lhci assert
+  sonarcloud: true
+
+# Deployment
+deployment:
+  release_branch: release
+  docker:
+    build_command: npm run build:docker
+    push_command: docker push iousco/batala-vitrine:latest
+  nas:
+    pull_compose: true
+    restart_compose: true
+    url: https://batala-lr.jc1932.synology.me
+
+# PWA
+pwa:
+  manifest: src/public/manifest.webmanifest
+  service_worker: src/public/js/pwa-sw-register.js
+
+# Secrets
+secrets:
+  env_file: .env
+  gitignore: true
+
+# Quality & accessibility
+quality:
+  accessibility: true
+  aria_labels: true
+  sanitize_user_input: true
+  keyboard_navigation: true
+
+# Notifications
+notifications:
+  email: true
+  slack: false
