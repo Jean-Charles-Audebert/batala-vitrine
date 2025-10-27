@@ -31,5 +31,5 @@ services:
     command: npm run dev
     restart: unless-stopped
 
-volumes:
-  db_data:
+# volumes:
+#   db_data:

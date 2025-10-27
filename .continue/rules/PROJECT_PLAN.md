@@ -9,7 +9,7 @@ Technos : Node.js (ESM) + Express + Pug + PostgreSQL
 Tests : Jest (TDD) + Playwright (E2E)  
 Déploiement : Docker + NAS (pull automatique)  
 Analyse : SonarCloud + Lighthouse  
-Gestion : Continue.dev (Epics, branches, PR, CI/CD, qualité automatisée)
+Gestion : GitHub Copilot Pro + GitHub Projects (Epics, branches, PR, revues IA)
 
 ---
 
@@ -27,7 +27,7 @@ Technos : Node.js (ESM) + Express + Pug + PostgreSQL
 Tests : Jest (TDD) + Playwright (E2E)  
 Déploiement : Docker + NAS  
 Analyse : SonarCloud + Lighthouse  
-Gestion : Continue.dev (Epics, branches, PR, CI/CD, qualité automatisée)
+Gestion : GitHub Copilot Pro + GitHub Projects (Epics, branches, PR, revues IA)
 
 ---
 
@@ -42,7 +42,7 @@ Gestion : Continue.dev (Epics, branches, PR, CI/CD, qualité automatisée)
 - US1.5 : Mettre en place Dockerfile + docker-compose.yml
 - US1.6 : Configurer GitHub Actions (lint, test, audit, build, push Docker)
 - US1.7 : Configurer SonarCloud & Lighthouse
-- US1.8 : Configurer Continue.dev (branches, PR, validation manuelle)
+- US1.8 : Configurer GitHub Copilot Pro + GitHub Projects
 
 ### Epic 2 : Authentification et Sécurité
 **Backlog**

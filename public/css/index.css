@@ -1,0 +1,556 @@
+/**
+ * Batala La Rochelle - Styles page d'accueil
+ * Fichier: public/css/index.css
+ */
+
+/* ==========================================================================
+   Layout principal
+   ========================================================================== */
+.vitrine-page {
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ==========================================================================
+   Sections génériques
+   ========================================================================== */
+.block-section {
+  position: relative;
+  padding: 4rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.header-section {
+  padding: 0;
+  border: none;
+}
+
+.header-bg {
+  background: linear-gradient(135deg, #424242 0%, #212121 100%);
+  background-size: cover;
+  background-position: center;
+  padding: 3rem 0;
+  position: relative;
+}
+
+.header-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+.logo {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.logo-placeholder {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.site-title {
+  font-size: 3rem;
+  margin: 1rem 0;
+  color: white;
+}
+
+.header-nav {
+  margin-top: 1.5rem;
+}
+
+.nav-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.edit-controls {
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   Section titles
+   ========================================================================== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #212121;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Cards grid
+   ========================================================================== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-image {
+  height: 200px;
+  background: linear-gradient(135deg, #e0e0e0 25%, transparent 25%),
+    linear-gradient(225deg, #e0e0e0 25%, transparent 25%),
+    linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+    linear-gradient(315deg, #e0e0e0 25%, #bdbdbd 25%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 0, 10px -10px, 0px 10px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #757575;
+  font-weight: bold;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  color: #212121;
+}
+
+.card-description {
+  color: #616161;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.card-controls {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover .card-controls {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Boutons
+   ========================================================================== */
+.btn,
+.btn-edit,
+.btn-add-card,
+.btn-edit-card,
+.btn-delete-card,
+.btn-edit-sm,
+.btn-add-sm,
+.btn-add-block {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-edit,
+.btn-add-card,
+.btn-add-block {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-edit:hover,
+.btn-add-card:hover {
+  background: #1976D2;
+}
+
+.btn-edit-card,
+.btn-delete-card,
+.btn-edit-sm,
+.btn-add-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-delete-card {
+  background: #f44336;
+  color: white;
+}
+
+.btn-add-block {
+  background: #4CAF50;
+  margin: 2rem auto;
+  display: block;
+}
+
+.btn-primary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-secondary {
+  background: #757575;
+  color: white;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer-section {
+  background: #424242;
+  color: #e0e0e0;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-title {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #90CAF9;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-item a {
+  color: #90CAF9;
+  text-decoration: none;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  font-size: 1.5rem;
+  text-decoration: none;
+  transition: transform 0.3s;
+}
+
+.social-link:hover {
+  transform: scale(1.2);
+}
+
+.social-controls {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #616161;
+}
+
+/* ==========================================================================
+   Icônes sociales (Font Awesome)
+   ========================================================================== */
+.social-link i {
+  font-size: 1.5rem;
+  color: #90CAF9;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.social-link:hover i {
+  color: #64B5F6;
+}
+
+.social-link[data-network="facebook"]:hover i {
+  color: #1877F2;
+}
+
+.social-link[data-network="instagram"]:hover i {
+  color: #E4405F;
+}
+
+.social-link[data-network="youtube"]:hover i {
+  color: #FF0000;
+}
+
+.social-link[data-network="tiktok"]:hover i {
+  color: #000000;
+}
+
+.social-link[data-network="x"]:hover i,
+.social-link[data-network="twitter"]:hover i {
+  color: #000000;
+}
+
+.social-link[data-network="linkedin"]:hover i {
+  color: #0A66C2;
+}
+
+/* ==========================================================================
+   Modales
+   ========================================================================== */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #757575;
+}
+
+.modal-title {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   Formulaires
+   ========================================================================== */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* ==========================================================================
+   Zone d'ajout de bloc
+   ========================================================================== */
+.add-block-zone {
+  text-align: center;
+  padding: 2rem 0;
+  border-top: 2px dashed #bdbdbd;
+  margin-top: 2rem;
+}
+
+/* ==========================================================================
+   FAB (Floating Action Button) - Authentification
+   ========================================================================== */
+.auth-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+}
+
+/* FAB Login */
+.fab-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #2196F3;
+  color: white;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+}
+
+.fab-login:hover {
+  background: #1976D2;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.fab-login i {
+  font-size: 1.25rem;
+}
+
+/* FAB Menu admin */
+.fab-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #424242;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1001;
+}
+
+.fab-toggle:hover {
+  background: #212121;
+  transform: rotate(90deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.fab-toggle i {
+  font-size: 1.25rem;
+}
+
+.fab-menu {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s;
+}
+
+.auth-fab:hover .fab-menu {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+.fab-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: white;
+  color: #424242;
+  border: none;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fab-item:hover {
+  background: #f5f5f5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.fab-item i {
+  font-size: 1.1rem;
+}
+
+.fab-item.fab-logout:hover {
+  background: #f44336;
+  color: white;
+}

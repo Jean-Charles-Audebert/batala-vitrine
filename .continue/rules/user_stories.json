@@ -1,0 +1,132 @@
+[
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.1 – Initialiser le projet Node.js + Express + Pug + PostgreSQL",
+    "description": "En tant que développeur, je veux initialiser le projet Node.js + Express + Pug + PostgreSQL afin d’avoir une base technique prête pour le site Batala LR"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.2 – Ajouter ESM, Jest, Playwright",
+    "description": "En tant que développeur, je veux ajouter ESM, Jest et Playwright afin de préparer le projet pour le développement et les tests"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.3 – Configurer ESLint et Prettier",
+    "description": "En tant que développeur, je veux configurer ESLint et Prettier afin de standardiser le code et éviter les erreurs de style"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.4 – Ajouter gestion .env (dotenv)",
+    "description": "En tant que développeur, je veux ajouter la gestion des variables d'environnement avec dotenv afin de sécuriser les configurations sensibles"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.5 – Mettre en place Dockerfile + docker-compose.yml",
+    "description": "En tant que développeur, je veux mettre en place Dockerfile et docker-compose.yml afin de faciliter le déploiement et l’environnement local"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.6 – Configurer GitHub Actions",
+    "description": "En tant que développeur, je veux configurer GitHub Actions pour lint, test, audit, build et push Docker afin d’automatiser le workflow CI/CD"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.7 – Configurer SonarCloud & Lighthouse",
+    "description": "En tant que développeur, je veux configurer SonarCloud et Lighthouse afin de suivre la qualité et la performance du code"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US1.8 – Configurer Continue.dev",
+    "description": "En tant que développeur, je veux configurer Continue.dev pour la gestion des branches, PR et validation manuelle afin de standardiser le workflow"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US2.1 – Authentification JWT + Refresh Token",
+    "description": "En tant qu’utilisateur, je veux m’authentifier via JWT et Refresh Token afin de sécuriser mes sessions"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US2.2 – Mot de passe hashé avec Argon2id",
+    "description": "En tant qu’utilisateur, je veux que mon mot de passe soit hashé avec Argon2id afin de sécuriser mes informations de connexion"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US2.3 – Gestion utilisateurs admin",
+    "description": "En tant qu’administrateur, je veux créer et inviter des utilisateurs par email afin de gérer l’accès à l’application"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US2.4 – Page de création de mot de passe via lien email",
+    "description": "En tant qu’utilisateur, je veux pouvoir créer mon mot de passe via un lien reçu par email afin d’accéder au dashboard"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US2.5 – Middleware de protection des routes /dashboard",
+    "description": "En tant qu’administrateur, je veux que le middleware protège les routes du dashboard afin que seuls les utilisateurs autorisés y accèdent"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US3.1 – CRUD des blocs dynamiques",
+    "description": "En tant qu’administrateur, je veux créer, lire, mettre à jour et supprimer les blocs dynamiques afin de gérer le contenu du site"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US3.2 – Modification de l’ordre des blocs",
+    "description": "En tant qu’administrateur, je veux modifier l’ordre des blocs par drag & drop afin d’organiser le contenu comme je le souhaite"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US3.3 – Upload d’images/documents",
+    "description": "En tant qu’administrateur, je veux pouvoir uploader des images et documents afin d’enrichir le contenu du site"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US3.4 – Validation et nettoyage des entrées",
+    "description": "En tant qu’administrateur, je veux valider et nettoyer les entrées (regex + sanitization) afin d’éviter les erreurs et injections"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US3.5 – Accessibilité ARIA + navigation clavier",
+    "description": "En tant qu’utilisateur, je veux que le site soit accessible ARIA et navigable au clavier afin d’assurer l’inclusion"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.1 – Page publique SSR avec Hero, sections dynamiques, footer",
+    "description": "En tant qu’utilisateur, je veux voir une page publique avec Hero, sections dynamiques et footer afin de naviguer et découvrir le site"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.2 – Bouton admin SVG pour connexion",
+    "description": "En tant qu’administrateur, je veux un bouton SVG pour me connecter afin d’accéder au dashboard"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.3 – Dashboard admin avec gestion des blocs",
+    "description": "En tant qu’administrateur, je veux un dashboard pour gérer les blocs dynamiques afin d’administrer le contenu efficacement"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.4 – Animation fluide et transitions légères (CSS)",
+    "description": "En tant qu’utilisateur, je veux des animations fluides et transitions légères afin d’améliorer l’expérience visuelle"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.5 – Bouton scroll-to-top SVG",
+    "description": "En tant qu’utilisateur, je veux un bouton scroll-to-top SVG afin de revenir rapidement en haut de page"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US4.6 – Manifest + Service Worker (offline + installable)",
+    "description": "En tant qu’utilisateur, je veux que le site soit installable et accessible offline grâce au Manifest et Service Worker"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US5.1 – Tests unitaires TDD (Jest)",
+    "description": "En tant que développeur, je veux écrire des tests unitaires avec Jest afin d’assurer la qualité du code"
+  },
+  {
+    "listId": "VOTRE_LIST_ID",
+    "name": "US5.2 – Tests E2E pour flux critiques (Playwright)",
+    "description": "En tant que développeur, je veux écrire des tests E2E pour les flux critiques avec Playwright afin de valider le fonctionnement global du site"
+  }
+]

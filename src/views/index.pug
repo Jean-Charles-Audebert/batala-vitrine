@@ -1,0 +1,129 @@
+extends layout
+
+block styles
+  link(rel='stylesheet', href='/css/index.css')
+
+block content
+  .vitrine-page
+    each contentBlock in blocks
+      case contentBlock.type
+        when 'header'
+          header.block-section.header-section(data-block-id=contentBlock.id)
+            - var logoElement = contentBlock.elements.find(el => el.type === 'image' && el.position === 1)
+            - var bgElement = contentBlock.elements.find(el => el.type === 'image' && el.position === 2)
+            .header-bg(style=bgElement && bgElement.media_path ? `background-image: url(${bgElement.media_path})` : '')
+              .container
+                .header-content
+                  if logoElement && logoElement.media_path
+                    img.logo(src=logoElement.media_path, alt='Logo Batala La Rochelle')
+                  else
+                    h1 Batala La Rochelle
+                  
+                  nav.header-nav
+                    a(href='#actus') Actualités
+                    a(href='#offres') Nos Offres
+                    a(href='#contact') Contact
+                    if user
+                      a.admin-btn(href='/admin/blocks') Admin
+                  
+                  if user
+                    .edit-controls
+                      button.edit-btn(data-block-id=contentBlock.id, data-action='edit-header')
+                        | ✏️ Modifier
+        
+        when 'actus', 'offres'
+          section.block-section(id=contentBlock.slug, data-block-id=contentBlock.id)
+            .container
+              .section-header
+                h2= contentBlock.title
+                if user
+                  button.add-card-btn(data-block-id=contentBlock.id) + Ajouter
+              
+              .cards-grid
+                each card in contentBlock.elements.filter(el => el.type === 'card')
+                  .card(data-card-id=card.id)
+                    if card.media_path
+                      img(src=card.media_path, alt=card.content.title)
+                    h3= card.content.title
+                    p= card.content.description
+                    if user
+                      .card-controls
+                        button.edit-card-btn(data-card-id=card.id) ✏️
+                        button.delete-card-btn(data-card-id=card.id) 🗑️
+        
+        when 'footer'
+          footer.block-section.footer-section(data-block-id=contentBlock.id)
+            .container
+              .footer-content
+                .footer-column
+                  h3 À propos
+                  - var aboutElement = contentBlock.elements.find(el => el.type === 'text' && el.position === 1)
+                  if aboutElement
+                    p= aboutElement.content
+                  else
+                    p Batala La Rochelle - Groupe de percussions afro-brésiliennes
+                
+                .footer-column
+                  h3 Contact
+                  - var contactElements = contentBlock.elements.filter(el => el.type === 'text' && el.position > 1 && el.position < 10)
+                  if contactElements.length > 0
+                    each contactEl in contactElements
+                      p= contactEl.content
+                  else
+                    p
+                      | Email : contact@batala-larochelle.fr
+                    p
+                      | Téléphone : 06 XX XX XX XX
+                
+                .footer-column
+                  h3 Suivez-nous
+                  .social-links
+                    - var socialElements = contentBlock.elements.filter(el => el.type === 'link')
+                    if socialElements.length > 0
+                      each socialEl in socialElements
+                        a(href=socialEl.content, target='_blank', rel='noopener noreferrer')
+                          != getSocialIcon(socialEl.content)
+                    else
+                      a(href='#', target='_blank')
+                        != getSocialIcon('facebook')
+                      a(href='#', target='_blank')
+                        != getSocialIcon('instagram')
+              
+              if user
+                .edit-controls
+                  button.edit-btn(data-block-id=contentBlock.id, data-action='edit-footer')
+                    | ✏️ Modifier
+              
+              .footer-bottom
+                p &copy; 2024 Batala La Rochelle. Tous droits réservés.
+    
+    if user
+      #cardModal.modal
+        .modal-content
+          span.close &times;
+          h2#modalTitle Ajouter une carte
+          form#cardForm
+            input(type='hidden', name='cardId')
+            input(type='hidden', name='blockId')
+            .form-group
+              label(for='cardTitle') Titre
+              input#cardTitle(type='text', name='title', required)
+            .form-group
+              label(for='cardDescription') Description
+              textarea#cardDescription(name='description', required)
+            .form-group
+              label(for='cardImage') URL de l'image
+              input#cardImage(type='url', name='image')
+            button(type='submit') Enregistrer
+    
+    .auth-fab
+      if user
+        .fab-menu
+          a.fab-item(href='/admin/blocks') 📋 Blocs
+          form(action='/auth/logout', method='POST', style='display: inline;')
+            button.fab-item(type='submit') 🚪 Déconnexion
+      else
+        a.fab-login(href='/auth/login') �� Connexion
+
+block scripts
+  script(src='/js/index.js')

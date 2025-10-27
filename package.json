@@ -3,26 +3,30 @@
   "version": "1.0.0",
   "description": "[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)\r [![Node.js](https://img.shields.io/badge/node-24.10.0-green)](https://nodejs.org/)\r [![Build Status](https://img.shields.io/github/workflow/status/<username>/<repo>/PR%20checks?label=CI)]()",
   "main": "index.js",
- "scripts": {
-  "start": "node src/server.js",
-  "dev": "nodemon --watch src --exec node src/server.js",
-  "lint": "eslint . --ext .js",
-  "test": "jest",
-  "test:watch": "jest --watch",
-  "e2e": "playwright test",
-  "build:docker": "docker build -t iouco/batala-vitrine:latest .",
-  "lhci:collect": "lhci collect --url=http://localhost:3000",
-  "lhci:assert": "lhci assert --assertions.lhr=performance:0.9"
-}
-,
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon --watch src --exec node src/server.js",
+    "lint": "eslint .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.mjs",
+    "test:watch": "jest --watch",
+    "e2e": "playwright test",
+    "seed:test-admin": "node scripts/seed-test-admin.js",
+    "seed:block-elements": "node scripts/seed-block-elements.js",
+    "build:docker": "docker build -t iouco/batala-vitrine:latest .",
+    "lhci:collect": "lhci collect --url=http://localhost:3000",
+    "lhci:assert": "lhci assert --assertions.lhr=performance:0.9",
+    "db:start": "docker compose up -d db",
+    "db:stop": "docker compose stop db",
+    "db:reset": "docker compose down -v && docker compose up -d db"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jean-Charles-Audebert/batala-vitrine.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "Apache-2.0",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/Jean-Charles-Audebert/batala-vitrine/issues"
   },
@@ -40,7 +44,9 @@
     "pug": "^3.0.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "eslint": "^9.37.0",
+    "eslint-plugin-n": "^17.23.1",
     "jest": "^30.2.0",
     "lhci": "^4.1.1",
     "nodemon": "^3.1.10",

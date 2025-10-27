@@ -1,0 +1,114 @@
+extends layout
+
+block content
+  .admins-container
+    h1= title
+    
+    if error
+      .alert.alert-error= error
+    
+    if success
+      .alert.alert-success= success
+    
+    .actions
+      a.btn.btn-primary(href="/admins/new") + Ajouter un admin
+  a.btn.btn-secondary(href="/auth/logout/web") Déconnexion
+    
+    if admins && admins.length > 0
+      table.admins-table
+        thead
+          tr
+            th ID
+            th Email
+            th Actif
+            th Date de création
+            th Actions
+        tbody
+          each admin in admins
+            tr
+              td= admin.id
+              td= admin.email
+              td= admin.is_active ? 'Oui' : 'Non'
+              td= new Date(admin.created_at).toLocaleDateString('fr-FR')
+              td.actions
+                a.btn.btn-sm.btn-edit(href=`/admins/${admin.id}/edit`) Modifier
+                form(method="POST" action=`/admins/${admin.id}/delete` style="display:inline")
+                  button.btn.btn-sm.btn-delete(type="submit" onclick="return confirm('Confirmer la suppression ?')") Supprimer
+    else
+      p Aucun administrateur trouvé.
+    
+    style.
+      .admins-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+      }
+      .actions {
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 1rem;
+      }
+      .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #0056b3;
+      }
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+      .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+      }
+      .btn-edit {
+        background: #ffc107;
+        color: #000;
+      }
+      .btn-delete {
+        background: #dc3545;
+        color: white;
+      }
+      .admins-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .admins-table th,
+      .admins-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      .admins-table thead {
+        background: #f8f9fa;
+      }
+      .admins-table td.actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+      }
+      .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
