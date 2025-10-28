@@ -156,9 +156,11 @@ npm run build:docker
 
 ## Licence
 
----
+Ce projet est sous licence Apache 2.0 (voir `LICENSE`).
 
-## Roadmap (extraits)
+**Copyright © 2025 caixaDev** – [https://caixadev.dev](https://caixadev.dev)
+
+---
 
 - Upload d’images/documents (Multer) avec stockage public et sanitation
 - Drag & drop pour l’ordre des blocs et des éléments
@@ -167,7 +169,7 @@ npm run build:docker
 
 ---
 
-## Licence
+## Licence (suite)
 
-Ce projet est sous licence Apache 2.0 (voir `LICENSE`).
-Note: le champ `license` dans `package.json` peut être aligné sur `Apache-2.0`.
+Note: le champ `license` dans `package.json` est aligné sur `Apache-2.0`.
+
