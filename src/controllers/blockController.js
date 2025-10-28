@@ -1,4 +1,5 @@
 import { query } from "../config/db.js";
+import { logger } from "../utils/logger.js";
 
 export const listBlocks = async (req, res) => {
   try {
@@ -7,7 +8,7 @@ export const listBlocks = async (req, res) => {
     );
     res.render("blocks", { title: "Gestion des blocs", blocks: rows });
   } catch (error) {
-    console.error("Erreur récupération blocs:", error);
+    logger.error("Erreur récupération blocs", error);
     res.status(500).send("Erreur lors de la récupération des blocs");
   }
 };
@@ -37,7 +38,7 @@ export const createBlock = async (req, res) => {
     );
     res.redirect("/blocks?success=Bloc créé avec succès");
   } catch (error) {
-    console.error("Erreur création bloc:", error);
+    logger.error("Erreur création bloc", error);
     res.render("block-form", { 
       title: "Créer un nouveau bloc", 
       formAction: "/blocks/new",
@@ -63,7 +64,7 @@ export const showEditBlockForm = async (req, res) => {
       block: rows[0]
     });
   } catch (error) {
-    console.error("Erreur récupération bloc:", error);
+    logger.error("Erreur récupération bloc", error);
     res.status(500).send("Erreur serveur");
   }
 };
@@ -81,7 +82,7 @@ export const updateBlock = async (req, res) => {
     );
     res.redirect("/blocks?success=Bloc modifié avec succès");
   } catch (error) {
-    console.error("Erreur modification bloc:", error);
+    logger.error("Erreur modification bloc", error);
     res.status(500).send("Erreur lors de la modification");
   }
 };
@@ -100,7 +101,7 @@ export const deleteBlock = async (req, res) => {
     await query("DELETE FROM blocks WHERE id=$1", [id]);
     res.redirect("/blocks?success=Bloc supprimé avec succès");
   } catch (error) {
-    console.error("Erreur suppression bloc:", error);
+    logger.error("Erreur suppression bloc", error);
     res.status(500).send("Erreur lors de la suppression");
   }
 };
@@ -117,7 +118,7 @@ export const reorderBlocks = async (req, res) => {
     }
     res.json({ success: true, message: "Ordre des blocs mis à jour" });
   } catch (error) {
-    console.error("Erreur réordonnancement blocs:", error);
+    logger.error("Erreur réordonnancement blocs", error);
     res.status(500).json({ error: "Erreur lors du réordonnancement" });
   }
 };

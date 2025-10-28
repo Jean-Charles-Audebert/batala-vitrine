@@ -1,5 +1,6 @@
 import { query } from "../config/db.js";
 import { getSocialIcon } from "../utils/socialIcons.js";
+import { logger } from "../utils/logger.js";
 
 export const showHome = async (req, res, deps = {}) => {
   const { query: _query = query } = deps;
@@ -25,7 +26,7 @@ export const showHome = async (req, res, deps = {}) => {
       getSocialIcon // Passer la fonction helper à la vue
     });
   } catch (error) {
-    console.error("Erreur récupération blocs:", error);
+    logger.error("Erreur récupération blocs", error);
     res.render("index", { 
       title: "Batala La Rochelle", 
       blocks: [],

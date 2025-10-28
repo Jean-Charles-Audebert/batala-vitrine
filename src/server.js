@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes.js";
 import refreshRoutes from "./routes/refreshRoutes.js";
 import blockRoutes from "./routes/blockRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
+import { logger } from "./utils/logger.js";
 
 dotenv.config();
 
@@ -63,5 +64,5 @@ app.use("/api", apiRoutes);
 // --- Lancement du serveur ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Serveur en ligne sur http://localhost:${PORT}`);
+  logger.success(`Serveur en ligne sur http://localhost:${PORT}`);
 });

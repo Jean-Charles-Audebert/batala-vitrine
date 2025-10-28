@@ -1,12 +1,13 @@
 import { query } from "../config/db.js";
 import { hashPassword } from "../utils/password.js";
+import { logger } from "../utils/logger.js";
 
 export const listAdmins = async (req, res) => {
   try {
     const { rows } = await query("SELECT id, email, is_active, created_at FROM admins");
     res.render("admins", { title: "Liste des admins", admins: rows });
   } catch (error) {
-    console.error("Erreur :", error);
+    logger.error("Erreur récupération admins", error);
     res.status(500).send("Erreur lors de la récupération des admins");
   }
 };
@@ -37,7 +38,7 @@ export const createAdmin = async (req, res) => {
     );
     res.redirect("/admins?success=Admin créé avec succès");
   } catch (error) {
-    console.error("Erreur création admin:", error);
+    logger.error("Erreur création admin", error);
     res.render("admin-form", { 
       title: "Créer un nouvel admin", 
       formAction: "/admins/new",
@@ -60,7 +61,7 @@ export const showEditAdminForm = async (req, res) => {
       admin: rows[0]
     });
   } catch (error) {
-    console.error("Erreur récupération admin:", error);
+    logger.error("Erreur récupération admin", error);
     res.status(500).send("Erreur serveur");
   }
 };
@@ -86,7 +87,7 @@ export const updateAdmin = async (req, res) => {
     }
     res.redirect("/admins?success=Admin modifié avec succès");
   } catch (error) {
-    console.error("Erreur modification admin:", error);
+    logger.error("Erreur modification admin", error);
     res.status(500).send("Erreur lors de la modification");
   }
 };
@@ -97,7 +98,7 @@ export const deleteAdmin = async (req, res) => {
     await query("DELETE FROM admins WHERE id=$1", [id]);
     res.redirect("/admins?success=Admin supprimé avec succès");
   } catch (error) {
-    console.error("Erreur suppression admin:", error);
+    logger.error("Erreur suppression admin", error);
     res.status(500).send("Erreur lors de la suppression");
   }
 };

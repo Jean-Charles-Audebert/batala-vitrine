@@ -1,4 +1,5 @@
 import { query } from "../config/db.js";
+import { logger } from "../utils/logger.js";
 
 // Récupérer tous les éléments d'un bloc
 export const getBlockElements = async (req, res) => {
@@ -10,7 +11,7 @@ export const getBlockElements = async (req, res) => {
     );
     res.json({ elements: rows });
   } catch (error) {
-    console.error("Erreur récupération éléments:", error);
+    logger.error("Erreur récupération éléments", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -31,7 +32,7 @@ export const createBlockElement = async (req, res) => {
     );
     res.json({ element: rows[0] });
   } catch (error) {
-    console.error("Erreur création élément:", error);
+    logger.error("Erreur création élément", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -69,7 +70,7 @@ export const updateBlockElement = async (req, res) => {
     
     res.json({ element: rows[0] });
   } catch (error) {
-    console.error("Erreur modification élément:", error);
+    logger.error("Erreur modification élément", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -87,7 +88,7 @@ export const deleteBlockElement = async (req, res) => {
     
     res.json({ success: true });
   } catch (error) {
-    console.error("Erreur suppression élément:", error);
+    logger.error("Erreur suppression élément", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
