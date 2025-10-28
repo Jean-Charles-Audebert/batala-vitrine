@@ -51,9 +51,9 @@ PORT=3000
 # PostgreSQL
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=batala
-DB_PASSWORD=batala_password
-DB_NAME=batala_vitrine
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
 
 # JWT
 JWT_SECRET=changeme-dev

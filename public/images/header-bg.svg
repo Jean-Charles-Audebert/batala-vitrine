@@ -11,6 +11,6 @@
   <rect width="1200" height="400" fill="url(#bg-gradient)"/>
   <rect width="1200" height="400" fill="url(#pattern)"/>
   <text x="600" y="200" font-size="48" font-weight="bold" text-anchor="middle" fill="#ffffff" opacity="0.3">
-    BATALA LA ROCHELLE
+    Header Background
   </text>
 </svg>
