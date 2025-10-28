@@ -1,0 +1,22 @@
+//- Composant Modal de carte
+//- Usage: include components/card-modal
+//- Variables attendues: user (pour conditionner l'affichage)
+
+if user
+  #cardModal.modal
+    .modal-content
+      span.close &times;
+      h2#modalTitle Ajouter une carte
+      form#cardForm
+        input(type='hidden', name='cardId')
+        input(type='hidden', name='blockId')
+        .form-group
+          label(for='cardTitle') Titre
+          input#cardTitle(type='text', name='title', required)
+        .form-group
+          label(for='cardDescription') Description
+          textarea#cardDescription(name='description', required)
+        .form-group
+          label(for='cardImage') URL de l'image
+          input#cardImage(type='url', name='image')
+        button(type='submit') Enregistrer

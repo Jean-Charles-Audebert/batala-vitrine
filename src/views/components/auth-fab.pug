@@ -1,0 +1,12 @@
+//- Composant FAB (Floating Action Button) Auth
+//- Usage: include components/auth-fab
+//- Variables attendues: user
+
+.auth-fab
+  if user
+    .fab-menu
+      a.fab-item(href='/admin/blocks') 📋 Blocs
+      form(action='/auth/logout', method='POST', style='display: inline;')
+        button.fab-item(type='submit') 🚪 Déconnexion
+  else
+    a.fab-login(href='/auth/login') 🔐 Connexion

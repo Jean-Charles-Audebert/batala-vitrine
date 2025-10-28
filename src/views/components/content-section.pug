@@ -1,0 +1,22 @@
+//- Composant Content Section (Actus / Offres)
+//- Usage: include components/content-section
+//- Variables attendues: contentBlock, user
+
+section.block-section(id=contentBlock.slug, data-block-id=contentBlock.id)
+  .container
+    .section-header
+      h2= contentBlock.title
+      if user
+        button.add-card-btn(data-block-id=contentBlock.id) + Ajouter
+    
+    .cards-grid
+      each card in contentBlock.elements.filter(el => el.type === 'card')
+        .card(data-card-id=card.id)
+          if card.media_path
+            img(src=card.media_path, alt=card.content.title)
+          h3= card.content.title
+          p= card.content.description
+          if user
+            .card-controls
+              button.edit-card-btn(data-card-id=card.id) ✏️
+              button.delete-card-btn(data-card-id=card.id) 🗑️
