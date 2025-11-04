@@ -102,11 +102,14 @@ Toutes les icônes générées dans `public/icons/` :
 ### Phase 4 : Admin CRUD Complet ✅ TERMINÉ
 - [x] Contrôleur adminController complet (create, edit, delete)
 - [x] Contrôleur blockController complet (create, edit, delete, reorder)
-- [x] Formulaires admin-form.ejs et block-form.ejs
+- [x] Contrôleur cardController complet (CRUD + reorder) ✨ NOUVEAU
+- [x] Formulaires admin-form.ejs, block-form.ejs, card-form.ejs ✨
 - [x] Interface de gestion des blocs avec réordonnancement
-- [x] Routes API pour réordonnancement (/api/blocks/reorder)
-- [x] CSS complet (admin.css avec badges, formulaires, etc.)
-- [x] Tests unitaires (42 tests passent)
+- [x] Interface de gestion des cartes avec réordonnancement ✨ NOUVEAU
+- [x] Routes API pour réordonnancement (/api/blocks/reorder, /api/cards/reorder) ✨
+- [x] Routes imbriquées /blocks/:blockId/cards ✨ NOUVEAU
+- [x] CSS complet (admin.css avec badges, formulaires, thumbnails)
+- [x] Tests unitaires (58 tests passent) ✨ +16 tests
 - [x] Tests E2E (7 tests passent)
 
 ### Phase 5 : WYSIWYG Inline (Frontend) - EN ATTENTE
@@ -128,19 +131,20 @@ Toutes les icônes générées dans `public/icons/` :
 
 ## 📋 PROCHAINES ÉTAPES PRIORITAIRES
 
-### 1. Gestion des Cards (CRUD)
-- [ ] Créer `cardController.js` avec CRUD complet
-- [ ] Créer vues `cards.ejs` et `card-form.ejs`
-- [ ] Ajouter routes dans `apiRoutes.js` ou créer `cardRoutes.js`
-- [ ] Permettre l'édition inline depuis les sections de contenu
-- [ ] Tests unitaires pour cardController
+### 1. Gestion des Cards (CRUD) ✅ TERMINÉ
+- [x] Créer `cardController.js` avec CRUD complet ✨
+- [x] Créer vues `cards.ejs` et `card-form.ejs` ✨
+- [x] Ajouter routes dans `cardRoutes.js` (imbriquées sous blocks) ✨
+- [x] Tests unitaires pour cardController (11 tests) ✨
+- [ ] Permettre l'édition inline depuis les sections de contenu (prochaine étape)
 
-### 2. Upload d'images
-- [ ] Configurer multer pour `public/uploads/`
-- [ ] Endpoint `/api/upload` pour images
-- [ ] Preview d'image dans les formulaires
-- [ ] Validation taille/type fichier
-- [ ] Optimisation images (sharp ?)
+### 2. Upload d'images ✅ TERMINÉ
+- [x] Configurer multer pour `public/uploads/` ✨
+- [x] Endpoint `/api/upload` pour images ✨
+- [x] Preview d'image dans les formulaires ✨
+- [x] Validation taille/type fichier (5 MB, JPEG/PNG/WebP/GIF) ✨
+- [x] Tests unitaires upload (5 tests) ✨
+- [ ] Optimisation images (sharp ?) - optionnel pour plus tard
 
 ### 3. Amélioration WYSIWYG
 - [ ] Formulaires modaux pour édition rapide
@@ -165,12 +169,12 @@ Toutes les icônes générées dans `public/icons/` :
 - ✅ JWT, Refresh tokens, Argon2id, Middlewares
 - ✅ Login web + API, Logout, Protection routes
 
-### Epic 3 : Gestion de Contenu (CMS) 🟡 IN PROGRESS
+### Epic 3 : Gestion de Contenu (CMS) � LARGEMENT AVANCÉ
 - ✅ CRUD Admins complet
 - ✅ CRUD Blocks complet avec réordonnancement
-- ⏳ CRUD Cards (à implémenter)
-- ⏳ Upload images (à implémenter)
-- ⏳ WYSIWYG inline (partiellement fait)
+- ✅ CRUD Cards complet avec réordonnancement ✨ NOUVEAU
+- ✅ Upload images fonctionnel (multer + validation) ✨ NOUVEAU
+- ⏳ WYSIWYG inline (partiellement fait - édition basique OK, améliorations à venir)
 
 ### Epic 4 : Interface Utilisateur ✅ LARGEMENT AVANCÉ
 - ✅ Page publique EJS avec composants réutilisables
@@ -179,9 +183,10 @@ Toutes les icônes générées dans `public/icons/` :
 - ⏳ PWA (manifest + SW à ajouter)
 
 ### Epic 5 : Tests & Qualité ✅ EXCELLENT
-- ✅ 42 tests unitaires Jest (100% passing)
+- ✅ 58 tests unitaires Jest (100% passing) ✨ +16 tests
 - ✅ 7 tests E2E Playwright (100% passing)
 - ✅ Lighthouse CI configuré
+- ✅ Coverage maintenue à ~73% statements
 - ⏳ Tests accessibilité (axe-core à intégrer)
 
 ---
@@ -190,10 +195,20 @@ Toutes les icônes générées dans `public/icons/` :
 
 **Terminé :**
 - ✅ Migration Pug → EJS complète
-- ✅ CRUD Admins & Blocks avec interfaces web
+- ✅ CRUD Admins, Blocks & Cards avec interfaces web ✨
+- ✅ Upload d'images avec multer (validation + preview) ✨
+- ✅ Réordonnancement drag-drop pour blocks ET cards ✨
 - ✅ 34 icônes SVG monochromes
-- ✅ CSS externalisé et organisé
-- ✅ 49 tests (42 unit + 7 E2E) tous passants
+- ✅ CSS externalisé et organisé (admin.css enrichi)
+- ✅ 65 tests (58 unit + 7 E2E) tous passants ✨ +16 tests
 - ✅ Cleanup repository (docs obsolètes supprimés)
+- ✅ Routes imbriquées /blocks/:blockId/cards ✨
 
-**Priorité suivante :** Gestion des Cards + Upload images
+**Dernières additions (4 nov 2025) :**
+- ✨ cardController.js : 7 fonctions CRUD + reorder (11 tests)
+- ✨ cards.ejs : Table avec drag-drop et contrôles position
+- ✨ card-form.ejs : Formulaire avec upload temps réel
+- ✨ upload.js : Configuration multer complète (5 tests)
+- ✨ POST /api/upload : Endpoint protégé avec validation
+
+**Priorité suivante :** WYSIWYG inline amélioré + PWA (manifest + SW)
