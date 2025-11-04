@@ -359,3 +359,26 @@ th {
   font-size: 1.125rem;
 }
 
+/* ==========================================================================
+   Cards specific styles
+   ========================================================================== */
+.card-thumbnail {
+  max-width: 80px;
+  max-height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.text-muted {
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.card-position {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+

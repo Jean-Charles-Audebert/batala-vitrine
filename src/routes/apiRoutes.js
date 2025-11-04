@@ -6,6 +6,7 @@ import {
   deleteBlockElement,
 } from "../controllers/blockElementController.js";
 import { reorderBlocks } from "../controllers/blockController.js";
+import { reorderCards } from "../controllers/cardController.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 
 const router = express.Router();
@@ -18,5 +19,8 @@ router.delete("/elements/:id", requireAuth, deleteBlockElement);
 
 // Route API pour le réordonnancement des blocs
 router.post("/blocks/reorder", requireAuth, reorderBlocks);
+
+// Route API pour le réordonnancement des cartes
+router.post("/blocks/:blockId/cards/reorder", requireAuth, reorderCards);
 
 export default router;

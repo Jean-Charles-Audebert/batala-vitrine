@@ -11,13 +11,13 @@
     <div class="toolbar">
       <h1><%= title %></h1>
       <div class="toolbar-actions">
-        <a href="/blocks/new" class="btn btn-primary">
+        <a href="/blocks/<%= block.id %>/cards/new" class="btn btn-primary">
           <img src="/icons/plus.svg" alt="" class="btn-icon">
-          Nouveau bloc
+          Nouvelle carte
         </a>
-        <a href="/admins" class="btn btn-secondary">
-          <img src="/icons/user.svg" alt="" class="btn-icon">
-          Admins
+        <a href="/blocks" class="btn btn-secondary">
+          <img src="/icons/arrow-up.svg" alt="" class="btn-icon">
+          Retour aux blocs
         </a>
       </div>
     </div>
@@ -30,86 +30,89 @@
       <div class="alert-error"><%= error %></div>
     <% } %>
 
-    <% if (blocks && blocks.length > 0) { %>
+    <% if (cards && cards.length > 0) { %>
       <table>
         <thead>
           <tr>
             <th>Position</th>
-            <th>Type</th>
             <th>Titre</th>
-            <th>Slug</th>
-            <th>Statut</th>
+            <th>Description</th>
+            <th>Image</th>
+            <% if (block.type === 'events') { %>
+              <th>Date événement</th>
+            <% } %>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="blocks-list">
-          <% blocks.forEach(block => { %>
-            <tr data-block-id="<%= block.id %>" data-position="<%= block.position %>">
-              <td class="block-position">
-                <span class="position-value"><%= block.position %></span>
+        <tbody id="cards-list">
+          <% cards.forEach(card => { %>
+            <tr data-card-id="<%= card.id %>" data-position="<%= card.position %>">
+              <td class="card-position">
+                <span class="position-value"><%= card.position %></span>
                 <div class="position-controls">
                   <button 
                     class="btn-move-up" 
                     title="Monter"
-                    aria-label="Monter le bloc <%= block.title %>"
+                    aria-label="Monter la carte <%= card.title %>"
                   >
                     <img src="/icons/arrow-up.svg" alt="">
                   </button>
                   <button 
                     class="btn-move-down" 
                     title="Descendre"
-                    aria-label="Descendre le bloc <%= block.title %>"
+                    aria-label="Descendre la carte <%= card.title %>"
                   >
                     <img src="/icons/arrow-down.svg" alt="">
                   </button>
                 </div>
               </td>
+              <td><strong><%= card.title %></strong></td>
               <td>
-                <span class="badge badge-type-<%= block.type %>">
-                  <%= block.type %>
-                </span>
-              </td>
-              <td><%= block.title %></td>
-              <td><code><%= block.slug %></code></td>
-              <td>
-                <% if (block.is_locked) { %>
-                  <span class="badge badge-locked">Verrouillé</span>
+                <% if (card.description) { %>
+                  <%= card.description.substring(0, 100) %><%= card.description.length > 100 ? '...' : '' %>
                 <% } else { %>
-                  <span class="badge badge-unlocked">Modifiable</span>
+                  <em class="text-muted">Pas de description</em>
                 <% } %>
               </td>
               <td>
+                <% if (card.media_path) { %>
+                  <img src="<%= card.media_path %>" alt="<%= card.title %>" class="card-thumbnail">
+                <% } else { %>
+                  <span class="text-muted">Pas d'image</span>
+                <% } %>
+              </td>
+              <% if (block.type === 'events') { %>
+                <td>
+                  <% if (card.event_date) { %>
+                    <%= new Date(card.event_date).toLocaleDateString('fr-FR') %>
+                  <% } else { %>
+                    <span class="text-muted">-</span>
+                  <% } %>
+                </td>
+              <% } %>
+              <td>
                 <div class="actions">
                   <a 
-                    href="/blocks/<%= block.id %>/cards" 
-                    class="btn btn-secondary btn-sm"
-                    title="Gérer les cartes"
-                  >
-                    <img src="/icons/image.svg" alt="" class="btn-icon">
-                  </a>
-                  <a 
-                    href="/blocks/<%= block.id %>/edit" 
+                    href="/blocks/<%= block.id %>/cards/<%= card.id %>/edit" 
                     class="btn btn-secondary btn-sm"
                     title="Modifier"
                   >
                     <img src="/icons/edit.svg" alt="" class="btn-icon">
                   </a>
-                  <% if (!block.is_locked) { %>
-                    <form 
-                      method="POST" 
-                      action="/blocks/<%= block.id %>/delete" 
-                      style="display: inline;"
-                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bloc ?');"
+                  <form 
+                    method="POST" 
+                    action="/blocks/<%= block.id %>/cards/<%= card.id %>/delete" 
+                    style="display: inline;"
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette carte ?');"
+                  >
+                    <button 
+                      type="submit" 
+                      class="btn btn-danger btn-sm"
+                      title="Supprimer"
                     >
-                      <button 
-                        type="submit" 
-                        class="btn btn-danger btn-sm"
-                        title="Supprimer"
-                      >
-                        <img src="/icons/trash.svg" alt="" class="btn-icon">
-                      </button>
-                    </form>
-                  <% } %>
+                      <img src="/icons/trash.svg" alt="" class="btn-icon">
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>
@@ -118,24 +121,23 @@
       </table>
     <% } else { %>
       <div class="empty-state">
-        <p>Aucun bloc pour le moment.</p>
-        <a href="/blocks/new" class="btn btn-primary">
+        <p>Aucune carte pour ce bloc.</p>
+        <a href="/blocks/<%= block.id %>/cards/new" class="btn btn-primary">
           <img src="/icons/plus.svg" alt="" class="btn-icon">
-          Créer le premier bloc
+          Créer la première carte
         </a>
       </div>
     <% } %>
   </div>
 
   <script>
-    // Réordonnancement des blocs
+    // Réordonnancement des cartes
     document.addEventListener('DOMContentLoaded', () => {
-      const blocksList = document.getElementById('blocks-list');
-      if (!blocksList) return;
+      const cardsList = document.getElementById('cards-list');
+      if (!cardsList) return;
 
-      const rows = Array.from(blocksList.querySelectorAll('tr'));
+      const rows = Array.from(cardsList.querySelectorAll('tr'));
 
-      // Fonction pour échanger deux lignes
       function swapRows(index1, index2) {
         if (index2 < 0 || index2 >= rows.length) return;
         
@@ -148,17 +150,11 @@
           row1.parentNode.insertBefore(row2, row1);
         }
         
-        // Inverser dans le tableau local
         [rows[index1], rows[index2]] = [rows[index2], rows[index1]];
-        
-        // Mettre à jour les positions visuelles
         updatePositions();
-        
-        // Envoyer au serveur
         saveOrder();
       }
 
-      // Mettre à jour les numéros de position affichés
       function updatePositions() {
         rows.forEach((row, index) => {
           const positionSpan = row.querySelector('.position-value');
@@ -169,14 +165,14 @@
         });
       }
 
-      // Enregistrer l'ordre sur le serveur
       function saveOrder() {
+        const blockId = '<%= block.id %>';
         const order = rows.map((row, index) => ({
-          id: parseInt(row.getAttribute('data-block-id'), 10),
+          id: parseInt(row.getAttribute('data-card-id'), 10),
           position: index + 1
         }));
 
-        fetch('/api/blocks/reorder', {
+        fetch(`/api/blocks/${blockId}/cards/reorder`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -196,7 +192,6 @@
         });
       }
 
-      // Attacher les événements aux boutons
       rows.forEach((row, index) => {
         const btnUp = row.querySelector('.btn-move-up');
         const btnDown = row.querySelector('.btn-move-down');
