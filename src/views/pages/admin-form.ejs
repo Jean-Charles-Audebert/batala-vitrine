@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Batala Vitrine</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="toolbar">
+      <h1><%= title %></h1>
+      <a href="/admins" class="btn btn-secondary">
+        <img src="/icons/cancel.svg" alt="" class="btn-icon">
+        Annuler
+      </a>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="<%= formAction %>" class="form-admin">
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          value="<%= admin ? admin.email : '' %>" 
+          required
+          placeholder="admin@example.com"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          Mot de passe <%= admin ? '(laisser vide pour ne pas modifier)' : '*' %>
+        </label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          <%= admin ? '' : 'required' %>
+          placeholder="Minimum 8 caractères"
+          minlength="8"
+        >
+        <small class="form-help">
+          Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            id="is_active" 
+            name="is_active"
+            <%= admin && admin.is_active ? 'checked' : '' %>
+          >
+          Compte actif
+        </label>
+        <small class="form-help">
+          Un compte inactif ne pourra pas se connecter.
+        </small>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <img src="/icons/save.svg" alt="" class="btn-icon">
+          <%= admin ? 'Mettre à jour' : 'Créer' %>
+        </button>
+        <a href="/admins" class="btn btn-secondary">
+          <img src="/icons/cancel.svg" alt="" class="btn-icon">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

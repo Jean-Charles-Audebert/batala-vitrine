@@ -11,7 +11,6 @@
     "test:watch": "jest --watch",
     "e2e": "playwright test",
     "seed:test-admin": "node scripts/seed-test-admin.js",
-    "seed:block-elements": "node scripts/seed-block-elements.js",
     "build:docker": "docker build -t iouco/batala-vitrine:latest .",
     "lhci:collect": "lhci collect --url=http://localhost:3000",
     "lhci:assert": "lhci assert --assertions.lhr=performance:0.9",

@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.skip('Authentification Flow (désactivé pendant migration EJS)', () => {
+test.describe('Authentification Flow', () => {
   test('devrait afficher la page d\'accueil', async ({ page }) => {
     await page.goto('/');
-    // Vérifier que la page s'affiche en cherchant un élément de navigation
-    const nav = page.locator('nav.header-nav');
-    await expect(nav).toBeVisible();
-    await expect(nav.locator('a').first()).toContainText('Actualités');
+    // Vérifier que la page s'affiche en cherchant le header
+    const header = page.locator('header.header-section');
+    await expect(header).toBeVisible();
+    // Vérifier qu'il y a le titre du site
+    await expect(page.locator('h1.site-title')).toBeVisible();
   });
 
   test('devrait retourner 401 pour /admins sans token', async ({ request }) => {

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.skip('Authentification Web Flow (désactivé pendant migration EJS)', () => {
+test.describe('Authentification Web Flow', () => {
   test('devrait permettre le login via formulaire web et rediriger vers /admins', async ({ page }) => {
     // Aller sur la page de login
     await page.goto('/auth/login');

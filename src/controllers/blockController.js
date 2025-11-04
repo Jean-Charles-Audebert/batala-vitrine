@@ -6,7 +6,12 @@ export const listBlocks = async (req, res) => {
     const { rows } = await query(
       "SELECT id, type, title, slug, position, is_locked FROM blocks ORDER BY position ASC"
     );
-    res.render("blocks", { title: "Gestion des blocs", blocks: rows });
+    res.render("pages/blocks", { 
+      title: "Gestion des blocs", 
+      blocks: rows,
+      success: req.query.success || null,
+      error: req.query.error || null
+    });
   } catch (error) {
     logger.error("Erreur récupération blocs", error);
     res.status(500).send("Erreur lors de la récupération des blocs");
@@ -14,7 +19,7 @@ export const listBlocks = async (req, res) => {
 };
 
 export const showNewBlockForm = (req, res) => {
-  res.render("block-form", { 
+  res.render("pages/block-form", { 
     title: "Créer un nouveau bloc", 
     formAction: "/blocks/new",
     block: null 
@@ -24,7 +29,7 @@ export const showNewBlockForm = (req, res) => {
 export const createBlock = async (req, res) => {
   const { type, title, slug, position } = req.body;
   if (!type || !title || !slug) {
-    return res.render("block-form", { 
+    return res.render("pages/block-form", { 
       title: "Créer un nouveau bloc", 
       formAction: "/blocks/new",
       block: null,
@@ -39,7 +44,7 @@ export const createBlock = async (req, res) => {
     res.redirect("/blocks?success=Bloc créé avec succès");
   } catch (error) {
     logger.error("Erreur création bloc", error);
-    res.render("block-form", { 
+    res.render("pages/block-form", { 
       title: "Créer un nouveau bloc", 
       formAction: "/blocks/new",
       block: { type, title, slug, position },
@@ -58,7 +63,7 @@ export const showEditBlockForm = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).send("Bloc non trouvé");
     }
-    res.render("block-form", { 
+    res.render("pages/block-form", { 
       title: "Modifier un bloc", 
       formAction: `/blocks/${id}/edit`,
       block: rows[0]

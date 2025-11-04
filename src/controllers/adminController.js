@@ -17,7 +17,7 @@ export const listAdmins = async (req, res) => {
 };
 
 export const showNewAdminForm = (req, res) => {
-  res.render("admin-form", { 
+  res.render("pages/admin-form", { 
     title: "Créer un nouvel admin", 
     formAction: "/admins/new",
     admin: null 
@@ -27,7 +27,7 @@ export const showNewAdminForm = (req, res) => {
 export const createAdmin = async (req, res) => {
   const { email, password, is_active } = req.body;
   if (!email || !password) {
-    return res.render("admin-form", { 
+    return res.render("pages/admin-form", { 
       title: "Créer un nouvel admin", 
       formAction: "/admins/new",
       admin: null,
@@ -43,7 +43,7 @@ export const createAdmin = async (req, res) => {
     res.redirect("/admins?success=Admin créé avec succès");
   } catch (error) {
     logger.error("Erreur création admin", error);
-    res.render("admin-form", { 
+    res.render("pages/admin-form", { 
       title: "Créer un nouvel admin", 
       formAction: "/admins/new",
       admin: { email },
@@ -59,7 +59,7 @@ export const showEditAdminForm = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).send("Admin non trouvé");
     }
-    res.render("admin-form", { 
+    res.render("pages/admin-form", { 
       title: "Modifier un admin", 
       formAction: `/admins/${id}/edit`,
       admin: rows[0]
