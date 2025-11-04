@@ -68,17 +68,17 @@
         </div>
       <% } %>
 
-      <!-- Upload d'image (sera fonctionnel après configuration multer) -->
+      <!-- Upload d'image -->
       <div class="form-group">
         <label for="image_upload">Uploader une nouvelle image</label>
         <input 
           type="file" 
           id="image_upload" 
-          accept="image/*"
-          disabled
+          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+          onchange="handleImageUpload(event)"
         >
-        <small class="form-help text-muted">
-          (Fonctionnalité d'upload à venir - utilisez le champ texte ci-dessus pour l'instant)
+        <small id="upload_status" class="form-help">
+          Formats acceptés : JPG, PNG, WebP, GIF (max 5 MB)
         </small>
       </div>
 
@@ -157,6 +157,55 @@
           img.src = path;
           img.style.display = 'block';
         }
+      }
+    }
+
+    // Gestion de l'upload d'image
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('upload_status');
+      const pathInput = document.getElementById('media_path');
+
+      // Validation taille client-side
+      if (file.size > 5 * 1024 * 1024) {
+        statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
+        statusEl.style.color = "#e74c3c";
+        event.target.value = "";
+        return;
+      }
+
+      // Préparation FormData
+      const formData = new FormData();
+      formData.append("image", file);
+
+      // Upload
+      statusEl.textContent = "⏳ Upload en cours...";
+      statusEl.style.color = "#3498db";
+
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
+          statusEl.style.color = "#27ae60";
+          pathInput.value = result.path;
+          updateImagePreview(result.path);
+        } else {
+          statusEl.textContent = `❌ Erreur : ${result.message}`;
+          statusEl.style.color = "#e74c3c";
+          event.target.value = "";
+        }
+      } catch (error) {
+        statusEl.textContent = "❌ Erreur réseau lors de l'upload";
+        statusEl.style.color = "#e74c3c";
+        event.target.value = "";
       }
     }
   </script>
