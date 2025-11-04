@@ -9,7 +9,7 @@ import { reorderBlocks } from "../controllers/blockController.js";
 import { reorderCards } from "../controllers/cardController.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
-import logger from "../utils/logger.js";
+import { logger } from "../utils/logger.js";
 
 const router = express.Router();
 
