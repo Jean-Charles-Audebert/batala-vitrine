@@ -1,0 +1,42 @@
+<%
+  // Composant Content Section (Actus / Offres)
+  // Variables attendues: contentBlock, user
+  const bgStyle = contentBlock.bg_image ? `background-image: url(${contentBlock.bg_image})` : '';
+%>
+
+<section class="block-section" id="<%= contentBlock.slug %>" data-block-id="<%= contentBlock.id %>" style="<%= bgStyle %>">
+  <div class="container">
+    <div class="section-header">
+      <h2><%= contentBlock.title %></h2>
+      <% if (user) { %>
+        <button class="add-card-btn" data-block-id="<%= contentBlock.id %>">
+          <img src="/icons/plus.svg" alt="Ajouter" class="icon" />
+        </button>
+      <% } %>
+    </div>
+    
+    <div class="cards-grid">
+      <% (contentBlock.cards || []).forEach(card => { %>
+        <div class="card" data-card-id="<%= card.id %>">
+          <% if (card.media_path) { %>
+            <img src="<%= card.media_path %>" alt="<%= card.title %>">
+          <% } %>
+          <h3><%= card.title %></h3>
+          <% if (card.description) { %>
+            <p><%= card.description %></p>
+          <% } %>
+          <% if (user) { %>
+            <div class="card-controls">
+              <button class="edit-card-btn" data-card-id="<%= card.id %>" title="Modifier">
+                <img src="/icons/edit.svg" alt="Modifier" class="icon" />
+              </button>
+              <button class="delete-card-btn" data-card-id="<%= card.id %>" title="Supprimer">
+                <img src="/icons/trash.svg" alt="Supprimer" class="icon" />
+              </button>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>

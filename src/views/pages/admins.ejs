@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="toolbar">
+      <h1>Liste des administrateurs</h1>
+      <div style="display: flex; gap: 0.75rem;">
+        <a href="/admins/new" class="btn btn-primary">
+          <img src="/icons/plus.svg" alt="Ajouter" class="icon" /> Nouvel admin
+        </a>
+        <a href="/" class="btn btn-secondary">← Accueil</a>
+      </div>
+    </div>
+    
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert-success">
+        <%= success %>
+      </div>
+    <% } %>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Statut</th>
+          <th>Date de création</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% admins.forEach(admin => { %>
+          <tr>
+            <td><%= admin.email %></td>
+            <td>
+              <% if (admin.is_active) { %>
+                <span class="badge badge-active">Actif</span>
+              <% } else { %>
+                <span class="badge badge-inactive">Inactif</span>
+              <% } %>
+            </td>
+            <td><%= new Date(admin.created_at).toLocaleDateString('fr-FR') %></td>
+            <td>
+              <div class="actions">
+                <a href="/admins/<%= admin.id %>/edit" class="btn btn-secondary">
+                  <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
+                </a>
+                <form action="/admins/<%= admin.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Supprimer cet admin ?')">
+                  <button type="submit" class="btn btn-danger">
+                    <img src="/icons/trash.svg" alt="Supprimer" class="icon" /> Supprimer
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

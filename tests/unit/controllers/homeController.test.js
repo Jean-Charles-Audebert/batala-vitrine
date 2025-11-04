@@ -8,7 +8,7 @@ function createRes() {
 }
 
 describe('homeController.showHome', () => {
-  it('doit rendre la vue index avec les blocs de la DB', async () => {
+  it('doit rendre la vue pages/index avec les blocs de la DB', async () => {
     const req = {};
     const res = createRes();
     const mockQuery = jest.fn();
@@ -16,11 +16,18 @@ describe('homeController.showHome', () => {
       { id: 1, type: 'header', title: 'En-tête', slug: 'header', position: 1 },
       { id: 2, type: 'actus', title: 'Actualités', slug: 'actualites', position: 2 },
     ];
-    mockQuery.mockResolvedValue({ rows: mockBlocks });
+    // 1) SELECT current_database(); 2) SELECT blocks ...
+    mockQuery
+      // 1) SELECT current_database()
+      .mockResolvedValueOnce({ rows: [{ current_database: 'batala_vitrine' }] })
+      // 2) SELECT ... FROM blocks
+      .mockResolvedValueOnce({ rows: mockBlocks })
+      // 3) SELECT ... FROM cards WHERE block_id=$1 for the 'actus' block
+      .mockResolvedValueOnce({ rows: [] });
 
     await showHome(req, res, { query: mockQuery });
 
-    expect(res.render).toHaveBeenCalledWith('index', expect.objectContaining({
+    expect(res.render).toHaveBeenCalledWith('pages/index', expect.objectContaining({
       title: 'Batala La Rochelle',
       blocks: mockBlocks,
     }));
@@ -34,7 +41,7 @@ describe('homeController.showHome', () => {
 
     await showHome(req, res, { query: mockQuery });
 
-    expect(res.render).toHaveBeenCalledWith('index', expect.objectContaining({
+    expect(res.render).toHaveBeenCalledWith('pages/index', expect.objectContaining({
       title: 'Batala La Rochelle',
       blocks: [],
     }));

@@ -1,0 +1,30 @@
+<%
+  // Composant Modal de carte
+  // Variables attendues: user (pour conditionner l'affichage)
+%>
+
+<% if (user) { %>
+  <div id="cardModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle">Ajouter une carte</h2>
+      <form id="cardForm">
+        <input type="hidden" name="cardId">
+        <input type="hidden" name="blockId">
+        <div class="form-group">
+          <label for="cardTitle">Titre</label>
+          <input id="cardTitle" type="text" name="title" required>
+        </div>
+        <div class="form-group">
+          <label for="cardDescription">Description</label>
+          <textarea id="cardDescription" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="cardImage">URL de l'image</label>
+          <input id="cardImage" type="url" name="image">
+        </div>
+        <button type="submit">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+<% } %>

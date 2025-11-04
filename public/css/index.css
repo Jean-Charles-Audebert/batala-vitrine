@@ -79,26 +79,65 @@
   color: white;
 }
 
-.header-nav {
-  margin-top: var(--spacing-lg);
+.admin-nav {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
 }
 
-.nav-link {
-  display: inline-block;
-  padding: 0.75rem var(--spacing-lg);
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
   background: rgba(255, 255, 255, 0.2);
   color: white;
   text-decoration: none;
-  border-radius: var(--radius-sm);
-  transition: background var(--transition-base);
+  border-radius: 50%;
+  transition: all var(--transition-base);
+  backdrop-filter: blur(4px);
 }
 
-.nav-link:hover {
+.admin-link:hover {
   background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.admin-link .icon {
+  font-size: 1.5rem;
 }
 
 .edit-controls {
   margin-top: var(--spacing-md);
+}
+
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(33, 150, 243, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  backdrop-filter: blur(4px);
+  font-size: 0;
+  gap: 0.25rem;
+}
+
+.edit-btn:hover {
+  background: rgba(25, 118, 210, 1);
+  transform: scale(1.1);
+}
+
+.edit-btn .icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
 }
 
 /* ==========================================================================
@@ -205,6 +244,9 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .btn-edit,
@@ -223,15 +265,38 @@
 .btn-delete-card,
 .btn-edit-sm,
 .btn-add-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
+  padding: 0.5rem;
+  font-size: 0;
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+}
+
+.btn-edit-card .icon,
+.btn-delete-card .icon {
+  width: 16px;
+  height: 16px;
 }
 
 .btn-delete-card {
   background: #f44336;
-  color: white;
+}
+
+.btn-delete-card:hover {
+  background: #d32f2f;
+}
+
+.btn-delete-card .icon {
+  filter: brightness(0) invert(1);
+}
+
+.btn-edit .icon,
+.btn-add-card .icon {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) invert(1);
 }
 
 .btn-add-block {
@@ -317,6 +382,38 @@
   text-align: center;
   padding-top: 2rem;
   border-top: 1px solid #616161;
+}
+
+/* Footer details/summary */
+.footer-section details {
+  cursor: pointer;
+}
+
+.footer-section summary {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+  list-style-position: outside;
+  user-select: none;
+}
+
+.footer-section summary:hover {
+  color: #90CAF9;
+}
+
+.footer-section details[open] summary {
+  margin-bottom: 1rem;
+}
+
+.footer-section details p {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.footer-section details p:last-child {
+  margin-bottom: 1.5rem;
 }
 
 /* ==========================================================================
@@ -459,22 +556,25 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  background: #2196F3;
+  background: #424242;
   color: white;
   border-radius: 50%;
   text-decoration: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.3s;
+  font-size: 0;
 }
 
 .fab-login:hover {
-  background: #1976D2;
+  background: #212121;
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.fab-login i {
-  font-size: 1.25rem;
+.fab-login .fab-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 /* FAB Menu admin */
@@ -547,11 +647,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.fab-item i {
-  font-size: 1.1rem;
+.fab-item .fab-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .fab-item.fab-logout:hover {
   background: #f44336;
-  color: white;
+}
+
+.fab-item.fab-logout:hover .fab-icon {
+  filter: brightness(0) invert(1);
 }

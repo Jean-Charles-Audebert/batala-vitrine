@@ -5,12 +5,14 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import router from "./routes/index.js";
+import healthRoutes from "./routes/health.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import refreshRoutes from "./routes/refreshRoutes.js";
 import blockRoutes from "./routes/blockRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
 import { logger } from "./utils/logger.js";
+import { query } from "./config/db.js";
 
 dotenv.config();
 
@@ -48,13 +50,24 @@ app.use(cookieParser());
 
 // --- Fichiers statiques ---
 app.use(express.static(path.join(__dirname, "../public")));
+// Alias rétrocompatibilité: servir /images/* depuis /public/icons
+app.use(
+  "/images",
+  express.static(path.join(__dirname, "../public/icons"))
+);
 
 // --- Configuration du moteur de vues ---
-app.set("view engine", "pug");
+app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+// Désactiver le cache EJS en développement
+if (process.env.NODE_ENV === "development") {
+  app.set("view cache", false);
+}
 
 // --- Routes ---
 app.use("/", router);
+app.use("/", healthRoutes);
 app.use("/admins", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/auth", refreshRoutes);
@@ -65,4 +78,24 @@ app.use("/api", apiRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.success(`Serveur en ligne sur http://localhost:${PORT}`);
+
+  // Diagnostic base de données au démarrage en développement uniquement
+  if (process.env.NODE_ENV === "development") {
+    (async () => {
+      try {
+        const info = await query(
+          "SELECT current_database() AS db, current_user AS usr, inet_server_addr() AS host, inet_server_port() AS port"
+        );
+        const searchPath = await query("SHOW search_path");
+        const cardsExists = await query(
+          "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'cards') AS exists"
+        );
+        logger.info(
+          `DB diagnostic → db=${info.rows[0].db} user=${info.rows[0].usr} host=${info.rows[0].host}:${info.rows[0].port} search_path=${searchPath.rows[0].search_path} cards=${cardsExists.rows[0].exists}`
+        );
+      } catch (e) {
+        logger.error("DB diagnostic a échoué", e);
+      }
+    })();
+  }
 });

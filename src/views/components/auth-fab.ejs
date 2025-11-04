@@ -1,0 +1,21 @@
+<%
+  // Composant FAB (Floating Action Button) Auth
+  // Variables attendues: user
+%>
+
+<div class="auth-fab">
+  <% if (user) { %>
+    <div class="fab-menu">
+      <a class="fab-item" href="/admin/blocks" title="Gérer les blocs">
+        <img src="/icons/settings.svg" alt="Blocs" class="fab-icon" />
+      </a>
+      <a class="fab-item fab-logout" href="/auth/logout/web" title="Déconnexion">
+        <img src="/icons/close.svg" alt="Déconnexion" class="fab-icon" />
+      </a>
+    </div>
+  <% } else { %>
+    <a class="fab-login" href="/auth/login" title="Connexion administrateur">
+      <img src="/icons/settings.svg" alt="Connexion" class="fab-icon" />
+    </a>
+  <% } %>
+</div>

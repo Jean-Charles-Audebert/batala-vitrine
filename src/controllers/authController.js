@@ -52,23 +52,23 @@ export function logoutWeb(req, res) {
 }
 
 export function showLoginPage(req, res) {
-  res.render('login', { title: 'Connexion' });
+  res.render('pages/login', { title: 'Connexion' });
 }
 
 export async function loginWeb(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.render('login', { title: 'Connexion', error: 'Email et mot de passe requis.' });
+    return res.render('pages/login', { title: 'Connexion', error: 'Email et mot de passe requis.' });
   }
   try {
     const { rows } = await query('SELECT id, email, password_hash, is_active FROM admins WHERE email=$1', [email]);
     const admin = rows[0];
     if (!admin || !admin.is_active) {
-      return res.render('login', { title: 'Connexion', error: 'Identifiants invalides.' });
+      return res.render('pages/login', { title: 'Connexion', error: 'Identifiants invalides.' });
     }
     const valid = await verifyPassword(password, admin.password_hash);
     if (!valid) {
-      return res.render('login', { title: 'Connexion', error: 'Identifiants invalides.' });
+      return res.render('pages/login', { title: 'Connexion', error: 'Identifiants invalides.' });
     }
     // Générer JWT et stocker dans cookie
     const payload = { sub: admin.id, email: admin.email };
@@ -79,6 +79,6 @@ export async function loginWeb(req, res) {
     res.cookie('access_token', accessToken, accessCookieOptions);
     return res.redirect('/admins');
   } catch {
-    return res.render('login', { title: 'Connexion', error: 'Erreur serveur.' });
+    return res.render('pages/login', { title: 'Connexion', error: 'Erreur serveur.' });
   }
 }

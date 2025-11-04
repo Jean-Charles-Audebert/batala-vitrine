@@ -1,0 +1,83 @@
+<%
+  // Composant Footer
+  // Variables attendues: contentBlock, user, getSocialIcon
+  const aboutElement = contentBlock.elements.find(el => el.type === 'text' && el.position === 1);
+  const contactElement = contentBlock.elements.find(el => el.type === 'contact' && el.position === 2);
+  const socialElement = contentBlock.elements.find(el => el.type === 'social');
+  
+  let aboutData = null;
+  let contactData = null;
+  let socialData = null;
+  
+  try {
+    aboutData = aboutElement ? JSON.parse(aboutElement.content) : null;
+    contactData = contactElement ? JSON.parse(contactElement.content) : null;
+    socialData = socialElement ? JSON.parse(socialElement.content) : null;
+  } catch(e) {}
+%>
+
+<footer class="block-section footer-section" data-block-id="<%= contentBlock.id %>">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-column">
+        <details>
+          <summary>À propos</summary>
+          <% if (aboutData && aboutData.about_content) { %>
+            <p><%= aboutData.about_content %></p>
+          <% } else { %>
+            <p>Batala La Rochelle - Groupe de percussions afro-brésiliennes</p>
+          <% } %>
+        </details>
+      </div>
+      
+      <div class="footer-column">
+        <details>
+          <summary>Contact</summary>
+          <% if (contactData) { %>
+            <% if (contactData.email) { %>
+              <p>Email : <%= contactData.email %></p>
+            <% } %>
+            <% if (contactData.phone) { %>
+              <p>Téléphone : <%= contactData.phone %></p>
+            <% } %>
+          <% } else { %>
+            <p>Email : contact@batala-larochelle.fr</p>
+            <p>Téléphone : 06 XX XX XX XX</p>
+          <% } %>
+        </details>
+      </div>
+      
+      <div class="footer-column">
+        <details>
+          <summary>Suivez-nous</summary>
+          <div class="social-links">
+            <% if (socialData && socialData.links) { %>
+              <% socialData.links.forEach(link => { %>
+                <a href="<%= link.url %>" target="_blank" rel="noopener noreferrer">
+                  <%- getSocialIcon(link.network) %>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <a href="#" target="_blank"><%- getSocialIcon('facebook') %></a>
+              <a href="#" target="_blank"><%- getSocialIcon('instagram') %></a>
+              <a href="#" target="_blank"><%- getSocialIcon('youtube') %></a>
+              <a href="#" target="_blank"><%- getSocialIcon('tiktok') %></a>
+            <% } %>
+          </div>
+        </details>
+      </div>
+    </div>
+    
+    <% if (user) { %>
+      <div class="edit-controls">
+        <button class="edit-btn" data-block-id="<%= contentBlock.id %>" data-action="edit-footer" title="Modifier le footer">
+          <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
+        </button>
+      </div>
+    <% } %>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 caixaDev. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>

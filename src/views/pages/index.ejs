@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+  <div class="vitrine-page">
+    <% blocks.forEach(contentBlock => { %>
+      <% if (contentBlock.type === 'header') { %>
+        <%- include('../components/header', { contentBlock, user }) %>
+      <% } else if (contentBlock.type === 'events' || contentBlock.type === 'offers') { %>
+        <%- include('../components/content-section', { contentBlock, user }) %>
+      <% } else if (contentBlock.type === 'footer') { %>
+        <%- include('../components/footer', { contentBlock, user, getSocialIcon }) %>
+      <% } %>
+    <% }) %>
+    
+    <%- include('../components/card-modal', { user }) %>
+    <%- include('../components/auth-fab', { user }) %>
+  </div>
+  
+  <script src="/js/index.js"></script>
+</body>
+</html>

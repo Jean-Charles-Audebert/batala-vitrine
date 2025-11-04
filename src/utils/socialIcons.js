@@ -2,18 +2,18 @@
 export function getSocialIcon(network) {
   // Liste des réseaux sociaux disponibles avec leurs icônes SVG
   const icons = {
-    facebook: '/images/facebook.svg',
-    instagram: '/images/instagram.svg',
-    youtube: '/images/youtube.svg',
-    tiktok: '/images/tiktok.svg',
-    x: '/images/x.svg',
-    twitter: '/images/x.svg', // alias pour x
-    bluesky: '/images/bluesky.svg',
-    linkedin: '/images/linkedin.svg',
-    discord: '/images/discord.svg',
-    slack: '/images/slack.svg',
-    whatsapp: '/images/whatsapp.svg',
-    reddit: '/images/reddit.svg',
+    facebook: '/icons/facebook.svg',
+    instagram: '/icons/instagram.svg',
+    youtube: '/icons/youtube.svg',
+    tiktok: '/icons/tiktok.svg',
+    x: '/icons/twitter.svg', // fichier présent: twitter.svg
+    twitter: '/icons/twitter.svg',
+    bluesky: '/icons/bluesky.svg',
+    linkedin: '/icons/linkedin.svg',
+    discord: '/icons/discord.svg',
+    slack: '/icons/slack.svg',
+    whatsapp: '/icons/whatsapp.svg',
+    reddit: '/icons/reddit.svg',
   };
   
   // Détecter le réseau social depuis l'URL si network est une URL
@@ -30,6 +30,6 @@ export function getSocialIcon(network) {
   else if (network?.includes('whatsapp.com')) detectedNetwork = 'whatsapp';
   else if (network?.includes('reddit.com')) detectedNetwork = 'reddit';
   
-  const iconPath = icons[detectedNetwork] || '/images/x.svg'; // fallback vers x
+  const iconPath = icons[detectedNetwork] || '/icons/twitter.svg'; // fallback raisonnable
   return `<img src="${iconPath}" alt="${detectedNetwork}" class="social-icon" />`;
 }

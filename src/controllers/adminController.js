@@ -5,7 +5,11 @@ import { logger } from "../utils/logger.js";
 export const listAdmins = async (req, res) => {
   try {
     const { rows } = await query("SELECT id, email, is_active, created_at FROM admins");
-    res.render("admins", { title: "Liste des admins", admins: rows });
+    res.render("pages/admins", { 
+      title: "Liste des admins", 
+      admins: rows,
+      success: req.query.success || null
+    });
   } catch (error) {
     logger.error("Erreur récupération admins", error);
     res.status(500).send("Erreur lors de la récupération des admins");

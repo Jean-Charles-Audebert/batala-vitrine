@@ -8,7 +8,7 @@
 
 ## Projet
 
-Site institutionnel rendu côté serveur (**SSR**) pour l’association Batala LR (Express + Pug).  
+Site institutionnel rendu côté serveur (**SSR**) pour l’association Batala LR (Express + EJS).  
 Le site présente activités, événements, offres de prestations et contacts.
 
 Les administrateurs peuvent se connecter pour gérer dynamiquement le contenu (blocs et cartes),
@@ -18,7 +18,7 @@ avec authentification JWT + cookies httpOnly (refresh).
 
 ## Stack
 
-- Backend : Node.js (ESM) + Express + Pug  
+- Backend : Node.js (ESM) + Express + EJS  
 - Base de données : PostgreSQL (`pg`)  
 - Authentification : JWT (access) + Refresh Token en cookie HttpOnly, Argon2id pour les mots de passe  
 - Sécurité : Helmet (CSP configurée pour Font Awesome CDN, images https/data)  
@@ -50,7 +50,7 @@ PORT=3000
 
 # PostgreSQL
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_USER=
 DB_PASSWORD=
 DB_NAME=
@@ -62,17 +62,17 @@ JWT_REFRESH_SECRET=changeme-refresh
 JWT_REFRESH_EXPIRES_IN=7d
 ```
 
-4. (Optionnel) Démarrer une base Postgres locale via Docker Compose :
+4. Démarrer une base Postgres locale via Docker Compose (port hôte 5433 → conteneur 5432) :
 
 ```bash
 npm run db:start
 ```
 
-5. Initialiser la base (une fois) avec les scripts SQL dans `migrations/` (via psql ou outil SQL)
-	- `migrations/000_init_db.sql`
-	- `migrations/001_schema.sql`
-	- `migrations/002_seed_test_admin.sql` (facultatif si vous utilisez le script node ci-dessous)
-	- `migrations/003_seed_block_elements.sql` (données de démonstration)
+5. Initialisation automatique: les scripts SQL sous `db/001_schema.sql` et `db/002_seed.sql` sont exécutés au premier démarrage du conteneur Postgres. Pour réinitialiser complètement:
+
+```bash
+npm run db:reset
+```
 
 6. Créer l’admin de test (recommandé pour l’E2E) :
 
@@ -88,6 +88,8 @@ npm run dev
 
 Le site sera disponible sur `http://localhost:3000`
 
+Endpoint de diagnostic (dev): `GET /health` renvoie l’état DB (base, user, host:port, search_path, présence de `cards`, compte des enregistrements).
+
 Astuce: si vous modifiez la CSP ou les assets, vérifiez que Font Awesome est
 bien autorisé (cdnjs.cloudflare.com) et que les images https/data sont permises.
 
@@ -97,6 +99,7 @@ bien autorisé (cdnjs.cloudflare.com) et que les images https/data sont permises
 
 - Public
 	- `GET /` page d’accueil (SSR)
+	- `GET /health` état runtime et DB (dev)
 	- `GET /auth/login` page de connexion
 	- `POST /auth/login/web` soumission du formulaire de connexion (redirection vers `/admins`)
 	- `GET /auth/logout/web` déconnexion (clear cookies + redirection)
