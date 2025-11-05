@@ -153,6 +153,15 @@ th {
   margin-bottom: 1.5rem;
 }
 
+.alert-info {
+  background: #bee3f8;
+  border: 1px solid #90cdf4;
+  color: #2c5282;
+  padding: 0.875rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
 /* ==========================================================================
    Badges
    ========================================================================== */

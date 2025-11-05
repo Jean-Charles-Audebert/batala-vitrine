@@ -21,76 +21,161 @@
     <% } %>
 
     <form method="POST" action="<%= formAction %>" class="form-block">
-      <div class="form-group">
-        <label for="type">Type de bloc *</label>
-        <select 
-          id="type" 
-          name="type" 
-          required
-          <%= block && block.is_locked ? 'disabled' : '' %>
-        >
-          <option value="">-- Sélectionner un type --</option>
-          <option value="header" <%= block && block.type === 'header' ? 'selected' : '' %>>Header</option>
-          <option value="events" <%= block && block.type === 'events' ? 'selected' : '' %>>Événements</option>
-          <option value="offers" <%= block && block.type === 'offers' ? 'selected' : '' %>>Offres</option>
-          <option value="footer" <%= block && block.type === 'footer' ? 'selected' : '' %>>Footer</option>
-          <option value="custom" <%= block && block.type === 'custom' ? 'selected' : '' %>>Personnalisé</option>
-        </select>
-        <small class="form-help">
-          Le type détermine la structure et le comportement du bloc.
-        </small>
-      </div>
+      <% const blockType = block ? block.type : null; %>
+      <% const isHeader = blockType === 'header'; %>
+      <% const isFooter = blockType === 'footer'; %>
+      <% const isStructural = isHeader || isFooter; %>
+      
+      <!-- Type de bloc (masqué si édition d'un bloc structurel) -->
+      <% if (!block || !isStructural) { %>
+        <div class="form-group">
+          <label for="type">Type de bloc *</label>
+          <select 
+            id="type" 
+            name="type" 
+            required
+            <%= block && block.is_locked ? 'disabled' : '' %>
+          >
+            <option value="">-- Sélectionner un type --</option>
+            <option value="header" <%= blockType === 'header' ? 'selected' : '' %>>Header</option>
+            <option value="events" <%= blockType === 'events' ? 'selected' : '' %>>Événements</option>
+            <option value="offers" <%= blockType === 'offers' ? 'selected' : '' %>>Offres</option>
+            <option value="footer" <%= blockType === 'footer' ? 'selected' : '' %>>Footer</option>
+            <option value="custom" <%= blockType === 'custom' ? 'selected' : '' %>>Personnalisé</option>
+          </select>
+          <small class="form-help">
+            Le type détermine la structure et le comportement du bloc.
+          </small>
+        </div>
+      <% } else { %>
+        <!-- Type caché pour les blocs structurels -->
+        <input type="hidden" name="type" value="<%= blockType %>">
+        <div class="alert-info" style="margin-bottom: 1.5rem;">
+          <strong>Type :</strong> <%= isHeader ? 'Header (en-tête)' : 'Footer (pied de page)' %>
+        </div>
+      <% } %>
 
-      <div class="form-group">
-        <label for="title">Titre *</label>
-        <input 
-          type="text" 
-          id="title" 
-          name="title" 
-          value="<%= block ? block.title || '' : '' %>" 
-          required
-          placeholder="Titre du bloc"
-        >
-      </div>
+      <!-- Titre du bloc (pour tous sauf header qui a header_title) -->
+      <% if (!isHeader) { %>
+        <div class="form-group">
+          <label for="title">Titre *</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            value="<%= block ? block.title || '' : '' %>" 
+            required
+            placeholder="Titre du bloc"
+          >
+        </div>
+      <% } %>
 
-      <div class="form-group">
-        <label for="slug">Slug (URL) *</label>
-        <input 
-          type="text" 
-          id="slug" 
-          name="slug" 
-          value="<%= block ? block.slug : '' %>" 
-          required
-          pattern="[a-z0-9-]+"
-          placeholder="exemple-bloc"
-          <%= block && block.is_locked ? 'readonly' : '' %>
-        >
-        <small class="form-help">
-          Identifiant unique (minuscules, chiffres et tirets uniquement).
-          <% if (block && block.is_locked) { %>
-            <strong>Ce champ est verrouillé.</strong>
+      <!-- Champs spécifiques au HEADER -->
+      <% if (isHeader) { %>
+        <div class="form-group">
+          <label for="header_title">Titre du site *</label>
+          <input 
+            type="text" 
+            id="header_title" 
+            name="header_title" 
+            value="<%= block ? block.header_title || '' : '' %>" 
+            required
+            placeholder="Batala La Rochelle"
+          >
+          <small class="form-help">
+            Le titre principal affiché dans le header.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="header_logo">Logo (URL ou chemin) *</label>
+          <input 
+            type="text" 
+            id="header_logo" 
+            name="header_logo" 
+            value="<%= block ? block.header_logo || '' : '' %>" 
+            placeholder="/assets/logo.svg ou /uploads/logo.png"
+          >
+          <small class="form-help">
+            Chemin vers l'image du logo (relatif depuis /public/).
+          </small>
+          <% if (block && block.header_logo) { %>
+            <div style="margin-top: 0.5rem;">
+              <img src="<%= block.header_logo %>" alt="Logo" style="max-width: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem;">
+            </div>
           <% } %>
-        </small>
-      </div>
+        </div>
 
-      <div class="form-group">
-        <label for="position">Position *</label>
-        <input 
-          type="number" 
-          id="position" 
-          name="position" 
-          value="<%= block ? block.position : 999 %>" 
-          required
-          min="1"
-        >
-        <small class="form-help">
-          Ordre d'affichage (1 = premier).
-        </small>
-      </div>
+        <div class="form-group">
+          <label for="bg_image">Image de fond</label>
+          <input 
+            type="text" 
+            id="bg_image" 
+            name="bg_image" 
+            value="<%= block ? block.bg_image || '' : '' %>" 
+            placeholder="/assets/header-bg.jpg ou /uploads/bg.jpg"
+          >
+          <small class="form-help">
+            Image de fond pour le header (optionnel).
+          </small>
+          <% if (block && block.bg_image) { %>
+            <div style="margin-top: 0.5rem;">
+              <img src="<%= block.bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <!-- Slug (masqué pour les blocs structurels) -->
+      <% if (!isStructural) { %>
+        <div class="form-group">
+          <label for="slug">Slug (URL) *</label>
+          <input 
+            type="text" 
+            id="slug" 
+            name="slug" 
+            value="<%= block ? block.slug : '' %>" 
+            required
+            pattern="[a-z0-9-]+"
+            placeholder="exemple-bloc"
+            <%= block && block.is_locked ? 'readonly' : '' %>
+          >
+          <small class="form-help">
+            Identifiant unique (minuscules, chiffres et tirets uniquement).
+            <% if (block && block.is_locked) { %>
+              <strong>Ce champ est verrouillé.</strong>
+            <% } %>
+          </small>
+        </div>
+      <% } else { %>
+        <!-- Slug caché pour les blocs structurels -->
+        <input type="hidden" name="slug" value="<%= block ? block.slug : '' %>">
+      <% } %>
+
+      <!-- Position (masquée pour les blocs structurels) -->
+      <% if (!isStructural) { %>
+        <div class="form-group">
+          <label for="position">Position *</label>
+          <input 
+            type="number" 
+            id="position" 
+            name="position" 
+            value="<%= block ? block.position : 999 %>" 
+            required
+            min="1"
+          >
+          <small class="form-help">
+            Ordre d'affichage (1 = premier).
+          </small>
+        </div>
+      <% } else { %>
+        <!-- Position cachée pour les blocs structurels -->
+        <input type="hidden" name="position" value="<%= block ? block.position : '' %>">
+      <% } %>
 
       <% if (block && block.is_locked) { %>
-        <div class="alert-error">
-          <strong>⚠️ Bloc verrouillé :</strong> Certains champs ne peuvent pas être modifiés.
+        <div class="alert-info">
+          <strong>ℹ️ Bloc système :</strong> Le type, le slug et la position sont gérés automatiquement.
         </div>
       <% } %>
 

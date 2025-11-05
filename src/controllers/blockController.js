@@ -98,7 +98,7 @@ export const showEditBlockForm = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, type, title, slug, position, is_locked FROM blocks WHERE id=$1", 
+      "SELECT id, type, title, slug, position, is_locked, bg_image, header_logo, header_title FROM blocks WHERE id=$1", 
       [id]
     );
     if (rows.length === 0) {
@@ -117,15 +117,39 @@ export const showEditBlockForm = async (req, res) => {
 
 export const updateBlock = async (req, res) => {
   const { id } = req.params;
-  const { type, title, slug, position } = req.body;
-  if (!type || !title || !slug) {
-    return res.status(400).send("Type, titre et slug requis");
-  }
+  const { type, title, slug, position, header_title, header_logo, bg_image } = req.body;
+  
   try {
-    await query(
-      "UPDATE blocks SET type=$1, title=$2, slug=$3, position=$4 WHERE id=$5",
-      [type, title, slug, position || 999, id]
-    );
+    // Récupérer le type de bloc actuel
+    const { rows: currentBlock } = await query("SELECT type FROM blocks WHERE id=$1", [id]);
+    if (currentBlock.length === 0) {
+      return res.status(404).send("Bloc non trouvé");
+    }
+    
+    const blockType = currentBlock[0].type;
+    
+    // Pour les blocs header, on met à jour les champs spécifiques
+    if (blockType === 'header') {
+      if (!header_title) {
+        return res.status(400).send("Le titre du site est requis pour le header");
+      }
+      
+      await query(
+        "UPDATE blocks SET header_title=$1, header_logo=$2, bg_image=$3 WHERE id=$4",
+        [header_title, header_logo || null, bg_image || null, id]
+      );
+    } else {
+      // Pour les autres blocs, mise à jour standard
+      if (!type || !title || !slug) {
+        return res.status(400).send("Type, titre et slug requis");
+      }
+      
+      await query(
+        "UPDATE blocks SET type=$1, title=$2, slug=$3, position=$4, bg_image=$5 WHERE id=$6",
+        [type, title, slug, position || 999, bg_image || null, id]
+      );
+    }
+    
     res.redirect("/blocks?success=Bloc modifié avec succès");
   } catch (error) {
     logger.error("Erreur modification bloc", error);
