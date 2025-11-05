@@ -11,4 +11,10 @@
   <% } %>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+  <%
+    // Sur les pages admin, lien vers l'accueil ; sinon, lien vers le contenu principal
+    const isAdminPage = typeof stylesheets !== 'undefined' && stylesheets.some(s => s.includes('admin.css'));
+    const skipHref = isAdminPage ? '/' : '#main-content';
+    const skipLabel = isAdminPage ? "Retour à l'accueil" : 'Aller au contenu principal';
+  %>
+  <a href="<%= skipHref %>" class="skip-link"><%= skipLabel %></a>

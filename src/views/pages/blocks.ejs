@@ -81,7 +81,6 @@
                     aria-label="Gérer les cartes du bloc <%= block.title %>"
                   >
                     <img src="/icons/image.svg" alt="" role="presentation" class="btn-icon">
-                    <span class="sr-only">Cartes</span>
                   </a>
                   <a 
                     href="/blocks/<%= block.id %>/edit" 
@@ -89,7 +88,6 @@
                     aria-label="Modifier le bloc <%= block.title %>"
                   >
                     <img src="/icons/edit.svg" alt="" role="presentation" class="btn-icon">
-                    <span class="sr-only">Modifier</span>
                   </a>
                   <% if (!block.is_locked) { %>
                     <form 
@@ -105,7 +103,6 @@
                         aria-label="Supprimer le bloc <%= block.title %>"
                       >
                         <img src="/icons/trash.svg" alt="" role="presentation" class="btn-icon">
-                        <span class="sr-only">Supprimer</span>
                       </button>
                     </form>
                   <% } %>
