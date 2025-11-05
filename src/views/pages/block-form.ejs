@@ -103,7 +103,7 @@
               id="header_logo_upload" 
               accept="image/*"
               style="display: none;"
-              onchange="handleImageUpload(event, 'header_logo')"
+              data-target-field="header_logo"
             >
             <button 
               type="button" 
@@ -145,7 +145,7 @@
               id="bg_image_upload" 
               accept="image/*"
               style="display: none;"
-              onchange="handleImageUpload(event, 'bg_image')"
+              data-target-field="bg_image"
             >
             <button 
               type="button" 
@@ -266,64 +266,73 @@
     }
 
     // Gestion de l'upload d'images
-    async function handleImageUpload(event, fieldId) {
-      const file = event.target.files[0];
-      if (!file) return;
+    document.addEventListener('DOMContentLoaded', function() {
+      // Attacher les event listeners aux inputs file
+      const fileInputs = document.querySelectorAll('input[type="file"][data-target-field]');
+      
+      fileInputs.forEach(fileInput => {
+        fileInput.addEventListener('change', async function(event) {
+          const file = event.target.files[0];
+          if (!file) return;
 
-      const statusEl = document.getElementById(fieldId + '_status');
-      const pathInput = document.getElementById(fieldId);
-      const previewContainer = document.getElementById(fieldId + '_preview');
-      const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+          const fieldId = fileInput.dataset.targetField;
+          const statusEl = document.getElementById(fieldId + '_status');
+          const pathInput = document.getElementById(fieldId);
+          const previewContainer = document.getElementById(fieldId + '_preview');
+          const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
 
-      // Validation taille client-side
-      if (file.size > 5 * 1024 * 1024) {
-        statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
-        statusEl.style.color = "#e74c3c";
-        event.target.value = "";
-        return;
-      }
-
-      // Préparation FormData
-      const formData = new FormData();
-      formData.append("image", file);
-
-      // Upload
-      statusEl.textContent = "⏳ Upload en cours...";
-      statusEl.style.color = "#3498db";
-
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
-          statusEl.style.color = "#27ae60";
-          
-          // Mettre à jour le champ texte
-          pathInput.value = result.path;
-          
-          // Mettre à jour la preview
-          if (previewImg) {
-            previewImg.src = result.path;
-            if (previewContainer) {
-              previewContainer.style.display = 'block';
-            }
+          // Validation taille client-side
+          if (file.size > 5 * 1024 * 1024) {
+            statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
+            statusEl.style.color = "#e74c3c";
+            event.target.value = "";
+            return;
           }
-        } else {
-          statusEl.textContent = `❌ Erreur : ${result.message}`;
-          statusEl.style.color = "#e74c3c";
-          event.target.value = "";
-        }
-      } catch (error) {
-        statusEl.textContent = "❌ Erreur réseau lors de l'upload";
-        statusEl.style.color = "#e74c3c";
-        event.target.value = "";
-      }
-    }
+
+          // Préparation FormData
+          const formData = new FormData();
+          formData.append("image", file);
+
+          // Upload
+          statusEl.textContent = "⏳ Upload en cours...";
+          statusEl.style.color = "#3498db";
+
+          try {
+            const response = await fetch("/api/upload", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
+              statusEl.style.color = "#27ae60";
+              
+              // Mettre à jour le champ texte
+              pathInput.value = result.path;
+              
+              // Mettre à jour la preview
+              if (previewImg) {
+                previewImg.src = result.path;
+                if (previewContainer) {
+                  previewContainer.style.display = 'block';
+                }
+              }
+            } else {
+              statusEl.textContent = `❌ Erreur : ${result.message}`;
+              statusEl.style.color = "#e74c3c";
+              event.target.value = "";
+            }
+          } catch (error) {
+            console.error('Erreur upload:', error);
+            statusEl.textContent = "❌ Erreur réseau lors de l'upload";
+            statusEl.style.color = "#e74c3c";
+            event.target.value = "";
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
