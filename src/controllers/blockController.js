@@ -37,9 +37,36 @@ export const createBlock = async (req, res) => {
     });
   }
   try {
+    // Calculer la position : avant le footer (ou à la fin si pas de footer)
+    let newPosition = position || 999;
+    
+    if (!position) {
+      const { rows: footerRows } = await query(
+        "SELECT position FROM blocks WHERE type='footer' ORDER BY position DESC LIMIT 1"
+      );
+      
+      if (footerRows.length > 0) {
+        // Insérer juste avant le footer
+        const footerPosition = footerRows[0].position;
+        newPosition = footerPosition;
+        
+        // Décaler le footer et les blocs après
+        await query(
+          "UPDATE blocks SET position = position + 1 WHERE position >= $1",
+          [footerPosition]
+        );
+      } else {
+        // Pas de footer, mettre à la fin
+        const { rows: maxRows } = await query(
+          "SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM blocks"
+        );
+        newPosition = maxRows[0].next_pos;
+      }
+    }
+    
     await query(
       "INSERT INTO blocks (type, title, slug, position, is_locked) VALUES ($1, $2, $3, $4, FALSE)",
-      [type, title, slug, position || 999]
+      [type, title, slug, newPosition]
     );
     res.redirect("/blocks?success=Bloc créé avec succès");
   } catch (error) {
@@ -117,10 +144,27 @@ export const reorderBlocks = async (req, res) => {
     return res.status(400).json({ error: "Format de données invalide" });
   }
   try {
-    // Mise à jour en batch
-    for (const item of order) {
+    // Récupérer le footer pour le garder en dernière position
+    const { rows: footerRows } = await query(
+      "SELECT id, position FROM blocks WHERE type='footer' LIMIT 1"
+    );
+    
+    const footerId = footerRows.length > 0 ? footerRows[0].id : null;
+    
+    // Filtrer le footer de l'ordre reçu (ne doit jamais être déplacé)
+    const orderWithoutFooter = order.filter(item => item.id !== footerId);
+    
+    // Mise à jour des positions pour les blocs non-footer
+    for (const item of orderWithoutFooter) {
       await query("UPDATE blocks SET position=$1 WHERE id=$2", [item.position, item.id]);
     }
+    
+    // S'assurer que le footer reste en dernière position
+    if (footerId) {
+      const maxPosition = Math.max(...orderWithoutFooter.map(item => item.position), 0);
+      await query("UPDATE blocks SET position=$1 WHERE id=$2", [maxPosition + 1, footerId]);
+    }
+    
     res.json({ success: true, message: "Ordre des blocs mis à jour" });
   } catch (error) {
     logger.error("Erreur réordonnancement blocs", error);

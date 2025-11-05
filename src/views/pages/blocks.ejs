@@ -44,25 +44,29 @@
         </thead>
         <tbody id="blocks-list">
           <% blocks.forEach(block => { %>
-            <tr data-block-id="<%= block.id %>" data-position="<%= block.position %>">
+            <tr data-block-id="<%= block.id %>" data-position="<%= block.position %>" data-block-type="<%= block.type %>">
               <td class="block-position">
                 <span class="position-value"><%= block.position %></span>
-                <div class="position-controls">
-                  <button 
-                    class="btn-move-up" 
-                    title="Monter"
-                    aria-label="Monter le bloc <%= block.title %>"
-                  >
-                    <img src="/icons/arrow-up.svg" alt="">
-                  </button>
-                  <button 
-                    class="btn-move-down" 
-                    title="Descendre"
-                    aria-label="Descendre le bloc <%= block.title %>"
-                  >
-                    <img src="/icons/arrow-down.svg" alt="">
-                  </button>
-                </div>
+                <% if (block.type !== 'footer') { %>
+                  <div class="position-controls">
+                    <button 
+                      class="btn-move-up" 
+                      title="Monter"
+                      aria-label="Monter le bloc <%= block.title %>"
+                    >
+                      <img src="/icons/arrow-up.svg" alt="">
+                    </button>
+                    <button 
+                      class="btn-move-down" 
+                      title="Descendre"
+                      aria-label="Descendre le bloc <%= block.title %>"
+                    >
+                      <img src="/icons/arrow-down.svg" alt="">
+                    </button>
+                  </div>
+                <% } else { %>
+                  <span class="text-muted" style="font-size: 0.85rem;">Toujours en dernier</span>
+                <% } %>
               </td>
               <td>
                 <span class="badge badge-type-<%= block.type %>">
@@ -142,6 +146,15 @@
         const row1 = rows[index1];
         const row2 = rows[index2];
         
+        // Empêcher de déplacer ou échanger avec le footer
+        const isFooter1 = row1.getAttribute('data-block-type') === 'footer';
+        const isFooter2 = row2.getAttribute('data-block-type') === 'footer';
+        
+        if (isFooter1 || isFooter2) {
+          console.log('Le footer ne peut pas être déplacé');
+          return;
+        }
+        
         if (index1 < index2) {
           row2.parentNode.insertBefore(row1, row2.nextSibling);
         } else {
@@ -171,10 +184,13 @@
 
       // Enregistrer l'ordre sur le serveur
       function saveOrder() {
-        const order = rows.map((row, index) => ({
-          id: parseInt(row.getAttribute('data-block-id'), 10),
-          position: index + 1
-        }));
+        // Ne pas inclure le footer dans l'ordre envoyé (géré par le backend)
+        const order = rows
+          .filter(row => row.getAttribute('data-block-type') !== 'footer')
+          .map((row, index) => ({
+            id: parseInt(row.getAttribute('data-block-id'), 10),
+            position: index + 1
+          }));
 
         fetch('/api/blocks/reorder', {
           method: 'POST',
