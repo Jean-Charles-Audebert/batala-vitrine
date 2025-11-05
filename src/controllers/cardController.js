@@ -1,5 +1,7 @@
 import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
+import { crudActionWrapper } from "../utils/controllerHelpers.js";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants.js";
 
 /**
  * Liste toutes les cartes d'un bloc donné
@@ -60,37 +62,34 @@ export const showNewCardForm = async (req, res) => {
 /**
  * Crée une nouvelle carte
  */
-export const createCard = async (req, res) => {
-  const { blockId } = req.params;
-  const { title, description, media_path, event_date, position } = req.body;
-  
-  if (!title) {
-    return res.render("pages/card-form", {
-      title: "Créer une nouvelle carte",
-      formAction: `/blocks/${blockId}/cards/new`,
-      block: { id: blockId },
-      card: null,
-      error: "Le titre est requis."
-    });
-  }
-  
-  try {
+export const createCard = crudActionWrapper(
+  async (req, res) => {
+    const { blockId } = req.params;
+    const { title, description, media_path, event_date, position } = req.body;
+    
+    if (!title) {
+      return res.render("pages/card-form", {
+        title: "Créer une nouvelle carte",
+        formAction: `/blocks/${blockId}/cards/new`,
+        block: { id: blockId },
+        card: null,
+        error: "Le titre est requis."
+      });
+    }
+    
     await query(
       "INSERT INTO cards (block_id, title, description, media_path, event_date, position) VALUES ($1, $2, $3, $4, $5, $6)",
       [blockId, title, description || null, media_path || null, event_date || null, position || 999]
     );
-    res.redirect(`/blocks/${blockId}/cards?success=Carte créée avec succès`);
-  } catch (error) {
-    logger.error("Erreur création carte", error);
-    res.render("pages/card-form", {
-      title: "Créer une nouvelle carte",
-      formAction: `/blocks/${blockId}/cards/new`,
-      block: { id: blockId },
-      card: { title, description, media_path, event_date, position },
-      error: "Erreur lors de la création de la carte"
-    });
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.CARD_CREATED,
+    errorMessage: ERROR_MESSAGES.DATABASE_ERROR,
+    logContext: "createCard",
+    redirectOnSuccess: "/",
+    redirectOnError: (req) => `/blocks/${req.params.blockId}/cards/new`
   }
-};
+);
 
 /**
  * Affiche le formulaire d'édition d'une carte
@@ -123,39 +122,45 @@ export const showEditCardForm = async (req, res) => {
 /**
  * Met à jour une carte
  */
-export const updateCard = async (req, res) => {
-  const { blockId, id } = req.params;
-  const { title, description, media_path, event_date, position } = req.body;
-  
-  if (!title) {
-    return res.status(400).send("Le titre est requis");
-  }
-  
-  try {
+export const updateCard = crudActionWrapper(
+  async (req, res) => {
+    const { blockId, id } = req.params;
+    const { title, description, media_path, event_date, position } = req.body;
+    
+    if (!title) {
+      return res.status(400).send("Le titre est requis");
+    }
+    
     await query(
       "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, updated_at=NOW() WHERE id=$6 AND block_id=$7",
       [title, description || null, media_path || null, event_date || null, position || 999, id, blockId]
     );
-    res.redirect(`/blocks/${blockId}/cards?success=Carte modifiée avec succès`);
-  } catch (error) {
-    logger.error("Erreur modification carte", error);
-    res.status(500).send("Erreur lors de la modification");
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.CARD_UPDATED,
+    errorMessage: ERROR_MESSAGES.DATABASE_ERROR,
+    logContext: "updateCard",
+    redirectOnSuccess: "/",
+    redirectOnError: (req) => `/blocks/${req.params.blockId}/cards/${req.params.id}/edit`
   }
-};
+);
 
 /**
  * Supprime une carte
  */
-export const deleteCard = async (req, res) => {
-  const { blockId, id } = req.params;
-  try {
+export const deleteCard = crudActionWrapper(
+  async (req) => {
+    const { blockId, id } = req.params;
     await query("DELETE FROM cards WHERE id=$1 AND block_id=$2", [id, blockId]);
-    res.redirect(`/blocks/${blockId}/cards?success=Carte supprimée avec succès`);
-  } catch (error) {
-    logger.error("Erreur suppression carte", error);
-    res.status(500).send("Erreur lors de la suppression");
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.CARD_DELETED,
+    errorMessage: ERROR_MESSAGES.CARD_NOT_FOUND,
+    logContext: "deleteCard",
+    redirectOnSuccess: "/",
+    redirectOnError: "/"
   }
-};
+);
 
 /**
  * Réordonne les cartes d'un bloc (API JSON)

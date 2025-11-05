@@ -11,7 +11,7 @@ export const showHome = async (req, res, deps = {}) => {
     
     // Récupérer tous les blocs dans l'ordre de position
     const { rows: blocks } = await _query(
-      "SELECT id, type, title, slug, position FROM blocks ORDER BY position ASC"
+      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image FROM blocks ORDER BY position ASC"
     );
     
     // Pour chaque bloc, récupérer ses éléments selon le type
@@ -22,7 +22,12 @@ export const showHome = async (req, res, deps = {}) => {
           "SELECT id, type, position, content FROM footer_elements WHERE block_id=$1 ORDER BY position ASC",
           [block.id]
         );
-        block.elements = elements;
+        
+        // Parser le JSON content pour chaque élément
+        block.elements = elements.map(el => ({
+          ...el,
+          parsedContent: el.content ? JSON.parse(el.content) : null
+        }));
       } else if (block.type !== 'header') {
         // Autres blocs (actus, offres, ...): charger les cartes normalisées
         const { rows: cards } = await _query(
@@ -35,7 +40,7 @@ export const showHome = async (req, res, deps = {}) => {
     }
     
     res.render("pages/index", {
-      title: "Batala La Rochelle",
+      title: "Accueil",
       blocks,
       user: req.user || null,
       getSocialIcon
@@ -43,7 +48,7 @@ export const showHome = async (req, res, deps = {}) => {
   } catch (error) {
     logger.error("Erreur récupération blocs", error);
     res.render("pages/index", {
-      title: "Batala La Rochelle",
+      title: "Accueil",
       blocks: [],
       user: null,
       getSocialIcon

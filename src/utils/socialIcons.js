@@ -1,20 +1,22 @@
+// Liste des réseaux sociaux disponibles avec leurs icônes SVG
+const SOCIAL_ICONS = {
+  facebook: '/icons/facebook.svg',
+  instagram: '/icons/instagram.svg',
+  youtube: '/icons/youtube.svg',
+  tiktok: '/icons/tiktok.svg',
+  x: '/icons/twitter.svg', // fichier présent: twitter.svg
+  twitter: '/icons/twitter.svg',
+  bluesky: '/icons/bluesky.svg',
+  linkedin: '/icons/linkedin.svg',
+  discord: '/icons/discord.svg',
+  slack: '/icons/slack.svg',
+  whatsapp: '/icons/whatsapp.svg',
+  reddit: '/icons/reddit.svg',
+};
+
 // Helper pour les icônes sociales (SVG)
 export function getSocialIcon(network) {
-  // Liste des réseaux sociaux disponibles avec leurs icônes SVG
-  const icons = {
-    facebook: '/icons/facebook.svg',
-    instagram: '/icons/instagram.svg',
-    youtube: '/icons/youtube.svg',
-    tiktok: '/icons/tiktok.svg',
-    x: '/icons/twitter.svg', // fichier présent: twitter.svg
-    twitter: '/icons/twitter.svg',
-    bluesky: '/icons/bluesky.svg',
-    linkedin: '/icons/linkedin.svg',
-    discord: '/icons/discord.svg',
-    slack: '/icons/slack.svg',
-    whatsapp: '/icons/whatsapp.svg',
-    reddit: '/icons/reddit.svg',
-  };
+  const icons = SOCIAL_ICONS;
   
   // Détecter le réseau social depuis l'URL si network est une URL
   let detectedNetwork = network?.toLowerCase();
@@ -32,4 +34,24 @@ export function getSocialIcon(network) {
   
   const iconPath = icons[detectedNetwork] || '/icons/twitter.svg'; // fallback raisonnable
   return `<img src="${iconPath}" alt="${detectedNetwork}" class="social-icon" />`;
+}
+
+/**
+ * Retourne la liste des réseaux sociaux disponibles
+ * @returns {Array<{id: string, name: string, icon: string}>}
+ */
+export function getAvailableSocialNetworks() {
+  return [
+    { id: 'facebook', name: 'Facebook', icon: SOCIAL_ICONS.facebook },
+    { id: 'instagram', name: 'Instagram', icon: SOCIAL_ICONS.instagram },
+    { id: 'youtube', name: 'YouTube', icon: SOCIAL_ICONS.youtube },
+    { id: 'tiktok', name: 'TikTok', icon: SOCIAL_ICONS.tiktok },
+    { id: 'x', name: 'X (Twitter)', icon: SOCIAL_ICONS.x },
+    { id: 'bluesky', name: 'Bluesky', icon: SOCIAL_ICONS.bluesky },
+    { id: 'linkedin', name: 'LinkedIn', icon: SOCIAL_ICONS.linkedin },
+    { id: 'discord', name: 'Discord', icon: SOCIAL_ICONS.discord },
+    { id: 'slack', name: 'Slack', icon: SOCIAL_ICONS.slack },
+    { id: 'whatsapp', name: 'WhatsApp', icon: SOCIAL_ICONS.whatsapp },
+    { id: 'reddit', name: 'Reddit', icon: SOCIAL_ICONS.reddit },
+  ];
 }

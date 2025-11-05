@@ -1,24 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> - Batala Vitrine</title>
-  <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body>
+<%-
+  include('../partials/head', {
+    title,
+    subtitle: 'Batala Vitrine',
+    stylesheets: ['/css/admin.css']
+  })
+%>
   <div class="admin-container">
-    <div class="toolbar">
-      <h1><%= title %></h1>
-      <a href="/admins" class="btn btn-secondary">
-        <img src="/icons/cancel.svg" alt="" class="btn-icon">
-        Annuler
-      </a>
-    </div>
+    <%-
+      include('../partials/admin-toolbar', {
+        title,
+        toolbarButtons: [
+          { href: '/admins', class: 'btn-secondary', icon: 'cancel', label: 'Annuler' }
+        ]
+      })
+    %>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="alert alert-error"><%= error %></div>
-    <% } %>
+    <%- include('../partials/alerts') %>
 
     <form method="POST" action="<%= formAction %>" class="form-admin">
       <div class="form-group">
@@ -77,5 +74,4 @@
       </div>
     </form>
   </div>
-</body>
-</html>
+<%- include('../partials/footer') %>

@@ -28,7 +28,7 @@ describe('homeController.showHome', () => {
     await showHome(req, res, { query: mockQuery });
 
     expect(res.render).toHaveBeenCalledWith('pages/index', expect.objectContaining({
-      title: 'Batala La Rochelle',
+      title: 'Accueil',
       blocks: mockBlocks,
     }));
   });
@@ -42,7 +42,7 @@ describe('homeController.showHome', () => {
     await showHome(req, res, { query: mockQuery });
 
     expect(res.render).toHaveBeenCalledWith('pages/index', expect.objectContaining({
-      title: 'Batala La Rochelle',
+      title: 'Accueil',
       blocks: [],
     }));
   });

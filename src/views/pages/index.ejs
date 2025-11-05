@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/index.css">
-</head>
-<body>
+<%-
+  include('../partials/head', {
+    title,
+    stylesheets: ['/css/style.css', '/css/index.css']
+  })
+%>
   <div class="vitrine-page">
     <% blocks.forEach(contentBlock => { %>
       <% if (contentBlock.type === 'header') { %>
@@ -23,6 +19,8 @@
     <%- include('../components/auth-fab', { user }) %>
   </div>
   
-  <script src="/js/index.js"></script>
-</body>
-</html>
+<%-
+  include('../partials/footer', {
+    scripts: ['/js/index.js']
+  })
+%>

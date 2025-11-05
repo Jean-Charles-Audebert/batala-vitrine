@@ -1,23 +1,17 @@
 import express from "express";
-import {
-  getBlockElements,
-  createBlockElement,
-  updateBlockElement,
-  deleteBlockElement,
-} from "../controllers/blockElementController.js";
 import { reorderBlocks } from "../controllers/blockController.js";
 import { reorderCards } from "../controllers/cardController.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
 import { logger } from "../utils/logger.js";
+import { createOptimizedVersion } from "../utils/imageOptimizer.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
-
-// Routes API pour les éléments de blocs (protégées)
-router.get("/blocks/:blockId/elements", requireAuth, getBlockElements);
-router.post("/blocks/:blockId/elements", requireAuth, createBlockElement);
-router.put("/elements/:id", requireAuth, updateBlockElement);
-router.delete("/elements/:id", requireAuth, deleteBlockElement);
 
 // Route API pour le réordonnancement des blocs
 router.post("/blocks/reorder", requireAuth, reorderBlocks);
@@ -31,7 +25,7 @@ router.post(
   requireAuth,
   upload.single("image"),
   handleMulterError,
-  (req, res) => {
+  async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({
@@ -40,14 +34,26 @@ router.post(
         });
       }
 
+      const fieldName = req.body.fieldName || "media_path"; // Nom du champ pour détecter le preset
+      const uploadedFilePath = path.join(__dirname, "../../public/uploads", req.file.filename);
+
+      logger.info(`Image uploadée : ${req.file.filename} (${req.file.size} bytes), champ: ${fieldName}`);
+
+      // Optimiser l'image (remplace l'original)
+      try {
+        await createOptimizedVersion(uploadedFilePath, fieldName);
+        logger.info(`Image optimisée: ${req.file.filename}`);
+      } catch (optError) {
+        logger.error("Erreur optimisation image (fichier conservé non optimisé):", optError);
+        // On continue même si l'optimisation échoue
+      }
+
       // Retourner le chemin relatif pour stockage en DB
       const relativePath = `/uploads/${req.file.filename}`;
 
-      logger.info(`Image uploadée : ${req.file.filename} (${req.file.size} bytes)`);
-
       res.status(200).json({
         success: true,
-        message: "Image uploadée avec succès.",
+        message: "Image uploadée et optimisée avec succès.",
         path: relativePath,
         filename: req.file.filename,
         size: req.file.size,

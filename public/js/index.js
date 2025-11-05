@@ -1,13 +1,11 @@
 /**
- * Batala La Rochelle - Scripts page d'accueil
+ * Scripts page d'accueil
  * Fichier: public/js/index.js
  * 
  * @fileoverview Scripts pour l'édition en ligne de la page d'accueil
  */
 
 /* global document, confirm, window */
-
-console.log('Script d\'édition chargé');
 
 // ==========================================================================
 // Gestion des modales
@@ -41,7 +39,6 @@ document.querySelectorAll('[data-close-modal]').forEach(btn => {
  * Éditer une carte existante - redirige vers l'interface admin
  */
 const editCardButtons = document.querySelectorAll('.edit-card-btn');
-console.log('Boutons d\'édition de cartes trouvés:', editCardButtons.length);
 
 editCardButtons.forEach(btn => {
   btn.addEventListener('click', (e) => {
@@ -52,7 +49,6 @@ editCardButtons.forEach(btn => {
     const blockId = e.currentTarget.closest('[data-block-id]')?.dataset.blockId;
     
     if (blockId && cardId) {
-      console.log('Redirection vers édition carte', cardId, 'du bloc', blockId);
       window.location.href = `/blocks/${blockId}/cards/${cardId}/edit`;
     }
   });
@@ -62,7 +58,6 @@ editCardButtons.forEach(btn => {
  * Supprimer une carte - via formulaire POST
  */
 const deleteCardButtons = document.querySelectorAll('.delete-card-btn');
-console.log('Boutons de suppression de cartes trouvés:', deleteCardButtons.length);
 
 deleteCardButtons.forEach(btn => {
   btn.addEventListener('click', async (e) => {
@@ -75,8 +70,6 @@ deleteCardButtons.forEach(btn => {
     const blockId = e.currentTarget.closest('[data-block-id]')?.dataset.blockId;
     
     if (blockId && cardId) {
-      console.log('Suppression de la carte', cardId, 'du bloc', blockId);
-      
       // Créer un formulaire pour POST
       const form = document.createElement('form');
       form.method = 'POST';
@@ -91,14 +84,12 @@ deleteCardButtons.forEach(btn => {
  * Ajouter une nouvelle carte - redirige vers l'interface admin
  */
 const addCardButtons = document.querySelectorAll('.add-card-btn');
-console.log('Boutons d\'ajout de cartes trouvés:', addCardButtons.length);
 
 addCardButtons.forEach(btn => {
   btn.addEventListener('click', (e) => {
     const blockId = e.currentTarget.dataset.blockId;
     
     if (blockId) {
-      console.log('Redirection vers création carte pour bloc', blockId);
       window.location.href = `/blocks/${blockId}/cards/new`;
     }
   });
@@ -117,7 +108,7 @@ document.querySelectorAll('[data-action="edit-header"]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const blockId = e.currentTarget.dataset.blockId;
     if (blockId) {
-      window.location.href = `/admin/blocks/${blockId}/edit`;
+      window.location.href = `/blocks/${blockId}/edit`;
     }
   });
 });
@@ -129,7 +120,7 @@ document.querySelectorAll('[data-action="edit-footer"]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const blockId = e.currentTarget.dataset.blockId;
     if (blockId) {
-      window.location.href = `/admin/blocks/${blockId}/edit`;
+      window.location.href = `/blocks/${blockId}/edit`;
     }
   });
 });

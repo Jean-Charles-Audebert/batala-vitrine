@@ -1,24 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> - Batala Vitrine</title>
-  <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body>
+<%-
+  include('../partials/head', {
+    title,
+    subtitle: 'Batala Vitrine',
+    stylesheets: ['/css/admin.css']
+  })
+%>
   <div class="admin-container">
-    <div class="toolbar">
-      <h1><%= title %></h1>
-      <a href="/blocks" class="btn btn-secondary">
-        <img src="/icons/cancel.svg" alt="" class="btn-icon">
-        Annuler
-      </a>
-    </div>
+    <%
+      const toolbarButtons = [{ href: '/blocks', class: 'btn-secondary', icon: 'cancel', label: 'Annuler' }];
+      // Ajouter bouton "Gérer les éléments" si édition d'un footer
+      if (block && block.type === 'footer') {
+        toolbarButtons.push({ href: `/blocks/${block.id}/footer-elements`, class: 'btn-primary', icon: 'list', label: 'Gérer les éléments' });
+      }
+    %>
+    <%-
+      include('../partials/admin-toolbar', {
+        title,
+        toolbarButtons
+      })
+    %>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="alert-error"><%= error %></div>
-    <% } %>
+    <%- include('../partials/alerts') %>
 
     <form method="POST" action="<%= formAction %>" class="form-block">
       <% const blockType = block ? block.type : null; %>
@@ -80,7 +82,7 @@
             name="header_title" 
             value="<%= block ? block.header_title || '' : '' %>" 
             required
-            placeholder="Batala La Rochelle"
+            placeholder="Nom du site"
           >
           <small class="form-help">
             Le titre principal affiché dans le header.
@@ -116,7 +118,7 @@
             </button>
           </div>
           <small class="form-help" id="header_logo_status">
-            Chemin vers l'image du logo (relatif depuis /public/).
+            Entrez un chemin (ex: <code>/assets/logo.svg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
           </small>
           <% if (block && block.header_logo) { %>
             <div style="margin-top: 0.5rem;" id="header_logo_preview">
@@ -158,7 +160,7 @@
             </button>
           </div>
           <small class="form-help" id="bg_image_status">
-            Image de fond pour le header (optionnel).
+            Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
           </small>
           <% if (block && block.bg_image) { %>
             <div style="margin-top: 0.5rem;" id="bg_image_preview">
@@ -238,101 +240,19 @@
     </form>
   </div>
 
-  <script>
-    // Auto-génération du slug depuis le titre
-    const titleInput = document.getElementById('title');
-    const slugInput = document.getElementById('slug');
-    const isEdit = <%= block ? 'true' : 'false' %>;
-    const isLocked = <%= block && block.is_locked ? 'true' : 'false' %>;
+  <% if (block) { %>
+    <script>
+      // Passer les données au script (évite de mélanger logique et rendu)
+      const slugEl = document.getElementById('slug');
+      if (slugEl) {
+        slugEl.dataset.isEdit = '<%= block ? 'true' : 'false' %>';
+        slugEl.dataset.isLocked = '<%= block && block.is_locked ? 'true' : 'false' %>';
+      }
+    </script>
+  <% } %>
 
-    if (!isEdit && titleInput && slugInput) {
-      titleInput.addEventListener('input', (e) => {
-        const slug = e.target.value
-          .toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever les accents
-          .replace(/[^a-z0-9\s-]/g, '') // Garder uniquement a-z, 0-9, espaces et tirets
-          .trim()
-          .replace(/\s+/g, '-') // Remplacer espaces par tirets
-          .replace(/-+/g, '-'); // Éviter les tirets multiples
-        slugInput.value = slug;
-      });
-    }
-
-    // Empêcher la modification du slug si verrouillé
-    if (isLocked && slugInput) {
-      slugInput.addEventListener('keydown', (e) => {
-        e.preventDefault();
-      });
-    }
-
-    // Gestion de l'upload d'images
-    document.addEventListener('DOMContentLoaded', function() {
-      // Attacher les event listeners aux inputs file
-      const fileInputs = document.querySelectorAll('input[type="file"][data-target-field]');
-      
-      fileInputs.forEach(fileInput => {
-        fileInput.addEventListener('change', async function(event) {
-          const file = event.target.files[0];
-          if (!file) return;
-
-          const fieldId = fileInput.dataset.targetField;
-          const statusEl = document.getElementById(fieldId + '_status');
-          const pathInput = document.getElementById(fieldId);
-          const previewContainer = document.getElementById(fieldId + '_preview');
-          const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
-
-          // Validation taille client-side
-          if (file.size > 5 * 1024 * 1024) {
-            statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
-            statusEl.style.color = "#e74c3c";
-            event.target.value = "";
-            return;
-          }
-
-          // Préparation FormData
-          const formData = new FormData();
-          formData.append("image", file);
-
-          // Upload
-          statusEl.textContent = "⏳ Upload en cours...";
-          statusEl.style.color = "#3498db";
-
-          try {
-            const response = await fetch("/api/upload", {
-              method: "POST",
-              body: formData,
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-              statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
-              statusEl.style.color = "#27ae60";
-              
-              // Mettre à jour le champ texte
-              pathInput.value = result.path;
-              
-              // Mettre à jour la preview
-              if (previewImg) {
-                previewImg.src = result.path;
-                if (previewContainer) {
-                  previewContainer.style.display = 'block';
-                }
-              }
-            } else {
-              statusEl.textContent = `❌ Erreur : ${result.message}`;
-              statusEl.style.color = "#e74c3c";
-              event.target.value = "";
-            }
-          } catch (error) {
-            console.error('Erreur upload:', error);
-            statusEl.textContent = "❌ Erreur réseau lors de l'upload";
-            statusEl.style.color = "#e74c3c";
-            event.target.value = "";
-          }
-        });
-      });
-    });
-  </script>
-</body>
-</html>
+<%-
+  include('../partials/footer', {
+    scripts: ['/js/block-form.js', '/js/image-upload.js']
+  })
+%>

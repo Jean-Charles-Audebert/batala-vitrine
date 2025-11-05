@@ -49,7 +49,7 @@ CREATE TABLE page (
 );
 
 -- Insérer la ligne unique par défaut
-INSERT INTO page (id, title) VALUES (1, 'Batala La Rochelle');
+INSERT INTO page (id, title) VALUES (1, 'Mon Site');
 
 -- ===============================
 --  BLOCKS

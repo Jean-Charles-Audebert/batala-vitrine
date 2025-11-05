@@ -1,0 +1,7 @@
+  <% if (typeof scripts !== 'undefined' && Array.isArray(scripts)) { %>
+    <% scripts.forEach(script => { %>
+  <script src="<%= script %>"></script>
+    <% }) %>
+  <% } %>
+</body>
+</html>

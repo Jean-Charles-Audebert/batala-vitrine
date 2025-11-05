@@ -11,6 +11,7 @@ import authRoutes from "./routes/authRoutes.js";
 import refreshRoutes from "./routes/refreshRoutes.js";
 import blockRoutes from "./routes/blockRoutes.js";
 import cardRoutes from "./routes/cardRoutes.js";
+import footerElementRoutes from "./routes/footerElementRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -74,6 +75,7 @@ app.use("/auth", authRoutes);
 app.use("/auth", refreshRoutes);
 app.use("/blocks", blockRoutes);
 app.use("/blocks/:blockId/cards", cardRoutes);
+app.use("/", footerElementRoutes);
 app.use("/api", apiRoutes);
 
 // --- Lancement du serveur ---

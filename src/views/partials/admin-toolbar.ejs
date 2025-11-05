@@ -1,0 +1,15 @@
+<div class="toolbar">
+  <h1><%= title %></h1>
+  <div class="toolbar-actions">
+    <% if (typeof toolbarButtons !== 'undefined' && Array.isArray(toolbarButtons)) { %>
+      <% toolbarButtons.forEach(button => { %>
+    <a href="<%= button.href %>" class="btn <%= button.class || 'btn-secondary' %>">
+      <% if (button.icon) { %>
+      <img src="/icons/<%= button.icon %>.svg" alt="" class="btn-icon">
+      <% } %>
+      <%= button.label %>
+    </a>
+      <% }) %>
+    <% } %>
+  </div>
+</div>

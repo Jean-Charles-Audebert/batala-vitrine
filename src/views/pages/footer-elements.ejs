@@ -1,0 +1,60 @@
+<%- include('../partials/head', {
+  title,
+  stylesheets: ['/css/common.css', '/css/admin.css']
+}) %>
+
+<%- include('../partials/alerts', { success, error }) %>
+
+<div class="container">
+  <%- include('../partials/admin-toolbar', {
+    title: `Éléments du footer : ${block.title}`,
+    toolbarButtons: [
+      { href: `/blocks/${block.id}/edit`, class: 'btn btn-secondary', icon: '←', label: 'Retour au bloc' },
+      { href: `/blocks/${block.id}/footer-elements/new`, class: 'btn btn-primary', icon: '+', label: 'Nouvel élément' }
+    ]
+  }) %>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Position</th>
+        <th>Contenu</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (elements.length === 0) { %>
+        <tr>
+          <td colspan="4" class="text-muted">Aucun élément footer. Créez-en un pour commencer.</td>
+        </tr>
+      <% } else { %>
+        <% elements.forEach(element => { %>
+          <tr>
+            <td>
+              <% if (element.type === 'text') { %>
+                <span class="badge badge-info">Texte</span>
+              <% } else if (element.type === 'contact') { %>
+                <span class="badge badge-success">Contact</span>
+              <% } else if (element.type === 'social') { %>
+                <span class="badge badge-primary">Social</span>
+              <% } %>
+            </td>
+            <td><%= element.position %></td>
+            <td class="text-truncate" style="max-width: 300px;">
+              <%= JSON.stringify(element.content).substring(0, 100) %>
+            </td>
+            <td>
+              <a href="/blocks/<%= block.id %>/footer-elements/<%= element.id %>/edit" class="btn btn-sm btn-secondary">Éditer</a>
+              <form action="/blocks/<%= block.id %>/footer-elements/<%= element.id %>?_method=DELETE" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer la suppression ?')">Supprimer</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer', { scripts: [] }) %>

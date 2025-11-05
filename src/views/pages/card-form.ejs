@@ -1,24 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> - Batala Vitrine</title>
-  <link rel="stylesheet" href="/css/admin.css">
-</head>
-<body>
+<%-
+  include('../partials/head', {
+    title,
+    subtitle: 'Batala Vitrine',
+    stylesheets: ['/css/admin.css']
+  })
+%>
   <div class="admin-container">
-    <div class="toolbar">
-      <h1><%= title %></h1>
-      <a href="/blocks/<%= block.id %>/cards" class="btn btn-secondary">
-        <img src="/icons/cancel.svg" alt="" class="btn-icon">
-        Annuler
-      </a>
-    </div>
+    <%-
+      include('../partials/admin-toolbar', {
+        title,
+        toolbarButtons: [
+          { href: `/blocks/${block.id}/cards`, class: 'btn-secondary', icon: 'cancel', label: 'Annuler' }
+        ]
+      })
+    %>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="alert-error"><%= error %></div>
-    <% } %>
+    <%- include('../partials/alerts') %>
 
     <form method="POST" action="<%= formAction %>" class="form-card">
       <div class="form-group">
@@ -44,42 +41,48 @@
       </div>
 
       <div class="form-group">
-        <label for="media_path">Chemin de l'image</label>
-        <input 
-          type="text" 
-          id="media_path" 
-          name="media_path" 
-          value="<%= card ? card.media_path || '' : '' %>" 
-          placeholder="/uploads/image.jpg ou /assets/placeholder-1.svg"
-        >
-        <small class="form-help">
-          Chemin relatif depuis /public/ ou URL complète.
-          Pour uploader une image, utilisez le bouton ci-dessous.
+        <label for="media_path">Image de la carte</label>
+        <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+          <input 
+            type="text" 
+            id="media_path" 
+            name="media_path" 
+            value="<%= card ? card.media_path || '' : '' %>" 
+            placeholder="/uploads/image.jpg ou /assets/placeholder-1.svg"
+            style="flex: 1;"
+          >
+          <input 
+            type="file" 
+            id="media_path_upload" 
+            accept="image/*"
+            style="display: none;"
+            data-target-field="media_path"
+          >
+          <button 
+            type="button" 
+            class="btn btn-secondary btn-sm"
+            onclick="document.getElementById('media_path_upload').click()"
+            title="Uploader une image"
+          >
+            <img src="/icons/image.svg" alt="" class="btn-icon">
+            Choisir
+          </button>
+        </div>
+        <small class="form-help" id="media_path_status">
+          Entrez un chemin (ex: /uploads/image.jpg) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
         </small>
       </div>
 
       <!-- Preview de l'image -->
-      <% if (card && card.media_path) { %>
-        <div class="form-group">
-          <label>Aperçu de l'image actuelle</label>
-          <div class="image-preview">
+      <div class="form-group" id="media_path_preview_container" style="<%= card && card.media_path ? '' : 'display: none;' %>">
+        <label>Aperçu de l'image</label>
+        <div class="image-preview" id="media_path_preview">
+          <% if (card && card.media_path) { %>
             <img src="<%= card.media_path %>" alt="<%= card.title %>" style="max-width: 300px; border-radius: 8px;">
-          </div>
+          <% } else { %>
+            <img src="" alt="Preview" style="max-width: 300px; border-radius: 8px;">
+          <% } %>
         </div>
-      <% } %>
-
-      <!-- Upload d'image -->
-      <div class="form-group">
-        <label for="image_upload">Uploader une nouvelle image</label>
-        <input 
-          type="file" 
-          id="image_upload" 
-          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-          onchange="handleImageUpload(event)"
-        >
-        <small id="upload_status" class="form-help">
-          Formats acceptés : JPG, PNG, WebP, GIF (max 5 MB)
-        </small>
       </div>
 
       <% if (block.type === 'events') { %>
@@ -125,89 +128,4 @@
     </form>
   </div>
 
-  <script>
-    // Preview d'image en temps réel
-    const mediaPathInput = document.getElementById('media_path');
-    const imageUploadInput = document.getElementById('image_upload');
-
-    if (mediaPathInput) {
-      mediaPathInput.addEventListener('input', (e) => {
-        updateImagePreview(e.target.value);
-      });
-    }
-
-    function updateImagePreview(path) {
-      if (!path) return;
-      
-      let existingPreview = document.querySelector('.image-preview');
-      if (!existingPreview) {
-        const formGroup = mediaPathInput.closest('.form-group');
-        const previewDiv = document.createElement('div');
-        previewDiv.className = 'form-group';
-        previewDiv.innerHTML = `
-          <label>Aperçu</label>
-          <div class="image-preview">
-            <img src="${path}" alt="Preview" style="max-width: 300px; border-radius: 8px;" onerror="this.style.display='none'">
-          </div>
-        `;
-        formGroup.after(previewDiv);
-      } else {
-        const img = existingPreview.querySelector('img');
-        if (img) {
-          img.src = path;
-          img.style.display = 'block';
-        }
-      }
-    }
-
-    // Gestion de l'upload d'image
-    async function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const statusEl = document.getElementById('upload_status');
-      const pathInput = document.getElementById('media_path');
-
-      // Validation taille client-side
-      if (file.size > 5 * 1024 * 1024) {
-        statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
-        statusEl.style.color = "#e74c3c";
-        event.target.value = "";
-        return;
-      }
-
-      // Préparation FormData
-      const formData = new FormData();
-      formData.append("image", file);
-
-      // Upload
-      statusEl.textContent = "⏳ Upload en cours...";
-      statusEl.style.color = "#3498db";
-
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
-          statusEl.style.color = "#27ae60";
-          pathInput.value = result.path;
-          updateImagePreview(result.path);
-        } else {
-          statusEl.textContent = `❌ Erreur : ${result.message}`;
-          statusEl.style.color = "#e74c3c";
-          event.target.value = "";
-        }
-      } catch (error) {
-        statusEl.textContent = "❌ Erreur réseau lors de l'upload";
-        statusEl.style.color = "#e74c3c";
-        event.target.value = "";
-      }
-    }
-  </script>
-</body>
-</html>
+<%- include('../partials/footer', { scripts: ['/js/image-upload.js'] }) %>

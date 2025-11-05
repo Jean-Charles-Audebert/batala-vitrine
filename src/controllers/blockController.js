@@ -1,5 +1,8 @@
 import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
+import { crudActionWrapper } from "../utils/controllerHelpers.js";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants.js";
+import { calculateBlockPosition, canDeleteBlock } from "../services/blockService.js";
 
 export const listBlocks = async (req, res) => {
   try {
@@ -26,73 +29,35 @@ export const showNewBlockForm = (req, res) => {
   });
 };
 
-export const createBlock = async (req, res) => {
-  const { type, title, slug, position } = req.body;
-  if (!type || !title || !slug) {
-    return res.render("pages/block-form", { 
-      title: "Créer un nouveau bloc", 
-      formAction: "/blocks/new",
-      block: null,
-      error: "Type, titre et slug requis." 
-    });
-  }
-  try {
-    // Calculer la position : après le header et avant le footer
-    let newPosition = position || 999;
+export const createBlock = crudActionWrapper(
+  async (req, res) => {
+    const { type, title, slug, position } = req.body;
     
-    if (!position) {
-      const { rows: headerRows } = await query(
-        "SELECT position FROM blocks WHERE type='header' ORDER BY position ASC LIMIT 1"
-      );
-      
-      const { rows: footerRows } = await query(
-        "SELECT position FROM blocks WHERE type='footer' ORDER BY position DESC LIMIT 1"
-      );
-      
-      if (footerRows.length > 0) {
-        // Insérer juste avant le footer
-        const footerPosition = footerRows[0].position;
-        newPosition = footerPosition;
-        
-        // Décaler le footer et les blocs après
-        await query(
-          "UPDATE blocks SET position = position + 1 WHERE position >= $1",
-          [footerPosition]
-        );
-      } else if (headerRows.length > 0) {
-        // Pas de footer, insérer après le header
-        const headerPosition = headerRows[0].position;
-        newPosition = headerPosition + 1;
-        
-        // Décaler les blocs après le header
-        await query(
-          "UPDATE blocks SET position = position + 1 WHERE position > $1",
-          [headerPosition]
-        );
-      } else {
-        // Ni header ni footer, mettre à la fin
-        const { rows: maxRows } = await query(
-          "SELECT COALESCE(MAX(position), 0) + 1 as next_pos FROM blocks"
-        );
-        newPosition = maxRows[0].next_pos;
-      }
+    if (!type || !title || !slug) {
+      return res.render("pages/block-form", { 
+        title: "Créer un nouveau bloc", 
+        formAction: "/blocks/new",
+        block: null,
+        error: "Type, titre et slug requis." 
+      });
     }
+    
+    // Calculer la position (délégué au service)
+    const newPosition = await calculateBlockPosition(position || null);
     
     await query(
       "INSERT INTO blocks (type, title, slug, position, is_locked) VALUES ($1, $2, $3, $4, FALSE)",
       [type, title, slug, newPosition]
     );
-    res.redirect("/blocks?success=Bloc créé avec succès");
-  } catch (error) {
-    logger.error("Erreur création bloc", error);
-    res.render("pages/block-form", { 
-      title: "Créer un nouveau bloc", 
-      formAction: "/blocks/new",
-      block: { type, title, slug, position },
-      error: "Erreur lors de la création (slug déjà existant ?)" 
-    });
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.BLOCK_CREATED,
+    errorMessage: ERROR_MESSAGES.DATABASE_ERROR,
+    logContext: "createBlock",
+    redirectOnSuccess: "/",
+    redirectOnError: "/blocks/new"
   }
-};
+);
 
 export const showEditBlockForm = async (req, res) => {
   const { id } = req.params;
@@ -115,11 +80,11 @@ export const showEditBlockForm = async (req, res) => {
   }
 };
 
-export const updateBlock = async (req, res) => {
-  const { id } = req.params;
-  const { type, title, slug, position, header_title, header_logo, bg_image } = req.body;
-  
-  try {
+export const updateBlock = crudActionWrapper(
+  async (req, res) => {
+    const { id } = req.params;
+    const { type, title, slug, position, header_title, header_logo, bg_image } = req.body;
+    
     // Récupérer le type de bloc actuel
     const { rows: currentBlock } = await query("SELECT type FROM blocks WHERE id=$1", [id]);
     if (currentBlock.length === 0) {
@@ -149,32 +114,36 @@ export const updateBlock = async (req, res) => {
         [type, title, slug, position || 999, bg_image || null, id]
       );
     }
-    
-    res.redirect("/blocks?success=Bloc modifié avec succès");
-  } catch (error) {
-    logger.error("Erreur modification bloc", error);
-    res.status(500).send("Erreur lors de la modification");
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.BLOCK_UPDATED,
+    errorMessage: ERROR_MESSAGES.DATABASE_ERROR,
+    logContext: "updateBlock",
+    redirectOnSuccess: "/",
+    redirectOnError: (req) => `/blocks/${req.params.id}/edit`
   }
-};
+);
 
-export const deleteBlock = async (req, res) => {
-  const { id } = req.params;
-  try {
-    // Vérifier que le bloc n'est pas verrouillé
-    const { rows } = await query("SELECT is_locked FROM blocks WHERE id=$1", [id]);
-    if (rows.length === 0) {
-      return res.status(404).send("Bloc non trouvé");
+export const deleteBlock = crudActionWrapper(
+  async (req) => {
+    const { id } = req.params;
+    
+    // Vérifier que le bloc peut être supprimé (délégué au service)
+    const { canDelete, reason } = await canDeleteBlock(id);
+    if (!canDelete) {
+      throw new Error(reason || ERROR_MESSAGES.BLOCK_NOT_FOUND);
     }
-    if (rows[0].is_locked) {
-      return res.redirect("/blocks?error=Impossible de supprimer un bloc verrouillé");
-    }
+    
     await query("DELETE FROM blocks WHERE id=$1", [id]);
-    res.redirect("/blocks?success=Bloc supprimé avec succès");
-  } catch (error) {
-    logger.error("Erreur suppression bloc", error);
-    res.status(500).send("Erreur lors de la suppression");
+  },
+  {
+    successMessage: SUCCESS_MESSAGES.BLOCK_DELETED,
+    errorMessage: ERROR_MESSAGES.BLOCK_NOT_FOUND,
+    logContext: "deleteBlock",
+    redirectOnSuccess: "/",
+    redirectOnError: "/"
   }
-};
+);
 
 export const reorderBlocks = async (req, res) => {
   const { order } = req.body; // Format attendu: [{ id: 1, position: 1 }, { id: 2, position: 2 }, ...]
