@@ -38,19 +38,38 @@
           <textarea 
             id="cardDescription" 
             name="description" 
-            required
-            aria-required="true"
+            aria-required="false"
           ></textarea>
         </div>
         <div class="form-group">
           <label for="cardImage">URL de l'image</label>
-          <input 
-            id="cardImage" 
-            type="url" 
-            name="image"
-            aria-describedby="cardImageHelp"
-          >
-          <span id="cardImageHelp" class="form-help">Optionnel : URL complète de l'image</span>
+          <div class="input-with-button">
+            <input 
+              id="cardImage" 
+              type="text" 
+              name="image"
+              aria-describedby="cardImageHelp cardImage_status"
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              aria-label="Choisir un fichier image à uploader"
+              onclick="document.getElementById('cardImage_file').click()"
+            >Choisir une image…</button>
+            <input 
+              id="cardImage_file" 
+              type="file" 
+              accept="image/*" 
+              data-target-field="cardImage" 
+              style="display:none"
+            >
+          </div>
+          <span id="cardImageHelp" class="form-help">Optionnel : URL complète ou chemin relatif (ex: /uploads/xxx.jpg), ou utilisez le bouton pour téléverser.</span>
+          <div id="cardImage_status" class="form-status" role="status" aria-live="polite"></div>
+        </div>
+        <div class="form-group" id="cardImage_preview" style="display:none">
+          <label class="sr-only" for="cardImage_preview_img">Aperçu de l'image</label>
+          <img id="cardImage_preview_img" src="" alt="Aperçu" style="max-width:100%;height:auto;"/>
         </div>
         <button type="submit" aria-label="Enregistrer la carte">Enregistrer</button>
       </form>
