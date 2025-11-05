@@ -16,6 +16,7 @@ export const FOOTER_ELEMENT_TYPES = {
   TEXT: "text",
   CONTACT: "contact",
   SOCIAL: "social",
+  LINK: "link",
 };
 
 // Présets d'optimisation d'images

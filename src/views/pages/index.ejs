@@ -18,11 +18,12 @@
     </main>
     
     <%- include('../components/card-modal', { user }) %>
+    <%- include('../components/footer-modals', { user }) %>
     <%- include('../components/auth-fab', { user }) %>
   </div>
   
 <%-
   include('../partials/footer', {
-    scripts: ['/js/index.js', '/js/image-upload.js']
+    scripts: ['/js/index.js', '/js/image-upload.js', '/js/footer-edit.js']
   })
 %>

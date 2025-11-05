@@ -1,0 +1,210 @@
+<%
+  // Composants modales pour édition inline des éléments footer
+  // Variables attendues: user, availableNetworks (depuis getSocialIcon)
+%>
+
+<% if (user) { %>
+  <!-- Modale À propos -->
+  <div 
+    id="aboutModal" 
+    class="modal" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="aboutModalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-content" role="document">
+      <button 
+        class="close" 
+        type="button"
+        data-close-modal="about"
+        aria-label="Fermer la fenêtre de modification"
+      >&times;</button>
+      <h2 id="aboutModalTitle">Modifier la section À propos</h2>
+      <form id="aboutForm">
+        <input type="hidden" name="blockId" aria-hidden="true">
+        <input type="hidden" name="elementId" aria-hidden="true">
+        <div class="form-group">
+          <label for="aboutContent">Description *</label>
+          <textarea 
+            id="aboutContent" 
+            name="about_content" 
+            rows="6"
+            required
+            aria-required="true"
+          ></textarea>
+        </div>
+        <button type="submit" aria-label="Enregistrer la description">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Contact -->
+  <div 
+    id="contactModal" 
+    class="modal" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="contactModalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-content" role="document">
+      <button 
+        class="close" 
+        type="button"
+        data-close-modal="contact"
+        aria-label="Fermer la fenêtre de modification"
+      >&times;</button>
+      <h2 id="contactModalTitle">Modifier les coordonnées</h2>
+      <form id="contactForm">
+        <input type="hidden" name="blockId" aria-hidden="true">
+        <input type="hidden" name="elementId" aria-hidden="true">
+        <div class="form-group">
+          <label for="contactPhone">Téléphone</label>
+          <input 
+            id="contactPhone" 
+            type="tel" 
+            name="contact_phone"
+            placeholder="+33 6 12 34 56 78"
+          >
+        </div>
+        <div class="form-group">
+          <label for="contactEmail">Email</label>
+          <input 
+            id="contactEmail" 
+            type="email" 
+            name="contact_email"
+            placeholder="contact@example.fr"
+          >
+        </div>
+        <div class="form-group">
+          <label for="contactAddress">Adresse</label>
+          <textarea 
+            id="contactAddress" 
+            name="contact_address" 
+            rows="3"
+            placeholder="1 Rue Example, 17000 Ville"
+          ></textarea>
+        </div>
+        <button type="submit" aria-label="Enregistrer les coordonnées">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Réseaux sociaux -->
+  <div 
+    id="socialModal" 
+    class="modal" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="socialModalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-content" role="document">
+      <button 
+        class="close" 
+        type="button"
+        data-close-modal="social"
+        aria-label="Fermer la fenêtre de modification"
+      >&times;</button>
+      <h2 id="socialModalTitle">Gérer les réseaux sociaux</h2>
+      
+      <div id="socialLinksList" class="social-links-list">
+        <!-- Liste dynamique des liens existants -->
+      </div>
+
+      <h3>Ajouter un réseau social</h3>
+      <form id="socialForm">
+        <input type="hidden" name="blockId" aria-hidden="true">
+        <div class="form-group">
+          <label for="socialNetwork">Plateforme *</label>
+          <select id="socialNetwork" name="social_network" required aria-required="true">
+            <option value="">-- Sélectionnez --</option>
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="x">X (Twitter)</option>
+            <option value="bluesky">Bluesky</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="discord">Discord</option>
+            <option value="slack">Slack</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="reddit">Reddit</option>
+            <option value="github">GitHub</option>
+            <option value="gitlab">GitLab</option>
+            <option value="mastodon">Mastodon</option>
+            <option value="threads">Threads</option>
+            <option value="telegram">Telegram</option>
+            <option value="pinterest">Pinterest</option>
+            <option value="snapchat">Snapchat</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="socialUrl">URL *</label>
+          <input 
+            id="socialUrl" 
+            type="url" 
+            name="social_url" 
+            required
+            aria-required="true"
+            placeholder="https://..."
+          >
+        </div>
+        <button type="submit" aria-label="Ajouter le réseau social">Ajouter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Liens externes -->
+  <div 
+    id="linkModal" 
+    class="modal" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="linkModalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-content" role="document">
+      <button 
+        class="close" 
+        type="button"
+        data-close-modal="link"
+        aria-label="Fermer la fenêtre de modification"
+      >&times;</button>
+      <h2 id="linkModalTitle">Gérer les liens externes</h2>
+      
+      <div id="externalLinksList" class="external-links-list">
+        <!-- Liste dynamique des liens existants -->
+      </div>
+
+      <h3>Ajouter un lien</h3>
+      <form id="linkForm">
+        <input type="hidden" name="blockId" aria-hidden="true">
+        <div class="form-group">
+          <label for="linkLabel">Libellé *</label>
+          <input 
+            id="linkLabel" 
+            type="text" 
+            name="link_label" 
+            required
+            aria-required="true"
+            placeholder="Partenaire, Ressource..."
+          >
+        </div>
+        <div class="form-group">
+          <label for="linkUrl">URL *</label>
+          <input 
+            id="linkUrl" 
+            type="url" 
+            name="link_url" 
+            required
+            aria-required="true"
+            placeholder="https://..."
+          >
+        </div>
+        <button type="submit" aria-label="Ajouter le lien">Ajouter</button>
+      </form>
+    </div>
+  </div>
+<% } %>

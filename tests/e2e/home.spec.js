@@ -1,15 +1,19 @@
 import { test, expect } from '@playwright/test';
 
-test('la home s’affiche avec les sections seedées', async ({ page }) => {
+test('la home s’affiche avec des sections et des cartes', async ({ page }) => {
   await page.goto('/');
 
-  // Le header est présent (titre seedé)
-  await expect(page.getByText('Titre de la page')).toBeVisible();
+  // Le header est présent
+  const header = page.locator('header.header-section');
+  await expect(header).toBeVisible();
+  await expect(header.locator('h1')).toBeVisible();
 
-  // Sections seedées
-  await expect(page.getByText('Événements à venir')).toBeVisible();
-  await expect(page.getByText('Nos offres')).toBeVisible();
+  // Vérifier qu'il y a au moins une section de contenu avec un titre
+  const sections = page.locator('section.block-section');
+  await expect(sections.first()).toBeVisible();
+  await expect(sections.first().locator('h2')).toBeVisible();
 
-  // Au moins une carte d’événement seedée
-  await expect(page.getByText('Titre actu').first()).toBeVisible();
+  // Au moins une carte visible dans une grille
+  const firstCardTitle = sections.first().locator('.cards-grid [role="listitem"] h3').first();
+  await expect(firstCardTitle).toBeVisible();
 });

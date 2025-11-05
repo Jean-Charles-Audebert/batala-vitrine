@@ -708,4 +708,51 @@
     min-width: 44px;
     min-height: 44px;
   }
+  
+  /* Footer edit buttons mobiles */
+  .edit-footer-section-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
+
+/* ==========================================================================
+   Footer section edit buttons
+   ========================================================================== */
+.footer-column {
+  position: relative;
+}
+
+.edit-footer-section-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.edit-footer-section-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.edit-footer-section-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.edit-footer-section-btn .icon {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+}
+

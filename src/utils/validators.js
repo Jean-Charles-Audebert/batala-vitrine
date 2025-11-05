@@ -5,10 +5,10 @@ import { FOOTER_ELEMENT_TYPES } from "../constants.js";
 
 /**
  * Valide et construit le contenu JSON d'un élément footer selon son type
- * @param {string} type - Type d'élément (text, contact, social)
+ * @param {string} type - Type d'élément (text, contact, social, link)
  * @param {Object} body - Corps de la requête contenant les champs
  * @returns {Object} - Contenu JSON structuré
- * @throws {Error} - Si le type est invalide
+ * @throws {Error} - Si le type est invalide ou si des champs requis manquent
  */
 export function validateAndBuildFooterContent(type, body) {
   const validTypes = Object.values(FOOTER_ELEMENT_TYPES);
@@ -21,43 +21,51 @@ export function validateAndBuildFooterContent(type, body) {
   
   switch (type) {
     case FOOTER_ELEMENT_TYPES.TEXT:
+      if (!body.about_content || !body.about_content.trim()) {
+        throw new Error("Le contenu de la section À propos est requis");
+      }
       content = {
-        title: body.text_title || '',
-        text: body.text_content || ''
+        about_title: body.about_title || 'À propos de nous',
+        about_content: body.about_content.trim()
       };
       break;
       
     case FOOTER_ELEMENT_TYPES.CONTACT:
       content = {
-        title: body.contact_title || '',
-        email: body.contact_email || '',
-        phone: body.contact_phone || '',
-        address: body.contact_address || ''
+        email: body.contact_email ? body.contact_email.trim() : '',
+        phone: body.contact_phone ? body.contact_phone.trim() : '',
+        address: body.contact_address ? body.contact_address.trim() : ''
       };
       break;
       
     case FOOTER_ELEMENT_TYPES.SOCIAL: {
-      // Parser les liens sociaux depuis les champs multiples
-      const platforms = body.social_platform || [];
-      const urls = body.social_url || [];
-      const links = [];
+      const network = body.social_network;
+      const url = body.social_url;
       
-      // Convertir en array si ce n'est pas déjà le cas
-      const platformArray = Array.isArray(platforms) ? platforms : [platforms];
-      const urlArray = Array.isArray(urls) ? urls : [urls];
-      
-      for (let i = 0; i < platformArray.length; i++) {
-        if (platformArray[i] && urlArray[i]) {
-          links.push({
-            platform: platformArray[i],
-            url: urlArray[i]
-          });
-        }
+      if (!network || !url) {
+        throw new Error("Plateforme et URL sont requis pour un réseau social");
       }
       
       content = {
-        title: body.social_title || '',
-        links
+        links: [{
+          network: network.trim(),
+          url: url.trim()
+        }]
+      };
+      break;
+    }
+      
+    case FOOTER_ELEMENT_TYPES.LINK: {
+      const label = body.link_label;
+      const url = body.link_url;
+      
+      if (!label || !url) {
+        throw new Error("Libellé et URL sont requis pour un lien externe");
+      }
+      
+      content = {
+        label: label.trim(),
+        url: url.trim()
       };
       break;
     }

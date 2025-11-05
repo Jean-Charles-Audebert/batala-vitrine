@@ -12,6 +12,15 @@ const SOCIAL_ICONS = {
   slack: '/icons/slack.svg',
   whatsapp: '/icons/whatsapp.svg',
   reddit: '/icons/reddit.svg',
+  github: '/icons/github.svg',
+  gitlab: '/icons/gitlab.svg',
+  mastodon: '/icons/mastodon.svg',
+  threads: '/icons/threads.svg',
+  telegram: '/icons/telegram.svg',
+  pinterest: '/icons/pinterest.svg',
+  snapchat: '/icons/snapchat.svg',
+  teams: '/icons/teams.svg',
+  skype: '/icons/skype.svg',
 };
 
 // Helper pour les icônes sociales (SVG)
@@ -53,5 +62,12 @@ export function getAvailableSocialNetworks() {
     { id: 'slack', name: 'Slack', icon: SOCIAL_ICONS.slack },
     { id: 'whatsapp', name: 'WhatsApp', icon: SOCIAL_ICONS.whatsapp },
     { id: 'reddit', name: 'Reddit', icon: SOCIAL_ICONS.reddit },
+    { id: 'github', name: 'GitHub', icon: SOCIAL_ICONS.github },
+    { id: 'gitlab', name: 'GitLab', icon: SOCIAL_ICONS.gitlab },
+    { id: 'mastodon', name: 'Mastodon', icon: SOCIAL_ICONS.mastodon },
+    { id: 'threads', name: 'Threads', icon: SOCIAL_ICONS.threads },
+    { id: 'telegram', name: 'Telegram', icon: SOCIAL_ICONS.telegram },
+    { id: 'pinterest', name: 'Pinterest', icon: SOCIAL_ICONS.pinterest },
+    { id: 'snapchat', name: 'Snapchat', icon: SOCIAL_ICONS.snapchat },
   ];
 }

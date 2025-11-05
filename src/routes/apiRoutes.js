@@ -1,6 +1,7 @@
 import express from "express";
 import { reorderBlocks } from "../controllers/blockController.js";
 import { reorderCards, getCardJson, updateCardJson, createCardJson } from "../controllers/cardController.js";
+import { getFooterElementJson, listFooterElementsJson, upsertFooterElementJson, deleteFooterElementJson } from "../controllers/footerElementController.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
 import { logger } from "../utils/logger.js";
@@ -23,6 +24,12 @@ router.post("/blocks/:blockId/cards/reorder", requireAuth, reorderCards);
 router.get("/blocks/:blockId/cards/:id", requireAuth, getCardJson);
 router.post("/blocks/:blockId/cards/:id", requireAuth, updateCardJson);
 router.post("/blocks/:blockId/cards", requireAuth, createCardJson);
+
+// Routes API pour CRUD footer elements (édition inline)
+router.get("/blocks/:blockId/footer-elements/:type", requireAuth, getFooterElementJson);
+router.get("/blocks/:blockId/footer-elements/list/:type", requireAuth, listFooterElementsJson);
+router.post("/blocks/:blockId/footer-elements/:type", requireAuth, upsertFooterElementJson);
+router.delete("/blocks/:blockId/footer-elements/:id", requireAuth, deleteFooterElementJson);
 
 // Route API pour l'upload d'images
 router.post(

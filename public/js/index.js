@@ -206,17 +206,4 @@ document.querySelectorAll('[data-action="edit-header"]').forEach(btn => {
   });
 });
 
-/**
- * Édition du footer - redirige vers l'interface admin des blocs
- */
-document.querySelectorAll('[data-action="edit-footer"]').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const blockId = e.currentTarget.dataset.blockId;
-    if (blockId) {
-      window.location.href = `/blocks/${blockId}/edit`;
-    }
-  });
-});
-
-// Note: Les fonctionnalités d'édition fine du footer (about, contact, socials)
-// seront implémentées plus tard via footerElementController
+// Note: Footer édité via modales inline (footer-edit.js)

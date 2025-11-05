@@ -2,13 +2,33 @@
   // Composant Footer
   // Variables attendues: contentBlock, user, getSocialIcon
   // Les éléments ont maintenant parsedContent au lieu de content brut
-  const aboutElement = contentBlock.elements.find(el => el.type === 'text' && el.position === 1);
-  const contactElement = contentBlock.elements.find(el => el.type === 'contact' && el.position === 2);
-  const socialElement = contentBlock.elements.find(el => el.type === 'social');
+  const aboutElement = contentBlock.elements.find(el => el.type === 'text');
+  const contactElement = contentBlock.elements.find(el => el.type === 'contact');
+  const socialElements = contentBlock.elements.filter(el => el.type === 'social');
+  const linkElements = contentBlock.elements.filter(el => el.type === 'link');
   
   const aboutData = aboutElement?.parsedContent || null;
   const contactData = contactElement?.parsedContent || null;
-  const socialData = socialElement?.parsedContent || null;
+  
+  // Agréger tous les liens sociaux
+  const allSocialLinks = [];
+  socialElements.forEach(el => {
+    if (el.parsedContent && el.parsedContent.links) {
+      allSocialLinks.push(...el.parsedContent.links);
+    }
+  });
+  
+  // Agréger tous les liens externes
+  const allExternalLinks = [];
+  linkElements.forEach(el => {
+    if (el.parsedContent) {
+      allExternalLinks.push({
+        id: el.id,
+        label: el.parsedContent.label || el.parsedContent.title,
+        url: el.parsedContent.url
+      });
+    }
+  });
 %>
 
 <footer class="block-section footer-section" data-block-id="<%= contentBlock.id %>" role="contentinfo">
@@ -23,6 +43,19 @@
             <% } else { %>
               <p>Description de votre organisation</p>
             <% } %>
+            <% if (user) { %>
+              <button 
+                class="edit-footer-section-btn" 
+                data-block-id="<%= contentBlock.id %>"
+                data-element-id="<%= aboutElement ? aboutElement.id : '' %>"
+                data-section="about"
+                type="button"
+                aria-label="Modifier la section À propos"
+              >
+                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Modifier</span>
+              </button>
+            <% } %>
           </div>
         </details>
       </div>
@@ -33,14 +66,30 @@
           <address role="region" aria-label="Coordonnées de contact">
             <% if (contactData) { %>
               <% if (contactData.email) { %>
-                <p>Email : <a href="mailto:<%= contactData.email %>"><%= contactData.email %></a></p>
+                <p>Email : <%= contactData.email %></p>
               <% } %>
               <% if (contactData.phone) { %>
-                <p>Téléphone : <a href="tel:<%= contactData.phone.replace(/\s/g, '') %>"><%= contactData.phone %></a></p>
+                <p>Téléphone : <%= contactData.phone %></p>
+              <% } %>
+              <% if (contactData.address) { %>
+                <p>Adresse : <%= contactData.address %></p>
               <% } %>
             <% } else { %>
-              <p>Email : <a href="mailto:contact@batala-larochelle.fr">contact@batala-larochelle.fr</a></p>
-              <p>Téléphone : <a href="tel:0600000000">06 XX XX XX XX</a></p>
+              <p>Email : contact@batala-larochelle.fr</p>
+              <p>Téléphone : 06 XX XX XX XX</p>
+            <% } %>
+            <% if (user) { %>
+              <button 
+                class="edit-footer-section-btn" 
+                data-block-id="<%= contentBlock.id %>"
+                data-element-id="<%= contactElement ? contactElement.id : '' %>"
+                data-section="contact"
+                type="button"
+                aria-label="Modifier les coordonnées de contact"
+              >
+                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Modifier</span>
+              </button>
             <% } %>
           </address>
         </details>
@@ -50,8 +99,8 @@
         <details>
           <summary>Suivez-nous</summary>
           <nav class="social-links" aria-label="Réseaux sociaux">
-            <% if (socialData && socialData.links) { %>
-              <% socialData.links.forEach(link => { %>
+            <% if (allSocialLinks && allSocialLinks.length > 0) { %>
+              <% allSocialLinks.forEach(link => { %>
                 <a 
                   href="<%= link.url %>" 
                   target="_blank" 
@@ -62,30 +111,62 @@
                 </a>
               <% }) %>
             <% } else { %>
-              <a href="#" target="_blank" aria-label="Facebook (ouvre dans un nouvel onglet)"><%- getSocialIcon('facebook') %></a>
-              <a href="#" target="_blank" aria-label="Instagram (ouvre dans un nouvel onglet)"><%- getSocialIcon('instagram') %></a>
-              <a href="#" target="_blank" aria-label="YouTube (ouvre dans un nouvel onglet)"><%- getSocialIcon('youtube') %></a>
-              <a href="#" target="_blank" aria-label="TikTok (ouvre dans un nouvel onglet)"><%- getSocialIcon('tiktok') %></a>
+              <p class="text-muted">Aucun réseau social configuré.</p>
+            <% } %>
+            <% if (user) { %>
+              <button 
+                class="edit-footer-section-btn" 
+                data-block-id="<%= contentBlock.id %>"
+                data-section="social"
+                type="button"
+                aria-label="Gérer les réseaux sociaux"
+              >
+                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Modifier</span>
+              </button>
+            <% } %>
+          </nav>
+        </details>
+      </div>
+      
+      <div class="footer-column">
+        <details>
+          <summary>Liens utiles</summary>
+          <nav class="external-links" aria-label="Liens externes">
+            <% if (allExternalLinks && allExternalLinks.length > 0) { %>
+              <ul class="links-list">
+                <% allExternalLinks.forEach(link => { %>
+                  <li>
+                    <a 
+                      href="<%= link.url %>" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      aria-label="<%= link.label %> (ouvre dans un nouvel onglet)"
+                    >
+                      <%= link.label %>
+                    </a>
+                  </li>
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <p class="text-muted">Aucun lien externe.</p>
+            <% } %>
+            <% if (user) { %>
+              <button 
+                class="edit-footer-section-btn" 
+                data-block-id="<%= contentBlock.id %>"
+                data-section="link"
+                type="button"
+                aria-label="Gérer les liens externes"
+              >
+                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Modifier</span>
+              </button>
             <% } %>
           </nav>
         </details>
       </div>
     </div>
-    
-    <% if (user) { %>
-      <div class="edit-controls" role="toolbar" aria-label="Actions d'édition du footer">
-        <button 
-          class="edit-btn" 
-          data-block-id="<%= contentBlock.id %>" 
-          data-action="edit-footer" 
-          type="button"
-          aria-label="Modifier les éléments du footer (à propos, contact, réseaux sociaux)"
-        >
-          <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-          <span>Modifier</span>
-        </button>
-      </div>
-    <% } %>
     
     <div class="footer-bottom">
       <p>&copy; 2025 caixaDev. Tous droits réservés.</p>

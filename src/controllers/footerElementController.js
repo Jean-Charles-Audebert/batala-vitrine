@@ -182,3 +182,106 @@ export const deleteFooterElement = crudActionWrapper(
     redirectOnError: (req) => `/blocks/${req.params.blockId}/footer-elements`
   }
 );
+
+/**
+ * API JSON - Récupère un élément footer par type
+ * GET /api/blocks/:blockId/footer-elements/:type
+ */
+export const getFooterElementJson = async (req, res) => {
+  const { blockId, type } = req.params;
+  try {
+    const { rows } = await query(
+      "SELECT id, type, position, content FROM footer_elements WHERE block_id=$1 AND type=$2",
+      [blockId, type]
+    );
+    if (rows.length === 0) {
+      return res.json({ success: true, element: null });
+    }
+    res.json({ success: true, element: rows[0] });
+  } catch (error) {
+    logger.error("Erreur API getFooterElementJson", error);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+/**
+ * API JSON - Liste tous les éléments footer d'un type
+ * GET /api/blocks/:blockId/footer-elements/list/:type
+ */
+export const listFooterElementsJson = async (req, res) => {
+  const { blockId, type } = req.params;
+  try {
+    const { rows } = await query(
+      "SELECT id, type, position, content FROM footer_elements WHERE block_id=$1 AND type=$2 ORDER BY position ASC",
+      [blockId, type]
+    );
+    res.json({ success: true, elements: rows });
+  } catch (error) {
+    logger.error("Erreur API listFooterElementsJson", error);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+/**
+ * API JSON - Met à jour ou crée un élément footer
+ * POST /api/blocks/:blockId/footer-elements/:type
+ */
+export const upsertFooterElementJson = async (req, res) => {
+  const { blockId, type } = req.params;
+  try {
+    // Valider et construire le contenu
+    const content = validateAndBuildFooterContent(type, req.body);
+    
+    // Vérifier si l'élément existe déjà (pour text et contact, un seul par bloc)
+    if (type === 'text' || type === 'contact') {
+      const { rows: existing } = await query(
+        "SELECT id FROM footer_elements WHERE block_id=$1 AND type=$2",
+        [blockId, type]
+      );
+      
+      if (existing.length > 0) {
+        // Update
+        await query(
+          "UPDATE footer_elements SET content=$1 WHERE id=$2 AND block_id=$3",
+          [JSON.stringify(content), existing[0].id, blockId]
+        );
+        logger.info(`Élément footer ${type} mis à jour (block_id=${blockId})`);
+        return res.json({ success: true, message: SUCCESS_MESSAGES.FOOTER_ELEMENT_UPDATED });
+      }
+    }
+    
+    // Insert (nouveau)
+    const { rows: posRows } = await query(
+      "SELECT COALESCE(MAX(position), 0) + 1 AS next_pos FROM footer_elements WHERE block_id=$1",
+      [blockId]
+    );
+    const position = posRows[0].next_pos;
+    
+    await query(
+      "INSERT INTO footer_elements (block_id, type, position, content) VALUES ($1, $2, $3, $4)",
+      [blockId, type, position, JSON.stringify(content)]
+    );
+    
+    logger.info(`Élément footer ${type} créé (block_id=${blockId})`);
+    res.status(201).json({ success: true, message: SUCCESS_MESSAGES.FOOTER_ELEMENT_CREATED });
+  } catch (error) {
+    logger.error("Erreur API upsertFooterElementJson", error);
+    res.status(500).json({ success: false, message: error.message || ERROR_MESSAGES.DATABASE_ERROR });
+  }
+};
+
+/**
+ * API JSON - Supprime un élément footer
+ * DELETE /api/blocks/:blockId/footer-elements/:id
+ */
+export const deleteFooterElementJson = async (req, res) => {
+  const { blockId, id } = req.params;
+  try {
+    await query("DELETE FROM footer_elements WHERE id=$1 AND block_id=$2", [id, blockId]);
+    logger.info(`Élément footer ${id} supprimé (API JSON)`);
+    res.json({ success: true, message: SUCCESS_MESSAGES.FOOTER_ELEMENT_DELETED });
+  } catch (error) {
+    logger.error("Erreur API deleteFooterElementJson", error);
+    res.status(500).json({ success: false, message: ERROR_MESSAGES.DATABASE_ERROR });
+  }
+};
