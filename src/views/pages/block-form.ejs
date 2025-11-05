@@ -89,38 +89,84 @@
 
         <div class="form-group">
           <label for="header_logo">Logo (URL ou chemin) *</label>
-          <input 
-            type="text" 
-            id="header_logo" 
-            name="header_logo" 
-            value="<%= block ? block.header_logo || '' : '' %>" 
-            placeholder="/assets/logo.svg ou /uploads/logo.png"
-          >
-          <small class="form-help">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input 
+              type="text" 
+              id="header_logo" 
+              name="header_logo" 
+              value="<%= block ? block.header_logo || '' : '' %>" 
+              placeholder="/assets/logo.svg ou /uploads/logo.png"
+              style="flex: 1;"
+            >
+            <input 
+              type="file" 
+              id="header_logo_upload" 
+              accept="image/*"
+              style="display: none;"
+              onchange="handleImageUpload(event, 'header_logo')"
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('header_logo_upload').click()"
+              title="Uploader une image"
+            >
+              <img src="/icons/image.svg" alt="" class="btn-icon">
+              Choisir
+            </button>
+          </div>
+          <small class="form-help" id="header_logo_status">
             Chemin vers l'image du logo (relatif depuis /public/).
           </small>
           <% if (block && block.header_logo) { %>
-            <div style="margin-top: 0.5rem;">
+            <div style="margin-top: 0.5rem;" id="header_logo_preview">
               <img src="<%= block.header_logo %>" alt="Logo" style="max-width: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem;">
+            </div>
+          <% } else { %>
+            <div style="margin-top: 0.5rem; display: none;" id="header_logo_preview">
+              <img src="" alt="Logo" style="max-width: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem;">
             </div>
           <% } %>
         </div>
 
         <div class="form-group">
           <label for="bg_image">Image de fond</label>
-          <input 
-            type="text" 
-            id="bg_image" 
-            name="bg_image" 
-            value="<%= block ? block.bg_image || '' : '' %>" 
-            placeholder="/assets/header-bg.jpg ou /uploads/bg.jpg"
-          >
-          <small class="form-help">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input 
+              type="text" 
+              id="bg_image" 
+              name="bg_image" 
+              value="<%= block ? block.bg_image || '' : '' %>" 
+              placeholder="/assets/header-bg.jpg ou /uploads/bg.jpg"
+              style="flex: 1;"
+            >
+            <input 
+              type="file" 
+              id="bg_image_upload" 
+              accept="image/*"
+              style="display: none;"
+              onchange="handleImageUpload(event, 'bg_image')"
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('bg_image_upload').click()"
+              title="Uploader une image"
+            >
+              <img src="/icons/image.svg" alt="" class="btn-icon">
+              Choisir
+            </button>
+          </div>
+          <small class="form-help" id="bg_image_status">
             Image de fond pour le header (optionnel).
           </small>
           <% if (block && block.bg_image) { %>
-            <div style="margin-top: 0.5rem;">
+            <div style="margin-top: 0.5rem;" id="bg_image_preview">
               <img src="<%= block.bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+          <% } else { %>
+            <div style="margin-top: 0.5rem; display: none;" id="bg_image_preview">
+              <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
             </div>
           <% } %>
         </div>
@@ -217,6 +263,66 @@
       slugInput.addEventListener('keydown', (e) => {
         e.preventDefault();
       });
+    }
+
+    // Gestion de l'upload d'images
+    async function handleImageUpload(event, fieldId) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById(fieldId + '_status');
+      const pathInput = document.getElementById(fieldId);
+      const previewContainer = document.getElementById(fieldId + '_preview');
+      const previewImg = previewContainer ? previewContainer.querySelector('img') : null;
+
+      // Validation taille client-side
+      if (file.size > 5 * 1024 * 1024) {
+        statusEl.textContent = "❌ Fichier trop volumineux (max 5 MB)";
+        statusEl.style.color = "#e74c3c";
+        event.target.value = "";
+        return;
+      }
+
+      // Préparation FormData
+      const formData = new FormData();
+      formData.append("image", file);
+
+      // Upload
+      statusEl.textContent = "⏳ Upload en cours...";
+      statusEl.style.color = "#3498db";
+
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          statusEl.textContent = `✅ Image uploadée : ${result.filename}`;
+          statusEl.style.color = "#27ae60";
+          
+          // Mettre à jour le champ texte
+          pathInput.value = result.path;
+          
+          // Mettre à jour la preview
+          if (previewImg) {
+            previewImg.src = result.path;
+            if (previewContainer) {
+              previewContainer.style.display = 'block';
+            }
+          }
+        } else {
+          statusEl.textContent = `❌ Erreur : ${result.message}`;
+          statusEl.style.color = "#e74c3c";
+          event.target.value = "";
+        }
+      } catch (error) {
+        statusEl.textContent = "❌ Erreur réseau lors de l'upload";
+        statusEl.style.color = "#e74c3c";
+        event.target.value = "";
+      }
     }
   </script>
 </body>
