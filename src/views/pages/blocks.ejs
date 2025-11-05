@@ -47,7 +47,7 @@
             <tr data-block-id="<%= block.id %>" data-position="<%= block.position %>" data-block-type="<%= block.type %>">
               <td class="block-position">
                 <span class="position-value"><%= block.position %></span>
-                <% if (block.type !== 'footer') { %>
+                <% if (block.type !== 'header' && block.type !== 'footer') { %>
                   <div class="position-controls">
                     <button 
                       class="btn-move-up" 
@@ -65,7 +65,9 @@
                     </button>
                   </div>
                 <% } else { %>
-                  <span class="text-muted" style="font-size: 0.85rem;">Toujours en dernier</span>
+                  <span class="text-muted" style="font-size: 0.85rem;">
+                    <%= block.type === 'header' ? 'Toujours en premier' : 'Toujours en dernier' %>
+                  </span>
                 <% } %>
               </td>
               <td>
@@ -146,12 +148,14 @@
         const row1 = rows[index1];
         const row2 = rows[index2];
         
-        // Empêcher de déplacer ou échanger avec le footer
-        const isFooter1 = row1.getAttribute('data-block-type') === 'footer';
-        const isFooter2 = row2.getAttribute('data-block-type') === 'footer';
+        // Empêcher de déplacer ou échanger avec le header ou le footer
+        const type1 = row1.getAttribute('data-block-type');
+        const type2 = row2.getAttribute('data-block-type');
+        const isFixed1 = type1 === 'header' || type1 === 'footer';
+        const isFixed2 = type2 === 'header' || type2 === 'footer';
         
-        if (isFooter1 || isFooter2) {
-          console.log('Le footer ne peut pas être déplacé');
+        if (isFixed1 || isFixed2) {
+          console.log('Le header et le footer ne peuvent pas être déplacés');
           return;
         }
         
@@ -184,9 +188,12 @@
 
       // Enregistrer l'ordre sur le serveur
       function saveOrder() {
-        // Ne pas inclure le footer dans l'ordre envoyé (géré par le backend)
+        // Ne pas inclure header et footer dans l'ordre envoyé (gérés par le backend)
         const order = rows
-          .filter(row => row.getAttribute('data-block-type') !== 'footer')
+          .filter(row => {
+            const type = row.getAttribute('data-block-type');
+            return type !== 'header' && type !== 'footer';
+          })
           .map((row, index) => ({
             id: parseInt(row.getAttribute('data-block-id'), 10),
             position: index + 1
