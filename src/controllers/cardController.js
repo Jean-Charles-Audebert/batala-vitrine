@@ -2,6 +2,7 @@ import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
 import { crudActionWrapper } from "../utils/controllerHelpers.js";
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants.js";
+import { getBlockBasicInfo } from "../services/index.js";
 
 /**
  * Liste toutes les cartes d'un bloc donné
@@ -15,18 +16,15 @@ export const listCards = async (req, res) => {
     );
     
     // Récupérer aussi les infos du bloc
-    const { rows: blockRows } = await query(
-      "SELECT id, type, title FROM blocks WHERE id=$1",
-      [blockId]
-    );
+    const block = await getBlockBasicInfo(blockId);
     
-    if (blockRows.length === 0) {
+    if (!block) {
       return res.status(404).send("Bloc non trouvé");
     }
     
     res.render("pages/cards", {
-      title: `Cartes du bloc "${blockRows[0].title}"`,
-      block: blockRows[0],
+      title: `Cartes du bloc "${block.title}"`,
+      block,
       cards: rows,
       success: req.query.success || null,
       error: req.query.error || null
@@ -43,14 +41,14 @@ export const listCards = async (req, res) => {
 export const showNewCardForm = async (req, res) => {
   const { blockId } = req.params;
   try {
-    const { rows } = await query("SELECT id, type, title FROM blocks WHERE id=$1", [blockId]);
-    if (rows.length === 0) {
+    const block = await getBlockBasicInfo(blockId);
+    if (!block) {
       return res.status(404).send("Bloc non trouvé");
     }
     res.render("pages/card-form", {
       title: "Créer une nouvelle carte",
       formAction: `/blocks/${blockId}/cards/new`,
-      block: rows[0],
+      block,
       card: null
     });
   } catch (error) {
@@ -105,12 +103,12 @@ export const showEditCardForm = async (req, res) => {
       return res.status(404).send("Carte non trouvée");
     }
     
-    const { rows: blockRows } = await query("SELECT id, type, title FROM blocks WHERE id=$1", [blockId]);
+    const block = await getBlockBasicInfo(blockId);
     
     res.render("pages/card-form", {
       title: "Modifier une carte",
       formAction: `/blocks/${blockId}/cards/${id}/edit`,
-      block: blockRows[0],
+      block,
       card: cardRows[0]
     });
   } catch (error) {

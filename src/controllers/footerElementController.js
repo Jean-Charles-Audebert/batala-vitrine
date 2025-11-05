@@ -7,6 +7,7 @@ import { getAvailableSocialNetworks } from "../utils/socialIcons.js";
 import { crudActionWrapper } from "../utils/controllerHelpers.js";
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants.js";
 import { validateAndBuildFooterContent } from "../utils/validators.js";
+import { getBlockBasicInfo } from "../services/index.js";
 
 /**
  * Liste les éléments du footer
@@ -51,15 +52,15 @@ export const showNewFooterElementForm = async (req, res) => {
   const { blockId } = req.params;
   
   try {
-    const { rows } = await query("SELECT id, title FROM blocks WHERE id=$1 AND type='footer'", [blockId]);
-    if (rows.length === 0) {
+    const block = await getBlockBasicInfo(blockId, 'footer');
+    if (!block) {
       return res.status(404).send("Bloc footer non trouvé");
     }
     
     res.render("pages/footer-element-form", {
       title: "Créer un élément footer",
       formAction: `/blocks/${blockId}/footer-elements/new`,
-      block: rows[0],
+      block,
       element: null,
       availableNetworks: getAvailableSocialNetworks()
     });
@@ -111,8 +112,8 @@ export const showEditFooterElementForm = async (req, res) => {
   const { blockId, id } = req.params;
   
   try {
-    const { rows: blockRows } = await query("SELECT id, title FROM blocks WHERE id=$1 AND type='footer'", [blockId]);
-    if (blockRows.length === 0) {
+    const block = await getBlockBasicInfo(blockId, 'footer');
+    if (!block) {
       return res.status(404).send("Bloc footer non trouvé");
     }
     
@@ -128,7 +129,7 @@ export const showEditFooterElementForm = async (req, res) => {
     res.render("pages/footer-element-form", {
       title: "Modifier l'élément footer",
       formAction: `/blocks/${blockId}/footer-elements/${id}/edit`,
-      block: blockRows[0],
+      block,
       element: elementRows[0],
       availableNetworks: getAvailableSocialNetworks()
     });

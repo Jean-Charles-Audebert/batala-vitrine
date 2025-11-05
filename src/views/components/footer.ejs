@@ -44,16 +44,19 @@
               <p>Description de votre organisation</p>
             <% } %>
             <% if (user) { %>
-              <button 
-                class="edit-footer-section-btn" 
-                data-block-id="<%= contentBlock.id %>"
-                data-element-id="<%= aboutElement ? aboutElement.id : '' %>"
-                data-section="about"
-                type="button"
-                aria-label="Modifier la section À propos"
-              >
-                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-              </button>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'edit-footer-section-btn',
+                  icon: 'edit',
+                  ariaLabel: 'Modifier la section À propos',
+                  dataAttrs: {
+                    'data-block-id': contentBlock.id,
+                    'data-element-id': aboutElement ? aboutElement.id : '',
+                    'data-section': 'about'
+                  }
+                })
+              %>
             <% } %>
           </div>
         </details>
@@ -78,16 +81,19 @@
               <p>Téléphone : 06 XX XX XX XX</p>
             <% } %>
             <% if (user) { %>
-              <button 
-                class="edit-footer-section-btn" 
-                data-block-id="<%= contentBlock.id %>"
-                data-element-id="<%= contactElement ? contactElement.id : '' %>"
-                data-section="contact"
-                type="button"
-                aria-label="Modifier les coordonnées de contact"
-              >
-                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-              </button>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'edit-footer-section-btn',
+                  icon: 'edit',
+                  ariaLabel: 'Modifier les coordonnées de contact',
+                  dataAttrs: {
+                    'data-block-id': contentBlock.id,
+                    'data-element-id': contactElement ? contactElement.id : '',
+                    'data-section': 'contact'
+                  }
+                })
+              %>
             <% } %>
           </address>
         </details>
@@ -112,15 +118,18 @@
               <p class="text-muted">Aucun réseau social configuré.</p>
             <% } %>
             <% if (user) { %>
-              <button 
-                class="edit-footer-section-btn" 
-                data-block-id="<%= contentBlock.id %>"
-                data-section="social"
-                type="button"
-                aria-label="Gérer les réseaux sociaux"
-              >
-                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-              </button>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'edit-footer-section-btn',
+                  icon: 'edit',
+                  ariaLabel: 'Gérer les réseaux sociaux',
+                  dataAttrs: {
+                    'data-block-id': contentBlock.id,
+                    'data-section': 'social'
+                  }
+                })
+              %>
             <% } %>
           </nav>
         </details>
@@ -149,15 +158,18 @@
               <p class="text-muted">Aucun lien externe.</p>
             <% } %>
             <% if (user) { %>
-              <button 
-                class="edit-footer-section-btn" 
-                data-block-id="<%= contentBlock.id %>"
-                data-section="link"
-                type="button"
-                aria-label="Gérer les liens externes"
-              >
-                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-              </button>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'edit-footer-section-btn',
+                  icon: 'edit',
+                  ariaLabel: 'Gérer les liens externes',
+                  dataAttrs: {
+                    'data-block-id': contentBlock.id,
+                    'data-section': 'link'
+                  }
+                })
+              %>
             <% } %>
           </nav>
         </details>

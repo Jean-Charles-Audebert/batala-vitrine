@@ -37,22 +37,7 @@
               <td class="block-position">
                 <span class="position-value"><%= block.position %></span>
                 <% if (block.type !== 'header' && block.type !== 'footer') { %>
-                  <div class="position-controls">
-                    <button 
-                      class="btn-move-up" 
-                      title="Monter"
-                      aria-label="Monter le bloc <%= block.title %>"
-                    >
-                      <img src="/icons/arrow-up.svg" alt="">
-                    </button>
-                    <button 
-                      class="btn-move-down" 
-                      title="Descendre"
-                      aria-label="Descendre le bloc <%= block.title %>"
-                    >
-                      <img src="/icons/arrow-down.svg" alt="">
-                    </button>
-                  </div>
+                  <%- include('../components/position-controls', { itemTitle: block.title, itemType: 'le bloc' }) %>
                 <% } else { %>
                   <span class="text-muted" style="font-size: 0.85rem;">
                     <%= block.type === 'header' ? 'Toujours en premier' : 'Toujours en dernier' %>

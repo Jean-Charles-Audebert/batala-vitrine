@@ -1,0 +1,33 @@
+<%
+  /**
+   * Composant bouton avec icône uniquement (pas de texte visible)
+   * 
+   * Props:
+   * - type: 'button' | 'submit' (default: 'button')
+   * - className: classes CSS additionnelles
+   * - icon: nom du fichier SVG (sans extension)
+   * - ariaLabel: description pour lecteurs d'écran (OBLIGATOIRE)
+   * - dataAttrs: objet pour data-* attributes { 'data-id': '123' }
+   * - onClick: handler JS optionnel (inline)
+   */
+  
+  const btnType = typeof type !== 'undefined' ? type : 'button';
+  const classes = typeof className !== 'undefined' ? className : '';
+  const iconName = typeof icon !== 'undefined' ? icon : 'edit';
+  const label = typeof ariaLabel !== 'undefined' ? ariaLabel : 'Action';
+  const dataAttributes = typeof dataAttrs !== 'undefined' ? dataAttrs : {};
+  const clickHandler = typeof onClick !== 'undefined' ? onClick : '';
+%>
+<button 
+  type="<%= btnType %>" 
+  class="<%= classes %>"
+  aria-label="<%= label %>"
+  <% Object.keys(dataAttributes).forEach(key => { %>
+    <%= key %>="<%= dataAttributes[key] %>"
+  <% }) %>
+  <% if (clickHandler) { %>
+    onclick="<%= clickHandler %>"
+  <% } %>
+>
+  <img src="/icons/<%= iconName %>.svg" alt="" role="presentation" class="icon" />
+</button>

@@ -27,15 +27,18 @@
         
         <% if (user) { %>
           <div class="edit-controls" role="toolbar" aria-label="Actions d'édition du header">
-            <button 
-              class="edit-btn" 
-              data-block-id="<%= contentBlock.id %>" 
-              data-action="edit-header" 
-              type="button"
-              aria-label="Modifier le header (logo et titre)"
-            >
-              <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-            </button>
+            <%-
+              include('icon-button', {
+                type: 'button',
+                className: 'edit-btn',
+                icon: 'edit',
+                ariaLabel: 'Modifier le header (logo et titre)',
+                dataAttrs: {
+                  'data-block-id': contentBlock.id,
+                  'data-action': 'edit-header'
+                }
+              })
+            %>
           </div>
         <% } %>
       </div>

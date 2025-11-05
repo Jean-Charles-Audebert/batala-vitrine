@@ -16,14 +16,15 @@
     <div class="section-header">
       <h2 id="section-title-<%= contentBlock.id %>"><%= contentBlock.title %></h2>
       <% if (user) { %>
-        <button 
-          class="add-card-btn" 
-          data-block-id="<%= contentBlock.id %>"
-          type="button"
-          aria-label="Ajouter une nouvelle carte dans <%= contentBlock.title %>"
-        >
-          <img src="/icons/plus.svg" alt="" role="presentation" class="icon" />
-        </button>
+        <%-
+          include('icon-button', {
+            type: 'button',
+            className: 'add-card-btn',
+            icon: 'plus',
+            ariaLabel: `Ajouter une nouvelle carte dans ${contentBlock.title}`,
+            dataAttrs: { 'data-block-id': contentBlock.id }
+          })
+        %>
       <% } %>
     </div>
     
@@ -43,22 +44,24 @@
           <% } %>
           <% if (user) { %>
             <div class="card-controls" role="toolbar" aria-label="Actions pour <%= card.title %>">
-              <button 
-                class="edit-card-btn" 
-                data-card-id="<%= card.id %>" 
-                type="button"
-                aria-label="Modifier la carte <%= card.title %>"
-              >
-                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
-              </button>
-              <button 
-                class="delete-card-btn" 
-                data-card-id="<%= card.id %>" 
-                type="button"
-                aria-label="Supprimer la carte <%= card.title %>"
-              >
-                <img src="/icons/trash.svg" alt="" role="presentation" class="icon" />
-              </button>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'edit-card-btn',
+                  icon: 'edit',
+                  ariaLabel: `Modifier la carte ${card.title}`,
+                  dataAttrs: { 'data-card-id': card.id }
+                })
+              %>
+              <%-
+                include('icon-button', {
+                  type: 'button',
+                  className: 'delete-card-btn',
+                  icon: 'trash',
+                  ariaLabel: `Supprimer la carte ${card.title}`,
+                  dataAttrs: { 'data-card-id': card.id }
+                })
+              %>
             </div>
           <% } %>
         </article>

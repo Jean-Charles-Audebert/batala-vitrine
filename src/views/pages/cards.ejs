@@ -38,22 +38,7 @@
             <tr data-card-id="<%= card.id %>" data-position="<%= card.position %>">
               <td class="card-position">
                 <span class="position-value"><%= card.position %></span>
-                <div class="position-controls">
-                  <button 
-                    class="btn-move-up" 
-                    title="Monter"
-                    aria-label="Monter la carte <%= card.title %>"
-                  >
-                    <img src="/icons/arrow-up.svg" alt="">
-                  </button>
-                  <button 
-                    class="btn-move-down" 
-                    title="Descendre"
-                    aria-label="Descendre la carte <%= card.title %>"
-                  >
-                    <img src="/icons/arrow-down.svg" alt="">
-                  </button>
-                </div>
+                <%- include('../components/position-controls', { itemTitle: card.title, itemType: 'la carte' }) %>
               </td>
               <td><strong><%= card.title %></strong></td>
               <td>

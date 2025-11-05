@@ -118,3 +118,21 @@ export async function canDeleteBlock(blockId) {
   
   return { canDelete: true };
 }
+
+/**
+ * Récupère un bloc avec validation minimale (id, type, title)
+ * Utile pour vérifier l'existence et le type avant une opération
+ * @param {number} blockId - ID du bloc
+ * @param {string|null} expectedType - Type attendu (null pour tout type)
+ * @returns {Promise<Object|null>} - Le bloc ou null
+ */
+export async function getBlockBasicInfo(blockId, expectedType = null) {
+  const query_text = expectedType
+    ? "SELECT id, type, title FROM blocks WHERE id=$1 AND type=$2"
+    : "SELECT id, type, title FROM blocks WHERE id=$1";
+  
+  const params = expectedType ? [blockId, expectedType] : [blockId];
+  
+  const { rows } = await query(query_text, params);
+  return rows[0] || null;
+}

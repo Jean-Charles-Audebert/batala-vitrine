@@ -1,0 +1,29 @@
+<%
+  /**
+   * Composant boutons de position (monter/descendre)
+   * Utilisé dans les tableaux avec drag-and-drop
+   * 
+   * Props:
+   * - itemTitle: titre de l'élément (pour aria-label)
+   * - itemType: 'bloc' | 'carte' | 'élément' (default: 'élément')
+   */
+  
+  const title = typeof itemTitle !== 'undefined' ? itemTitle : 'cet élément';
+  const itemTypeName = typeof itemType !== 'undefined' ? itemType : 'élément';
+%>
+<div class="position-controls">
+  <button 
+    class="btn-move-up" 
+    title="Monter"
+    aria-label="Monter <%= itemTypeName %> <%= title %>"
+  >
+    <img src="/icons/arrow-up.svg" alt="">
+  </button>
+  <button 
+    class="btn-move-down" 
+    title="Descendre"
+    aria-label="Descendre <%= itemTypeName %> <%= title %>"
+  >
+    <img src="/icons/arrow-down.svg" alt="">
+  </button>
+</div>
