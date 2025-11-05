@@ -75,13 +75,14 @@ body {
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #333;
-  border: none;
+  background: #cbd5e0;
+  color: #1a202c;
+  border: 1px solid #a0aec0;
 }
 
 .btn-secondary:hover {
-  background: #cbd5e0;
+  background: #a0aec0;
+  border-color: #718096;
 }
 
 .btn-secondary .icon {
@@ -278,6 +279,47 @@ th {
 }
 
 /* ==========================================================================
+   Responsive Mobile
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Tableaux scrollables horizontalement */
+  .admin-container table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Boutons taille tactile minimum WCAG (44x44px) */
+  .btn, .btn-sm {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Formulaires pleine largeur */
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px; /* Évite zoom iOS */
+  }
+  
+  /* Admin toolbar responsive */
+  .admin-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .toolbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .toolbar-actions .btn {
+    flex: 1;
+  }
+}
+
+/* ==========================================================================
    Blocks specific styles
    ========================================================================== */
 .block-position {
@@ -380,7 +422,7 @@ th {
 }
 
 .text-muted {
-  color: #a0aec0;
+  color: #4a5568;
   font-style: italic;
   font-size: 0.875rem;
 }

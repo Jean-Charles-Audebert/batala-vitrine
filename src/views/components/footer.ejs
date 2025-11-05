@@ -11,62 +11,78 @@
   const socialData = socialElement?.parsedContent || null;
 %>
 
-<footer class="block-section footer-section" data-block-id="<%= contentBlock.id %>">
+<footer class="block-section footer-section" data-block-id="<%= contentBlock.id %>" role="contentinfo">
   <div class="container">
     <div class="footer-content">
       <div class="footer-column">
         <details>
           <summary>À propos</summary>
-          <% if (aboutData && aboutData.about_content) { %>
-            <p><%= aboutData.about_content %></p>
-          <% } else { %>
-            <p>Description de votre organisation</p>
-          <% } %>
+          <div role="region" aria-label="Informations sur l'organisation">
+            <% if (aboutData && aboutData.about_content) { %>
+              <p><%= aboutData.about_content %></p>
+            <% } else { %>
+              <p>Description de votre organisation</p>
+            <% } %>
+          </div>
         </details>
       </div>
       
       <div class="footer-column">
         <details>
           <summary>Contact</summary>
-          <% if (contactData) { %>
-            <% if (contactData.email) { %>
-              <p>Email : <%= contactData.email %></p>
+          <address role="region" aria-label="Coordonnées de contact">
+            <% if (contactData) { %>
+              <% if (contactData.email) { %>
+                <p>Email : <a href="mailto:<%= contactData.email %>"><%= contactData.email %></a></p>
+              <% } %>
+              <% if (contactData.phone) { %>
+                <p>Téléphone : <a href="tel:<%= contactData.phone.replace(/\s/g, '') %>"><%= contactData.phone %></a></p>
+              <% } %>
+            <% } else { %>
+              <p>Email : <a href="mailto:contact@batala-larochelle.fr">contact@batala-larochelle.fr</a></p>
+              <p>Téléphone : <a href="tel:0600000000">06 XX XX XX XX</a></p>
             <% } %>
-            <% if (contactData.phone) { %>
-              <p>Téléphone : <%= contactData.phone %></p>
-            <% } %>
-          <% } else { %>
-            <p>Email : contact@batala-larochelle.fr</p>
-            <p>Téléphone : 06 XX XX XX XX</p>
-          <% } %>
+          </address>
         </details>
       </div>
       
       <div class="footer-column">
         <details>
           <summary>Suivez-nous</summary>
-          <div class="social-links">
+          <nav class="social-links" aria-label="Réseaux sociaux">
             <% if (socialData && socialData.links) { %>
               <% socialData.links.forEach(link => { %>
-                <a href="<%= link.url %>" target="_blank" rel="noopener noreferrer">
+                <a 
+                  href="<%= link.url %>" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  aria-label="<%= link.platform || link.network %> (ouvre dans un nouvel onglet)"
+                >
                   <%- getSocialIcon(link.platform || link.network) %>
                 </a>
               <% }) %>
             <% } else { %>
-              <a href="#" target="_blank"><%- getSocialIcon('facebook') %></a>
-              <a href="#" target="_blank"><%- getSocialIcon('instagram') %></a>
-              <a href="#" target="_blank"><%- getSocialIcon('youtube') %></a>
-              <a href="#" target="_blank"><%- getSocialIcon('tiktok') %></a>
+              <a href="#" target="_blank" aria-label="Facebook (ouvre dans un nouvel onglet)"><%- getSocialIcon('facebook') %></a>
+              <a href="#" target="_blank" aria-label="Instagram (ouvre dans un nouvel onglet)"><%- getSocialIcon('instagram') %></a>
+              <a href="#" target="_blank" aria-label="YouTube (ouvre dans un nouvel onglet)"><%- getSocialIcon('youtube') %></a>
+              <a href="#" target="_blank" aria-label="TikTok (ouvre dans un nouvel onglet)"><%- getSocialIcon('tiktok') %></a>
             <% } %>
-          </div>
+          </nav>
         </details>
       </div>
     </div>
     
     <% if (user) { %>
-      <div class="edit-controls">
-        <button class="edit-btn" data-block-id="<%= contentBlock.id %>" data-action="edit-footer" title="Modifier le footer">
-          <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
+      <div class="edit-controls" role="toolbar" aria-label="Actions d'édition du footer">
+        <button 
+          class="edit-btn" 
+          data-block-id="<%= contentBlock.id %>" 
+          data-action="edit-footer" 
+          type="button"
+          aria-label="Modifier les éléments du footer (à propos, contact, réseaux sociaux)"
+        >
+          <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+          <span>Modifier</span>
         </button>
       </div>
     <% } %>

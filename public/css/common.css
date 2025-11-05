@@ -7,7 +7,7 @@
   --color-secondary: #2ecc71;
   --color-danger: #e74c3c;
   --color-warning: #f39c12;
-  --color-info: #bee3f8;
+  --color-info: #4299e1;
   
   /* Couleurs de fond */
   --bg-primary: #ffffff;
@@ -16,7 +16,7 @@
   
   /* Couleurs de texte */
   --text-primary: #2c3e50;
-  --text-secondary: #7f8c8d;
+  --text-secondary: #4a5568;
   --text-light: #ecf0f1;
   
   /* Couleurs de bordure */
@@ -146,6 +146,51 @@
 }
 
 /**
+ * Accessibilité - Screen Reader Only
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/**
+ * Skip Link pour navigation clavier
+ */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  z-index: 10000;
+  border-radius: 0 0 var(--radius-sm) 0;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/**
  * Composants réutilisables - Badges
  */
 .badge {
@@ -171,8 +216,8 @@
 }
 
 .badge-info {
-  background-color: #bee3f8;
-  color: #2c5282;
+  background-color: var(--color-info);
+  color: white;
 }
 
 .badge-warning {
@@ -183,6 +228,47 @@
 .badge-danger {
   background-color: var(--color-danger);
   color: white;
+}
+
+/**
+ * Accessibilité - Focus Visible (WCAG 2.1)
+ */
+/* Supprime le outline par défaut pour clics souris */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Focus visible uniquement pour navigation clavier */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Focus spécifique pour boutons */
+.btn:focus-visible,
+button:focus-visible,
+a.btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+/* Focus pour liens */
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+/* Focus pour champs de formulaire */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /**

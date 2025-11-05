@@ -4,26 +4,54 @@
 %>
 
 <% if (user) { %>
-  <div id="cardModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
+  <div 
+    id="cardModal" 
+    class="modal" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-content" role="document">
+      <button 
+        class="close" 
+        type="button"
+        aria-label="Fermer la fenêtre de modification"
+      >&times;</button>
       <h2 id="modalTitle">Ajouter une carte</h2>
       <form id="cardForm">
-        <input type="hidden" name="cardId">
-        <input type="hidden" name="blockId">
+        <input type="hidden" name="cardId" aria-hidden="true">
+        <input type="hidden" name="blockId" aria-hidden="true">
         <div class="form-group">
           <label for="cardTitle">Titre</label>
-          <input id="cardTitle" type="text" name="title" required>
+          <input 
+            id="cardTitle" 
+            type="text" 
+            name="title" 
+            required
+            aria-required="true"
+          >
         </div>
         <div class="form-group">
           <label for="cardDescription">Description</label>
-          <textarea id="cardDescription" name="description" required></textarea>
+          <textarea 
+            id="cardDescription" 
+            name="description" 
+            required
+            aria-required="true"
+          ></textarea>
         </div>
         <div class="form-group">
           <label for="cardImage">URL de l'image</label>
-          <input id="cardImage" type="url" name="image">
+          <input 
+            id="cardImage" 
+            type="url" 
+            name="image"
+            aria-describedby="cardImageHelp"
+          >
+          <span id="cardImageHelp" class="form-help">Optionnel : URL complète de l'image</span>
         </div>
-        <button type="submit">Enregistrer</button>
+        <button type="submit" aria-label="Enregistrer la carte">Enregistrer</button>
       </form>
     </div>
   </div>

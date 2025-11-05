@@ -1,7 +1,21 @@
 <% if (typeof success !== 'undefined' && success) { %>
-  <div class="alert-success"><%= success %></div>
+  <div 
+    class="alert-success" 
+    role="alert"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <%= success %>
+  </div>
 <% } %>
 
 <% if (typeof error !== 'undefined' && error) { %>
-  <div class="alert-error"><%= error %></div>
+  <div 
+    class="alert-error" 
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <%= error %>
+  </div>
 <% } %>

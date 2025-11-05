@@ -5,15 +5,17 @@
   })
 %>
   <div class="vitrine-page">
-    <% blocks.forEach(contentBlock => { %>
-      <% if (contentBlock.type === 'header') { %>
-        <%- include('../components/header', { contentBlock, user }) %>
-      <% } else if (contentBlock.type === 'events' || contentBlock.type === 'offers') { %>
-        <%- include('../components/content-section', { contentBlock, user }) %>
-      <% } else if (contentBlock.type === 'footer') { %>
-        <%- include('../components/footer', { contentBlock, user, getSocialIcon }) %>
-      <% } %>
-    <% }) %>
+    <main id="main-content" role="main">
+      <% blocks.forEach(contentBlock => { %>
+        <% if (contentBlock.type === 'header') { %>
+          <%- include('../components/header', { contentBlock, user }) %>
+        <% } else if (contentBlock.type === 'events' || contentBlock.type === 'offers') { %>
+          <%- include('../components/content-section', { contentBlock, user }) %>
+        <% } else if (contentBlock.type === 'footer') { %>
+          <%- include('../components/footer', { contentBlock, user, getSocialIcon }) %>
+        <% } %>
+      <% }) %>
+    </main>
     
     <%- include('../components/card-modal', { user }) %>
     <%- include('../components/auth-fab', { user }) %>

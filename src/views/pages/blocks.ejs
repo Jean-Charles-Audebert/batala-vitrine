@@ -19,15 +19,16 @@
     <%- include('../partials/alerts') %>
 
     <% if (blocks && blocks.length > 0) { %>
-      <table>
+      <table role="table" aria-label="Liste des blocs du site">
+        <caption class="sr-only">Gestion des blocs (header, sections, footer) avec possibilité de réordonnancement</caption>
         <thead>
           <tr>
-            <th>Position</th>
-            <th>Type</th>
-            <th>Titre</th>
-            <th>Slug</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th scope="col">Position</th>
+            <th scope="col">Type</th>
+            <th scope="col">Titre</th>
+            <th scope="col">Slug</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody id="blocks-list">
@@ -73,20 +74,22 @@
                 <% } %>
               </td>
               <td>
-                <div class="actions">
+                <div class="actions" role="group" aria-label="Actions pour le bloc <%= block.title %>">
                   <a 
                     href="/blocks/<%= block.id %>/cards" 
                     class="btn btn-secondary btn-sm"
-                    title="Gérer les cartes"
+                    aria-label="Gérer les cartes du bloc <%= block.title %>"
                   >
-                    <img src="/icons/image.svg" alt="" class="btn-icon">
+                    <img src="/icons/image.svg" alt="" role="presentation" class="btn-icon">
+                    <span class="sr-only">Cartes</span>
                   </a>
                   <a 
                     href="/blocks/<%= block.id %>/edit" 
                     class="btn btn-secondary btn-sm"
-                    title="Modifier"
+                    aria-label="Modifier le bloc <%= block.title %>"
                   >
-                    <img src="/icons/edit.svg" alt="" class="btn-icon">
+                    <img src="/icons/edit.svg" alt="" role="presentation" class="btn-icon">
+                    <span class="sr-only">Modifier</span>
                   </a>
                   <% if (!block.is_locked) { %>
                     <form 
@@ -94,13 +97,15 @@
                       action="/blocks/<%= block.id %>/delete" 
                       style="display: inline;"
                       onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bloc ?');"
+                      aria-label="Formulaire de suppression"
                     >
                       <button 
                         type="submit" 
                         class="btn btn-danger btn-sm"
-                        title="Supprimer"
+                        aria-label="Supprimer le bloc <%= block.title %>"
                       >
-                        <img src="/icons/trash.svg" alt="" class="btn-icon">
+                        <img src="/icons/trash.svg" alt="" role="presentation" class="btn-icon">
+                        <span class="sr-only">Supprimer</span>
                       </button>
                     </form>
                   <% } %>

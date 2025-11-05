@@ -19,17 +19,18 @@
     <%- include('../partials/alerts') %>
 
     <% if (cards && cards.length > 0) { %>
-      <table>
+      <table role="table" aria-label="Liste des cartes du bloc <%= block.title %>">
+        <caption class="sr-only">Gestion des cartes avec réordonnancement pour le bloc <%= block.title %></caption>
         <thead>
           <tr>
-            <th>Position</th>
-            <th>Titre</th>
-            <th>Description</th>
-            <th>Image</th>
+            <th scope="col">Position</th>
+            <th scope="col">Titre</th>
+            <th scope="col">Description</th>
+            <th scope="col">Image</th>
             <% if (block.type === 'events') { %>
-              <th>Date événement</th>
+              <th scope="col">Date événement</th>
             <% } %>
-            <th>Actions</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody id="cards-list">
@@ -79,26 +80,29 @@
                 </td>
               <% } %>
               <td>
-                <div class="actions">
+                <div class="actions" role="group" aria-label="Actions pour la carte <%= card.title %>">
                   <a 
                     href="/blocks/<%= block.id %>/cards/<%= card.id %>/edit" 
                     class="btn btn-secondary btn-sm"
-                    title="Modifier"
+                    aria-label="Modifier la carte <%= card.title %>"
                   >
-                    <img src="/icons/edit.svg" alt="" class="btn-icon">
+                    <img src="/icons/edit.svg" alt="" role="presentation" class="btn-icon">
+                    <span class="sr-only">Modifier</span>
                   </a>
                   <form 
                     method="POST" 
                     action="/blocks/<%= block.id %>/cards/<%= card.id %>/delete" 
                     style="display: inline;"
                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette carte ?');"
+                    aria-label="Formulaire de suppression"
                   >
                     <button 
                       type="submit" 
                       class="btn btn-danger btn-sm"
-                      title="Supprimer"
+                      aria-label="Supprimer la carte <%= card.title %>"
                     >
-                      <img src="/icons/trash.svg" alt="" class="btn-icon">
+                      <img src="/icons/trash.svg" alt="" role="presentation" class="btn-icon">
+                      <span class="sr-only">Supprimer</span>
                     </button>
                   </form>
                 </div>

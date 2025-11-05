@@ -3,19 +3,37 @@
   // Variables attendues: user
 %>
 
-<div class="auth-fab">
+<nav class="auth-fab" aria-label="Navigation administrateur" role="navigation">
   <% if (user) { %>
-    <div class="fab-menu">
-      <a class="fab-item" href="/admin/blocks" title="Gérer les blocs">
-        <img src="/icons/settings.svg" alt="Blocs" class="fab-icon" />
+    <div class="fab-menu" role="menu">
+      <a 
+        class="fab-item" 
+        href="/admin/blocks" 
+        role="menuitem"
+        aria-label="Gérer les blocs du site"
+      >
+        <img src="/icons/settings.svg" alt="" role="presentation" class="fab-icon" />
+        <span class="sr-only">Gérer les blocs</span>
       </a>
-      <a class="fab-item fab-logout" href="/auth/logout/web" title="Déconnexion">
-        <img src="/icons/close.svg" alt="Déconnexion" class="fab-icon" />
+      <a 
+        class="fab-item fab-logout" 
+        href="/auth/logout/web" 
+        role="menuitem"
+        aria-label="Se déconnecter de l'interface administrateur"
+      >
+        <img src="/icons/close.svg" alt="" role="presentation" class="fab-icon" />
+        <span class="sr-only">Déconnexion</span>
       </a>
     </div>
   <% } else { %>
-    <a class="fab-login" href="/auth/login" title="Connexion administrateur">
-      <img src="/icons/settings.svg" alt="Connexion" class="fab-icon" />
+    <a 
+      class="fab-login" 
+      href="/auth/login" 
+      role="button"
+      aria-label="Connexion à l'interface administrateur"
+    >
+      <img src="/icons/settings.svg" alt="" role="presentation" class="fab-icon" />
+      <span class="sr-only">Connexion administrateur</span>
     </a>
   <% } %>
-</div>
+</nav>

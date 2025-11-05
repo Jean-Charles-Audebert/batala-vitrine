@@ -6,25 +6,36 @@
   const titleText = contentBlock.header_title || 'Titre de la page';
 %>
 
-<header class="block-section header-section" data-block-id="<%= contentBlock.id %>">
-  <div class="header-bg" style="background-image: url(<%= bgImage %>)">
+<header class="block-section header-section" data-block-id="<%= contentBlock.id %>" role="banner">
+  <div class="header-bg" style="background-image: url(<%= bgImage %>)" role="img" aria-label="Image de fond du header">
     <div class="container">
       <div class="header-content">
-        <img class="logo" src="<%= logoSrc %>" alt="Logo">
+        <img class="logo" src="<%= logoSrc %>" alt="Logo <%= titleText %>">
         <h1 class="site-title"><%= titleText %></h1>
         
         <% if (user) { %>
-          <nav class="admin-nav">
-            <a class="admin-link" href="/admins" title="Gérer les administrateurs">
-              <span class="icon">👥</span>
+          <nav class="admin-nav" aria-label="Liens administration rapides">
+            <a 
+              class="admin-link" 
+              href="/admins" 
+              aria-label="Gérer les administrateurs du site"
+            >
+              <span class="icon" role="img" aria-label="Icône utilisateurs">👥</span>
             </a>
           </nav>
         <% } %>
         
         <% if (user) { %>
-          <div class="edit-controls">
-            <button class="edit-btn" data-block-id="<%= contentBlock.id %>" data-action="edit-header" title="Modifier le header">
-              <img src="/icons/edit.svg" alt="Modifier" class="icon" />
+          <div class="edit-controls" role="toolbar" aria-label="Actions d'édition du header">
+            <button 
+              class="edit-btn" 
+              data-block-id="<%= contentBlock.id %>" 
+              data-action="edit-header" 
+              type="button"
+              aria-label="Modifier le header (logo et titre)"
+            >
+              <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+              <span class="sr-only">Modifier</span>
             </button>
           </div>
         <% } %>

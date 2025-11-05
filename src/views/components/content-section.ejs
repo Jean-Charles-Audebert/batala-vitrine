@@ -2,40 +2,69 @@
   // Composant Content Section (Actus / Offres)
   // Variables attendues: contentBlock, user
   const bgStyle = contentBlock.bg_image ? `background-image: url(${contentBlock.bg_image})` : '';
+  const sectionLabel = contentBlock.type === 'events' ? 'Section des événements' : 'Section des offres';
 %>
 
-<section class="block-section" id="<%= contentBlock.slug %>" data-block-id="<%= contentBlock.id %>" style="<%= bgStyle %>">
+<section 
+  class="block-section" 
+  id="<%= contentBlock.slug %>" 
+  data-block-id="<%= contentBlock.id %>" 
+  style="<%= bgStyle %>"
+  aria-labelledby="section-title-<%= contentBlock.id %>"
+>
   <div class="container">
     <div class="section-header">
-      <h2><%= contentBlock.title %></h2>
+      <h2 id="section-title-<%= contentBlock.id %>"><%= contentBlock.title %></h2>
       <% if (user) { %>
-        <button class="add-card-btn" data-block-id="<%= contentBlock.id %>">
-          <img src="/icons/plus.svg" alt="Ajouter" class="icon" />
+        <button 
+          class="add-card-btn" 
+          data-block-id="<%= contentBlock.id %>"
+          type="button"
+          aria-label="Ajouter une nouvelle carte dans <%= contentBlock.title %>"
+        >
+          <img src="/icons/plus.svg" alt="" role="presentation" class="icon" />
+          <span class="sr-only">Ajouter</span>
         </button>
       <% } %>
     </div>
     
-    <div class="cards-grid">
+    <div class="cards-grid" role="list" aria-label="<%= sectionLabel %>">
       <% (contentBlock.cards || []).forEach(card => { %>
-        <div class="card" data-card-id="<%= card.id %>">
+        <article class="card" data-card-id="<%= card.id %>" role="listitem">
           <% if (card.media_path) { %>
-            <img src="<%= card.media_path %>" alt="<%= card.title %>">
+            <img 
+              src="<%= card.media_path %>" 
+              alt="<%= card.title %> - <%= card.description ? card.description.substring(0, 100) : 'Illustration' %>"
+              loading="lazy"
+            >
           <% } %>
           <h3><%= card.title %></h3>
           <% if (card.description) { %>
             <p><%= card.description %></p>
           <% } %>
           <% if (user) { %>
-            <div class="card-controls">
-              <button class="edit-card-btn" data-card-id="<%= card.id %>" title="Modifier">
-                <img src="/icons/edit.svg" alt="Modifier" class="icon" />
+            <div class="card-controls" role="toolbar" aria-label="Actions pour <%= card.title %>">
+              <button 
+                class="edit-card-btn" 
+                data-card-id="<%= card.id %>" 
+                type="button"
+                aria-label="Modifier la carte <%= card.title %>"
+              >
+                <img src="/icons/edit.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Modifier</span>
               </button>
-              <button class="delete-card-btn" data-card-id="<%= card.id %>" title="Supprimer">
-                <img src="/icons/trash.svg" alt="Supprimer" class="icon" />
+              <button 
+                class="delete-card-btn" 
+                data-card-id="<%= card.id %>" 
+                type="button"
+                aria-label="Supprimer la carte <%= card.title %>"
+              >
+                <img src="/icons/trash.svg" alt="" role="presentation" class="icon" />
+                <span class="sr-only">Supprimer</span>
               </button>
             </div>
           <% } %>
-        </div>
+        </article>
       <% }) %>
     </div>
   </div>
