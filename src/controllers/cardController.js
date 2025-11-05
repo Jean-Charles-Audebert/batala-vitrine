@@ -186,3 +186,72 @@ export const reorderCards = async (req, res) => {
     res.status(500).json({ error: "Erreur lors du réordonnancement" });
   }
 };
+
+/**
+ * API JSON - Récupère une carte par id pour édition inline
+ * GET /api/blocks/:blockId/cards/:id
+ */
+export const getCardJson = async (req, res) => {
+  const { blockId, id } = req.params;
+  try {
+    const { rows } = await query(
+      "SELECT id, block_id, position, title, description, media_path, event_date FROM cards WHERE id=$1 AND block_id=$2",
+      [id, blockId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Carte non trouvée" });
+    }
+    res.json({ success: true, card: rows[0] });
+  } catch (error) {
+    logger.error("Erreur API getCardJson", error);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+/**
+ * API JSON - Met à jour une carte (édition inline)
+ * POST /api/blocks/:blockId/cards/:id
+ */
+export const updateCardJson = async (req, res) => {
+  const { blockId, id } = req.params;
+  const { title, description, media_path, event_date, position } = req.body;
+
+  if (!title || !title.trim()) {
+    return res.status(400).json({ success: false, message: "Le titre est requis" });
+  }
+  try {
+    const { rows } = await query(
+      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=COALESCE($5, position), updated_at=NOW() WHERE id=$6 AND block_id=$7 RETURNING id, block_id, position, title, description, media_path, event_date",
+      [title.trim(), description || null, media_path || null, event_date || null, position || null, id, blockId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Carte non trouvée" });
+    }
+    res.json({ success: true, message: SUCCESS_MESSAGES.CARD_UPDATED, card: rows[0] });
+  } catch (error) {
+    logger.error("Erreur API updateCardJson", error);
+    res.status(500).json({ success: false, message: ERROR_MESSAGES.DATABASE_ERROR });
+  }
+};
+
+/**
+ * API JSON - Crée une carte (création rapide depuis modale)
+ * POST /api/blocks/:blockId/cards
+ */
+export const createCardJson = async (req, res) => {
+  const { blockId } = req.params;
+  const { title, description, media_path, event_date, position } = req.body;
+  if (!title || !title.trim()) {
+    return res.status(400).json({ success: false, message: "Le titre est requis" });
+  }
+  try {
+    const { rows } = await query(
+      "INSERT INTO cards (block_id, title, description, media_path, event_date, position) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 999)) RETURNING id, block_id, position, title, description, media_path, event_date",
+      [blockId, title.trim(), description || null, media_path || null, event_date || null, position || null]
+    );
+    res.status(201).json({ success: true, message: SUCCESS_MESSAGES.CARD_CREATED, card: rows[0] });
+  } catch (error) {
+    logger.error("Erreur API createCardJson", error);
+    res.status(500).json({ success: false, message: ERROR_MESSAGES.DATABASE_ERROR });
+  }
+};

@@ -5,7 +5,7 @@
  * @fileoverview Scripts pour l'édition en ligne de la page d'accueil
  */
 
-/* global document, confirm, window */
+/* global document, confirm, window, fetch */
 
 // ==========================================================================
 // Gestion des modales
@@ -17,7 +17,11 @@
 document.querySelectorAll('[data-modal]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const modalId = e.target.dataset.modal + 'Modal';
-    document.getElementById(modalId)?.classList.add('active');
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+      modalEl.classList.add('active');
+      modalEl.setAttribute('aria-hidden', 'false');
+    }
   });
 });
 
@@ -27,8 +31,23 @@ document.querySelectorAll('[data-modal]').forEach(btn => {
 document.querySelectorAll('[data-close-modal]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const modalId = e.target.dataset.closeModal + 'Modal';
-    document.getElementById(modalId)?.classList.remove('active');
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+      modalEl.classList.remove('active');
+      modalEl.setAttribute('aria-hidden', 'true');
+    }
   });
+});
+
+// Fermer la modale au clavier (Esc)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modalEl = document.getElementById('cardModal');
+    if (modalEl && modalEl.classList.contains('active')) {
+      modalEl.classList.remove('active');
+      modalEl.setAttribute('aria-hidden', 'true');
+    }
+  }
 });
 
 // ==========================================================================
@@ -36,20 +55,41 @@ document.querySelectorAll('[data-close-modal]').forEach(btn => {
 // ==========================================================================
 
 /**
- * Éditer une carte existante - redirige vers l'interface admin
+ * Éditer une carte existante - ouverture modale et sauvegarde en AJAX
  */
 const editCardButtons = document.querySelectorAll('.edit-card-btn');
 
 editCardButtons.forEach(btn => {
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
     
     const cardId = e.currentTarget.dataset.cardId;
     const blockId = e.currentTarget.closest('[data-block-id]')?.dataset.blockId;
     
-    if (blockId && cardId) {
-      window.location.href = `/blocks/${blockId}/cards/${cardId}/edit`;
+    if (!blockId || !cardId) return;
+
+    try {
+      const resp = await fetch(`/api/blocks/${blockId}/cards/${cardId}`);
+      const data = await resp.json();
+      if (!data.success) throw new Error(data.message || 'Erreur lors du chargement de la carte');
+
+      const card = data.card;
+      // Renseigner la modale
+      const modalEl = document.getElementById('cardModal');
+      if (!modalEl) return;
+      modalEl.classList.add('active');
+      modalEl.setAttribute('aria-hidden', 'false');
+      document.getElementById('modalTitle').textContent = 'Modifier la carte';
+      const form = document.getElementById('cardForm');
+      form.querySelector('[name="cardId"]').value = card.id;
+      form.querySelector('[name="blockId"]').value = card.block_id;
+      document.getElementById('cardTitle').value = card.title || '';
+      document.getElementById('cardDescription').value = card.description || '';
+      const imgInput = document.getElementById('cardImage');
+      if (imgInput) imgInput.value = card.media_path || '';
+    } catch (err) {
+      window.alert(err.message);
     }
   });
 });
@@ -81,7 +121,7 @@ deleteCardButtons.forEach(btn => {
 });
 
 /**
- * Ajouter une nouvelle carte - redirige vers l'interface admin
+ * Ajouter une nouvelle carte - ouverture modale (création rapide)
  */
 const addCardButtons = document.querySelectorAll('.add-card-btn');
 
@@ -89,13 +129,66 @@ addCardButtons.forEach(btn => {
   btn.addEventListener('click', (e) => {
     const blockId = e.currentTarget.dataset.blockId;
     
-    if (blockId) {
-      window.location.href = `/blocks/${blockId}/cards/new`;
-    }
+    if (!blockId) return;
+    const modalEl = document.getElementById('cardModal');
+    if (!modalEl) return;
+    modalEl.classList.add('active');
+    modalEl.setAttribute('aria-hidden', 'false');
+    document.getElementById('modalTitle').textContent = 'Ajouter une carte';
+    const form = document.getElementById('cardForm');
+    form.querySelector('[name="cardId"]').value = '';
+    form.querySelector('[name="blockId"]').value = blockId;
+    document.getElementById('cardTitle').value = '';
+    document.getElementById('cardDescription').value = '';
+    const imgInput = document.getElementById('cardImage');
+    if (imgInput) imgInput.value = '';
   });
 });
 
-// Supprimé - les formulaires sont maintenant gérés par les pages admin dédiées
+// Soumission du formulaire modale (création/mise à jour via API JSON)
+const cardForm = document.getElementById('cardForm');
+if (cardForm) {
+  cardForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const cardId = form.querySelector('[name="cardId"]').value;
+    const blockId = form.querySelector('[name="blockId"]').value;
+    const title = document.getElementById('cardTitle').value.trim();
+    const description = document.getElementById('cardDescription').value.trim();
+    const imageUrl = document.getElementById('cardImage')?.value?.trim() || '';
+
+    if (!title) {
+      window.alert('Le titre est requis');
+      document.getElementById('cardTitle').focus();
+      return;
+    }
+
+    const payload = { title, description, media_path: imageUrl };
+    const isCreate = !cardId;
+    const url = isCreate 
+      ? `/api/blocks/${blockId}/cards`
+      : `/api/blocks/${blockId}/cards/${cardId}`;
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      if (!data.success) throw new Error(data.message || 'Erreur lors de la sauvegarde');
+
+      // Fermer modal et recharger pour refléter les changements
+      const modalEl = document.getElementById('cardModal');
+      if (modalEl) {
+        modalEl.classList.remove('active');
+        modalEl.setAttribute('aria-hidden', 'true');
+      }
+      window.location.reload();
+    } catch (err) {
+      window.alert(err.message);
+    }
+  });
+}
 
 // ==========================================================================
 // Placeholders pour fonctionnalités futures
