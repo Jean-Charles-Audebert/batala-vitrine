@@ -101,11 +101,6 @@
   font-size: 0.875rem;
 }
 
-.btn-icon {
-  width: 16px;
-  height: 16px;
-}
-
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;

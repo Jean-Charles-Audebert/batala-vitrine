@@ -5,7 +5,7 @@
       <% toolbarButtons.forEach(button => { %>
     <a href="<%= button.href %>" class="btn <%= button.class || 'btn-secondary' %>">
       <% if (button.icon) { %>
-      <img src="/icons/<%= button.icon %>.svg" alt="" class="btn-icon">
+      <img src="/icons/<%= button.icon %>.svg" alt="" class="icon">
       <% } %>
       <%= button.label %>
     </a>

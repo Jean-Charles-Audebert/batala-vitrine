@@ -262,10 +262,11 @@ th {
   cursor: pointer;
 }
 
-.btn-icon {
+/* SUPPRIMÉ - géré dans buttons.css */
+/* .btn-icon {
   width: 16px;
   height: 16px;
-}
+} */
 
 .btn-sm {
   padding: 0.5rem 0.75rem;

@@ -52,11 +52,6 @@ app.use(cookieParser());
 
 // --- Fichiers statiques ---
 app.use(express.static(path.join(__dirname, "../public")));
-// Alias rétrocompatibilité: servir /images/* depuis /public/icons
-app.use(
-  "/images",
-  express.static(path.join(__dirname, "../public/icons"))
-);
 
 // --- Configuration du moteur de vues ---
 app.set("view engine", "ejs");

@@ -9,9 +9,13 @@ export const showHome = async (req, res, deps = {}) => {
     const dbCheck = await _query("SELECT current_database()");
     logger.info(`Base de données connectée: ${dbCheck.rows[0].current_database}`);
     
-    // Récupérer tous les blocs dans l'ordre de position
+    // Récupérer les paramètres de la page (thème global)
+    const { rows: pageRows } = await _query("SELECT * FROM page WHERE id=1");
+    const pageSettings = pageRows[0] || { theme: {} };
+    
+    // Récupérer tous les blocs dans l'ordre de position (avec nouveaux champs de thème)
     const { rows: blocks } = await _query(
-      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image FROM blocks ORDER BY position ASC"
+      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image, is_transparent, bg_color, title_font, title_color FROM blocks ORDER BY position ASC"
     );
     
     // Pour chaque bloc, récupérer ses éléments selon le type
@@ -29,9 +33,9 @@ export const showHome = async (req, res, deps = {}) => {
           parsedContent: el.content ? JSON.parse(el.content) : null
         }));
       } else if (block.type !== 'header') {
-        // Autres blocs (actus, offres, ...): charger les cartes normalisées
+        // Autres blocs (actus, offres, ...): charger les cartes normalisées (avec nouveaux champs de thème)
         const { rows: cards } = await _query(
-          "SELECT id, position, title, description, media_path FROM cards WHERE block_id=$1 ORDER BY position ASC",
+          "SELECT id, position, title, description, media_path, bg_color, title_color, description_color FROM cards WHERE block_id=$1 ORDER BY position ASC",
           [block.id]
         );
         block.cards = cards;
@@ -42,6 +46,7 @@ export const showHome = async (req, res, deps = {}) => {
     res.render("pages/index", {
       title: "Accueil",
       blocks,
+      pageSettings,
       user: req.user || null,
       getSocialIcon
     });
@@ -50,6 +55,7 @@ export const showHome = async (req, res, deps = {}) => {
     res.render("pages/index", {
       title: "Accueil",
       blocks: [],
+      pageSettings: { theme: {} },
       user: null,
       getSocialIcon
     });

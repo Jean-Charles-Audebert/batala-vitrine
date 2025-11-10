@@ -1,20 +1,79 @@
 <%-
   include('../partials/head', {
     title,
-    stylesheets: ['/css/style.css', '/css/index.css']
+    stylesheets: ['/css/style.css', '/css/index.css', '/css/buttons.css']
   })
 %>
+  <%
+    // Extraire les thèmes des 3 zones avec valeurs par défaut
+    const headerBgImage = pageSettings?.header_bg_image || null;
+    const headerBgColor = pageSettings?.header_bg_color || '#ffffff';
+    const headerTitleFont = pageSettings?.header_title_font || 'Arial, sans-serif';
+    const headerTitleColor = pageSettings?.header_title_color || '#333333';
+    
+    const mainBgImage = pageSettings?.main_bg_image || null;
+    const mainBgColor = pageSettings?.main_bg_color || '#f5f5f5';
+    const mainTitleFont = pageSettings?.main_title_font || 'Arial, sans-serif';
+    const mainTitleColor = pageSettings?.main_title_color || '#333333';
+    
+    const footerBgImage = pageSettings?.footer_bg_image || null;
+    const footerBgColor = pageSettings?.footer_bg_color || '#2c3e50';
+    const footerTextColor = pageSettings?.footer_text_color || '#ecf0f1';
+  %>
+  
+  <!-- Variables CSS pour le thème (3 zones: header, main, footer) -->
+  <style>
+    :root {
+      /* ZONE 1: HEADER */
+      --header-bg-color: <%= headerBgColor %>;
+      <% if (headerBgImage) { %>
+      --header-bg-image: url(<%= headerBgImage %>);
+      <% } %>
+      --header-title-font: <%= headerTitleFont %>;
+      --header-title-color: <%= headerTitleColor %>;
+      
+      /* ZONE 2: MAIN CONTENT */
+      --main-bg-color: <%= mainBgColor %>;
+      <% if (mainBgImage) { %>
+      --main-bg-image: url(<%= mainBgImage %>);
+      <% } %>
+      --main-title-font: <%= mainTitleFont %>;
+      --main-title-color: <%= mainTitleColor %>;
+      
+      /* ZONE 3: FOOTER */
+      --footer-bg-color: <%= footerBgColor %>;
+      <% if (footerBgImage) { %>
+      --footer-bg-image: url(<%= footerBgImage %>);
+      <% } %>
+      --footer-text-color: <%= footerTextColor %>;
+    }
+  </style>
+
   <div class="vitrine-page">
     <main id="main-content" role="main">
-      <% blocks.forEach(contentBlock => { %>
-        <% if (contentBlock.type === 'header') { %>
-          <%- include('../components/header', { contentBlock, user }) %>
-        <% } else if (contentBlock.type === 'events' || contentBlock.type === 'offers') { %>
+      <%
+        // Séparer les blocs en 3 catégories
+        const headerBlock = blocks.find(b => b.type === 'header');
+        const footerBlock = blocks.find(b => b.type === 'footer');
+        const mainBlocks = blocks.filter(b => b.type !== 'header' && b.type !== 'footer');
+      %>
+      
+      <!-- ZONE 1: HEADER -->
+      <% if (headerBlock) { %>
+        <%- include('../components/header', { contentBlock: headerBlock, user }) %>
+      <% } %>
+      
+      <!-- ZONE 2: MAIN CONTENT WRAPPER (tous les blocs sauf header/footer) -->
+      <div class="main-content-wrapper">
+        <% mainBlocks.forEach(contentBlock => { %>
           <%- include('../components/content-section', { contentBlock, user }) %>
-        <% } else if (contentBlock.type === 'footer') { %>
-          <%- include('../components/footer', { contentBlock, user, getSocialIcon }) %>
-        <% } %>
-      <% }) %>
+        <% }) %>
+      </div>
+      
+      <!-- ZONE 3: FOOTER -->
+      <% if (footerBlock) { %>
+        <%- include('../components/footer', { contentBlock: footerBlock, user, getSocialIcon }) %>
+      <% } %>
     </main>
     
     <%- include('../components/card-modal', { user }) %>

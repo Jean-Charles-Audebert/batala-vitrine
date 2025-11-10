@@ -63,16 +63,27 @@ export const showEditBlockForm = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, type, title, slug, position, is_locked, bg_image, header_logo, header_title FROM blocks WHERE id=$1", 
+      "SELECT id, type, title, slug, position, is_locked, bg_image, header_logo, header_title, is_transparent, bg_color, title_font, title_color FROM blocks WHERE id=$1", 
       [id]
     );
     if (rows.length === 0) {
       return res.status(404).send("Bloc non trouvé");
     }
+    
+    const block = rows[0];
+    
+    // Récupérer les paramètres de la page si c'est le header
+    let pageSettings = null;
+    if (block.type === 'header') {
+      const { rows: pageRows } = await query("SELECT * FROM page WHERE id=1");
+      pageSettings = pageRows[0] || null;
+    }
+    
     res.render("pages/block-form", { 
-      title: "Modifier un bloc", 
+      title: block.type === 'header' ? "Paramètres de la page" : "Modifier un bloc", 
       formAction: `/blocks/${id}/edit`,
-      block: rows[0]
+      block,
+      pageSettings
     });
   } catch (error) {
     logger.error("Erreur récupération bloc", error);
@@ -83,7 +94,15 @@ export const showEditBlockForm = async (req, res) => {
 export const updateBlock = crudActionWrapper(
   async (req, res) => {
     const { id } = req.params;
-    const { type, title, slug, position, header_title, header_logo, bg_image } = req.body;
+    const { 
+      type, title, slug, position, header_title, header_logo, bg_image,
+      // Page theme settings (3 zones: header, main, footer)
+      header_bg_image, header_bg_color, header_title_font, header_title_color,
+      main_bg_image, main_bg_color, main_title_font, main_title_color,
+      footer_bg_image, footer_bg_color, footer_text_color,
+      // Block theme settings
+      is_transparent, block_bg_color, block_title_font, block_title_color
+    } = req.body;
     
     // Récupérer le type de bloc actuel
     const { rows: currentBlock } = await query("SELECT type FROM blocks WHERE id=$1", [id]);
@@ -93,25 +112,51 @@ export const updateBlock = crudActionWrapper(
     
     const blockType = currentBlock[0].type;
     
-    // Pour les blocs header, on met à jour les champs spécifiques
+    // Pour les blocs header, on met à jour les champs spécifiques + paramètres de la page
     if (blockType === 'header') {
       if (!header_title) {
         return res.status(400).send("Le titre du site est requis pour le header");
       }
       
+      // Mise à jour du bloc header
       await query(
         "UPDATE blocks SET header_title=$1, header_logo=$2, bg_image=$3 WHERE id=$4",
         [header_title, header_logo || null, bg_image || null, id]
       );
+      
+      // Mise à jour des paramètres de la page (thème global avec 3 zones)
+      await query(
+        `UPDATE page SET 
+          header_bg_image=$1, header_bg_color=$2, header_title_font=$3, header_title_color=$4,
+          main_bg_image=$5, main_bg_color=$6, main_title_font=$7, main_title_color=$8,
+          footer_bg_image=$9, footer_bg_color=$10, footer_text_color=$11,
+          updated_at=NOW() 
+        WHERE id=1`,
+        [
+          header_bg_image || null, header_bg_color || '#ffffff', header_title_font || 'Arial, sans-serif', header_title_color || '#333333',
+          main_bg_image || null, main_bg_color || '#f5f5f5', main_title_font || 'Arial, sans-serif', main_title_color || '#333333',
+          footer_bg_image || null, footer_bg_color || '#2c3e50', footer_text_color || '#ecf0f1'
+        ]
+      );
     } else {
-      // Pour les autres blocs, mise à jour standard
+      // Pour les autres blocs, mise à jour standard + thème du bloc
       if (!type || !title || !slug) {
         return res.status(400).send("Type, titre et slug requis");
       }
       
       await query(
-        "UPDATE blocks SET type=$1, title=$2, slug=$3, position=$4, bg_image=$5 WHERE id=$6",
-        [type, title, slug, position || 999, bg_image || null, id]
+        `UPDATE blocks SET 
+          type=$1, title=$2, slug=$3, position=$4, bg_image=$5,
+          is_transparent=$6, bg_color=$7, title_font=$8, title_color=$9
+        WHERE id=$10`,
+        [
+          type, title, slug, position || 999, bg_image || null,
+          is_transparent === 'true' || is_transparent === true, 
+          block_bg_color || null, 
+          block_title_font || null, 
+          block_title_color || null,
+          id
+        ]
       );
     }
   },

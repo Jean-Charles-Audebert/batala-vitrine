@@ -2,7 +2,7 @@
   include('../partials/head', {
     title,
     subtitle: 'Batala Vitrine',
-    stylesheets: ['/css/admin.css']
+    stylesheets: ['/css/admin.css', '/css/buttons.css']
   })
 %>
   <div class="admin-container">
@@ -59,12 +59,12 @@
             data-target-field="media_path"
           >
           <button 
-            type="button" 
+          <button 
             class="btn btn-secondary btn-sm"
             onclick="document.getElementById('media_path_upload').click()"
             title="Uploader une image"
           >
-            <img src="/icons/image.svg" alt="" class="btn-icon">
+            <img src="/icons/image.svg" alt="" class="icon">
             Choisir
           </button>
         </div>
@@ -116,14 +116,21 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          <img src="/icons/save.svg" alt="" class="btn-icon">
-          <%= card ? 'Mettre à jour' : 'Créer' %>
-        </button>
-        <a href="/blocks/<%= block.id %>/cards" class="btn btn-secondary">
-          <img src="/icons/cancel.svg" alt="" class="btn-icon">
-          Annuler
-        </a>
+        <%- include('../components/icon-button', {
+          type: 'submit',
+          className: 'btn btn-primary',
+          icon: 'save',
+          text: card ? 'Mettre à jour' : 'Créer',
+          ariaLabel: card ? 'Mettre à jour la carte' : 'Créer la carte'
+        }) %>
+        <%- include('../components/icon-button', {
+          type: 'a',
+          href: `/blocks/${block.id}/cards`,
+          className: 'btn btn-secondary',
+          icon: 'cancel',
+          text: 'Annuler',
+          ariaLabel: 'Annuler et retourner à la liste des cartes'
+        }) %>
       </div>
     </form>
   </div>

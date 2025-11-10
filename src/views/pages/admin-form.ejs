@@ -2,7 +2,7 @@
   include('../partials/head', {
     title,
     subtitle: 'Batala Vitrine',
-    stylesheets: ['/css/admin.css']
+    stylesheets: ['/css/admin.css', '/css/buttons.css']
   })
 %>
   <div class="admin-container">
@@ -63,14 +63,21 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          <img src="/icons/save.svg" alt="" class="btn-icon">
-          <%= admin ? 'Mettre à jour' : 'Créer' %>
-        </button>
-        <a href="/admins" class="btn btn-secondary">
-          <img src="/icons/cancel.svg" alt="" class="btn-icon">
-          Annuler
-        </a>
+        <%- include('../components/icon-button', {
+          type: 'submit',
+          className: 'btn btn-primary',
+          icon: 'save',
+          text: admin ? 'Mettre à jour' : 'Créer',
+          ariaLabel: admin ? 'Mettre à jour l\'administrateur' : 'Créer l\'administrateur'
+        }) %>
+        <%- include('../components/icon-button', {
+          type: 'a',
+          href: '/admins',
+          className: 'btn btn-secondary',
+          icon: 'cancel',
+          text: 'Annuler',
+          ariaLabel: 'Annuler et retourner à la liste des administrateurs'
+        }) %>
       </div>
     </form>
   </div>

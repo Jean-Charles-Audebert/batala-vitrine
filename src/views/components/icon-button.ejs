@@ -1,33 +1,57 @@
 <%
   /**
-   * Composant bouton avec icône uniquement (pas de texte visible)
+   * Composant bouton avec icône (avec ou sans texte)
    * 
    * Props:
-   * - type: 'button' | 'submit' (default: 'button')
+   * - type: 'button' | 'submit' | 'a' (default: 'button')
+   * - href: URL si type='a'
    * - className: classes CSS additionnelles
    * - icon: nom du fichier SVG (sans extension)
+   * - text: texte visible à côté de l'icône (optionnel)
    * - ariaLabel: description pour lecteurs d'écran (OBLIGATOIRE)
    * - dataAttrs: objet pour data-* attributes { 'data-id': '123' }
    * - onClick: handler JS optionnel (inline)
+   * - onSubmit: handler pour formulaires (si applicable)
+   * - title: tooltip
    */
   
   const btnType = typeof type !== 'undefined' ? type : 'button';
   const classes = typeof className !== 'undefined' ? className : '';
   const iconName = typeof icon !== 'undefined' ? icon : 'edit';
   const label = typeof ariaLabel !== 'undefined' ? ariaLabel : 'Action';
+  const buttonText = typeof text !== 'undefined' ? text : '';
   const dataAttributes = typeof dataAttrs !== 'undefined' ? dataAttrs : {};
   const clickHandler = typeof onClick !== 'undefined' ? onClick : '';
+  const hrefAttr = typeof href !== 'undefined' ? href : '';
+  const titleAttr = typeof title !== 'undefined' ? title : '';
+  const submitHandler = typeof onSubmit !== 'undefined' ? onSubmit : '';
 %>
+<% if (btnType === 'a') { %>
+<a 
+  href="<%= hrefAttr %>"
+  class="<%= classes %>"
+  aria-label="<%= label %>"
+  <% if (titleAttr) { %>title="<%= titleAttr %>"<% } %>
+  <% Object.keys(dataAttributes).forEach(key => { %>
+    <%= key %>="<%= dataAttributes[key] %>"
+  <% }) %>
+>
+  <img src="/icons/<%= iconName %>.svg" alt="" role="presentation" class="icon" />
+  <% if (buttonText) { %><%= buttonText %><% } %>
+</a>
+<% } else { %>
 <button 
   type="<%= btnType %>" 
   class="<%= classes %>"
   aria-label="<%= label %>"
+  <% if (titleAttr) { %>title="<%= titleAttr %>"<% } %>
   <% Object.keys(dataAttributes).forEach(key => { %>
     <%= key %>="<%= dataAttributes[key] %>"
   <% }) %>
-  <% if (clickHandler) { %>
-    onclick="<%= clickHandler %>"
-  <% } %>
+  <% if (clickHandler) { %>onclick="<%= clickHandler %>"<% } %>
+  <% if (submitHandler) { %>onsubmit="<%= submitHandler %>"<% } %>
 >
   <img src="/icons/<%= iconName %>.svg" alt="" role="presentation" class="icon" />
+  <% if (buttonText) { %><%= buttonText %><% } %>
 </button>
+<% } %>

@@ -2,7 +2,7 @@
   include('../partials/head', {
     title,
     subtitle: 'Batala Vitrine',
-    stylesheets: ['/css/admin.css']
+    stylesheets: ['/css/admin.css', '/css/buttons.css']
   })
 %>
   <div class="admin-container">
@@ -113,7 +113,7 @@
               onclick="document.getElementById('header_logo_upload').click()"
               title="Uploader une image"
             >
-              <img src="/icons/image.svg" alt="" class="btn-icon">
+              <img src="/icons/image.svg" alt="" class="icon">
               Choisir
             </button>
           </div>
@@ -155,7 +155,7 @@
               onclick="document.getElementById('bg_image_upload').click()"
               title="Uploader une image"
             >
-              <img src="/icons/image.svg" alt="" class="btn-icon">
+              <img src="/icons/image.svg" alt="" class="icon">
               Choisir
             </button>
           </div>
@@ -172,6 +172,236 @@
             </div>
           <% } %>
         </div>
+
+        <!-- Paramètres globaux de la page (uniquement pour header) -->
+        <% if (pageSettings) { %>
+          <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+          
+          <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">🎨 Thème de la page</h2>
+          
+          <p style="margin-bottom: 2rem; padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 4px;">
+            <strong>ℹ️ Information :</strong> Personnalisez l'apparence de votre site en définissant les thèmes pour chaque zone (Header, Contenu principal, Footer).
+            <br><br>
+            <a href="/" target="_blank" style="color: #1976D2; text-decoration: underline;">👁️ Aperçu du site dans un nouvel onglet</a>
+          </p>
+          
+          <!-- SECTION 1: HEADER -->
+          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #2196F3; color: #333; font-size: 1.25rem;">
+            📋 Zone 1 : En-tête (Header)
+          </h3>
+          
+          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+            Personnalisez l'apparence de la zone d'en-tête du site (logo, titre principal).
+          </p>
+
+          <div class="form-group">
+            <label for="header_bg_image">Image de fond du header</label>
+            <input 
+              type="text" 
+              id="header_bg_image" 
+              name="header_bg_image" 
+              value="<%= pageSettings.header_bg_image || '' %>" 
+              placeholder="/assets/header-bg.jpg"
+            >
+            <small class="form-help">Image affichée en arrière-plan du header.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="header_bg_color">Couleur de fond du header</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="header_bg_color" 
+                name="header_bg_color" 
+                value="<%= pageSettings.header_bg_color || '#ffffff' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.header_bg_color || '#ffffff' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="header_bg_color_display"
+              >
+            </div>
+            <small class="form-help">Couleur de fond si aucune image n'est définie.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="header_title_font">Police du titre du header</label>
+            <select id="header_title_font" name="header_title_font">
+              <% const headerTitleFont = pageSettings.header_title_font || 'Arial, sans-serif'; %>
+              <option value="Arial, sans-serif" <%= headerTitleFont === 'Arial, sans-serif' ? 'selected' : '' %>>Arial</option>
+              <option value="'Helvetica Neue', Helvetica, sans-serif" <%= headerTitleFont === "'Helvetica Neue', Helvetica, sans-serif" ? 'selected' : '' %>>Helvetica</option>
+              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <%= headerTitleFont === "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ? 'selected' : '' %>>Segoe UI</option>
+              <option value="Georgia, serif" <%= headerTitleFont === 'Georgia, serif' ? 'selected' : '' %>>Georgia (Serif)</option>
+              <option value="'Times New Roman', Times, serif" <%= headerTitleFont === "'Times New Roman', Times, serif" ? 'selected' : '' %>>Times New Roman</option>
+              <option value="Verdana, sans-serif" <%= headerTitleFont === 'Verdana, sans-serif' ? 'selected' : '' %>>Verdana</option>
+            </select>
+            <small class="form-help">Police utilisée pour le titre du site dans le header.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="header_title_color">Couleur du titre du header</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="header_title_color" 
+                name="header_title_color" 
+                value="<%= pageSettings.header_title_color || '#333333' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.header_title_color || '#333333' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="header_title_color_display"
+              >
+            </div>
+            <small class="form-help">Couleur du titre du site.</small>
+          </div>
+
+          <!-- SECTION 2: MAIN CONTENT -->
+          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #4CAF50; color: #333; font-size: 1.25rem;">
+            📄 Zone 2 : Contenu principal (Main)
+          </h3>
+          
+          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+            Personnalisez l'apparence de la zone de contenu principal (tous les blocs entre le header et le footer).
+          </p>
+
+          <div class="form-group">
+            <label for="main_bg_image">Image de fond du contenu principal</label>
+            <input 
+              type="text" 
+              id="main_bg_image" 
+              name="main_bg_image" 
+              value="<%= pageSettings.main_bg_image || '' %>" 
+              placeholder="/assets/main-bg.jpg"
+            >
+            <small class="form-help">Image affichée en arrière-plan du contenu principal.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="main_bg_color">Couleur de fond du contenu principal</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="main_bg_color" 
+                name="main_bg_color" 
+                value="<%= pageSettings.main_bg_color || '#f5f5f5' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.main_bg_color || '#f5f5f5' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="main_bg_color_display"
+              >
+            </div>
+            <small class="form-help">Couleur de fond visible derrière les blocs transparents.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="main_title_font">Police des titres du contenu</label>
+            <select id="main_title_font" name="main_title_font">
+              <% const mainTitleFont = pageSettings.main_title_font || 'Arial, sans-serif'; %>
+              <option value="Arial, sans-serif" <%= mainTitleFont === 'Arial, sans-serif' ? 'selected' : '' %>>Arial</option>
+              <option value="'Helvetica Neue', Helvetica, sans-serif" <%= mainTitleFont === "'Helvetica Neue', Helvetica, sans-serif" ? 'selected' : '' %>>Helvetica</option>
+              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <%= mainTitleFont === "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ? 'selected' : '' %>>Segoe UI</option>
+              <option value="Georgia, serif" <%= mainTitleFont === 'Georgia, serif' ? 'selected' : '' %>>Georgia (Serif)</option>
+              <option value="'Times New Roman', Times, serif" <%= mainTitleFont === "'Times New Roman', Times, serif" ? 'selected' : '' %>>Times New Roman</option>
+              <option value="Verdana, sans-serif" <%= mainTitleFont === 'Verdana, sans-serif' ? 'selected' : '' %>>Verdana</option>
+            </select>
+            <small class="form-help">Police des titres des blocs de contenu.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="main_title_color">Couleur des titres du contenu</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="main_title_color" 
+                name="main_title_color" 
+                value="<%= pageSettings.main_title_color || '#333333' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.main_title_color || '#333333' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="main_title_color_display"
+              >
+            </div>
+            <small class="form-help">Couleur des titres de section (si non personnalisés au niveau du bloc).</small>
+          </div>
+
+          <!-- SECTION 3: FOOTER -->
+          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #FF9800; color: #333; font-size: 1.25rem;">
+            🔖 Zone 3 : Pied de page (Footer)
+          </h3>
+          
+          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+            Personnalisez l'apparence de la zone de pied de page (informations, contact, liens sociaux).
+          </p>
+
+          <div class="form-group">
+            <label for="footer_bg_image">Image de fond du footer</label>
+            <input 
+              type="text" 
+              id="footer_bg_image" 
+              name="footer_bg_image" 
+              value="<%= pageSettings.footer_bg_image || '' %>" 
+              placeholder="/assets/footer-bg.jpg"
+            >
+            <small class="form-help">Image affichée en arrière-plan du footer.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="footer_bg_color">Couleur de fond du footer</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="footer_bg_color" 
+                name="footer_bg_color" 
+                value="<%= pageSettings.footer_bg_color || '#2c3e50' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.footer_bg_color || '#2c3e50' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="footer_bg_color_display"
+              >
+            </div>
+            <small class="form-help">⚠️ Le fond du footer doit être foncé (les icônes des réseaux sociaux sont blanches).</small>
+          </div>
+
+          <div class="form-group">
+            <label for="footer_text_color">Couleur du texte du footer</label>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <input 
+                type="color" 
+                id="footer_text_color" 
+                name="footer_text_color" 
+                value="<%= pageSettings.footer_text_color || '#ecf0f1' %>"
+                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              >
+              <input 
+                type="text" 
+                value="<%= pageSettings.footer_text_color || '#ecf0f1' %>" 
+                readonly
+                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+                id="footer_text_color_display"
+              >
+            </div>
+            <small class="form-help">Couleur du texte dans le footer (souvent clair).</small>
+          </div>
+        <% } %>
       <% } %>
 
       <!-- Slug (masqué pour les blocs structurels) -->
@@ -208,7 +438,7 @@
             type="number" 
             id="position" 
             name="position" 
-            value="<%= block ? block.position : 999 %>" 
+            value="<%= block ? block.position : 2 %>" 
             required
             min="1"
           >
@@ -221,19 +451,14 @@
         <input type="hidden" name="position" value="<%= block ? block.position : '' %>">
       <% } %>
 
-      <% if (block && block.is_locked) { %>
-        <div class="alert-info">
-          <strong>ℹ️ Bloc système :</strong> Le type, le slug et la position sont gérés automatiquement.
-        </div>
-      <% } %>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-          <img src="/icons/save.svg" alt="" class="btn-icon">
+          <img src="/icons/save.svg" alt="" class="icon">
           <%= block ? 'Mettre à jour' : 'Créer' %>
         </button>
         <a href="/blocks" class="btn btn-secondary">
-          <img src="/icons/cancel.svg" alt="" class="btn-icon">
+          <img src="/icons/cancel.svg" alt="" class="icon">
           Annuler
         </a>
       </div>
@@ -247,6 +472,47 @@
       if (slugEl) {
         slugEl.dataset.isEdit = '<%= block ? 'true' : 'false' %>';
         slugEl.dataset.isLocked = '<%= block && block.is_locked ? 'true' : 'false' %>';
+      }
+    </script>
+  <% } %>
+
+  <% if (block && block.type === 'header' && pageSettings) { %>
+    <script>
+      // Synchroniser les inputs color avec les displays textuels (3 zones)
+      const colorInputs = [
+        'header_bg_color', 'header_title_color',
+        'main_bg_color', 'main_title_color',
+        'footer_bg_color', 'footer_text_color'
+      ];
+      colorInputs.forEach(id => {
+        const input = document.getElementById(id);
+        const display = document.getElementById(id + '_display');
+        if (input && display) {
+          input.addEventListener('input', (e) => {
+            display.value = e.target.value.toUpperCase();
+          });
+        }
+      });
+
+      // Validation : le footer doit avoir un fond foncé (pour les icônes blanches)
+      const footerBgInput = document.getElementById('footer_bg_color');
+      if (footerBgInput) {
+        footerBgInput.addEventListener('input', (e) => {
+          const hex = e.target.value;
+          // Calculer la luminosité
+          const rgb = parseInt(hex.slice(1), 16);
+          const r = (rgb >> 16) & 0xff;
+          const g = (rgb >> 8) & 0xff;
+          const b = (rgb >> 0) & 0xff;
+          const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          
+          // Si trop clair (luminance > 0.5), forcer une couleur sombre
+          if (luminance > 0.5) {
+            e.target.value = '#2c3e50';
+            document.getElementById('footer_bg_color_display').value = '#2C3E50';
+            alert('Le fond du footer doit être foncé pour que les icônes blanches soient visibles.');
+          }
+        });
       }
     </script>
   <% } %>

@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Boutons d'édition et d'action (pages admin)
+   ========================================================================== */
+
+/* Bouton icône générique */
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  opacity: 0.7;
+}
+
+.btn-icon img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Boutons spécifiques */
+.btn-edit,
+.edit-btn,
+.edit-footer-section-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-edit:hover,
+.edit-btn:hover,
+.edit-footer-section-btn:hover {
+  opacity: 0.7;
+}
+
+.btn-edit img,
+.edit-btn img,
+.edit-footer-section-btn img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.btn-trash,
+.delete-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-trash:hover,
+.delete-btn:hover {
+  opacity: 0.7;
+}
+
+.btn-trash img,
+.delete-btn img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.btn-add {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-add:hover {
+  opacity: 0.7;
+}
+
+.btn-add img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Icônes dans les boutons - toujours visibles et bonne taille */
+.btn-icon img,
+.btn-edit img,
+.btn-trash img,
+.btn-add img,
+.edit-btn img,
+.delete-btn img,
+.edit-footer-section-btn img,
+.btn .btn-icon,
+.btn img.btn-icon,
+button .btn-icon,
+button img.btn-icon,
+img.btn-icon {
+  filter: none !important;
+  opacity: 1 !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}

@@ -1,12 +1,14 @@
 -- Seed consolidé: Batala Vitrine WMS
 
 -- Blocs de base
-INSERT INTO blocks (type, title, slug, position, is_active, is_locked, is_collapsible)
+-- Note: is_transparent, bg_color, title_font, title_color added for theme customization
+-- Footer has explicit bg_color (#424242) to never be transparent
+INSERT INTO blocks (type, title, slug, position, is_active, is_locked, is_collapsible, is_transparent, bg_color, title_font, title_color)
 VALUES
-  ('header', 'En-tête du site', 'header', 1, TRUE, TRUE, FALSE),
-  ('events', 'Événements à venir', 'evenements', 2, TRUE, FALSE, FALSE),
-  ('offers', 'Nos offres', 'offres', 3, TRUE, FALSE, FALSE),
-  ('footer', 'Pied de page', 'footer', 4, TRUE, TRUE, FALSE);
+  ('header', 'En-tête du site', 'header', 1, TRUE, TRUE, FALSE, FALSE, NULL, NULL, NULL),
+  ('events', 'Événements à venir', 'evenements', 2, TRUE, FALSE, FALSE, TRUE, NULL, NULL, NULL),
+  ('offers', 'Nos offres', 'offres', 3, TRUE, FALSE, FALSE, TRUE, NULL, NULL, NULL),
+  ('footer', 'Pied de page', 'footer', 999, TRUE, TRUE, FALSE, FALSE, '#424242', NULL, '#e0e0e0');
 
 -- Header: logo, background, titre
 UPDATE blocks
@@ -16,29 +18,30 @@ SET header_logo = '/assets/logo-default.svg',
 WHERE slug = 'header';
 
 -- Cartes: Événements (avec dates)
-INSERT INTO cards (block_id, position, title, description, media_path, event_date)
-SELECT b.id, 1, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-1.svg', '2025-06-15'
+-- Note: bg_color, title_color, description_color added for card theme customization (NULL = inherit from parent)
+INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
+SELECT b.id, 1, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-1.svg', '2025-06-15', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'evenements';
 
-INSERT INTO cards (block_id, position, title, description, media_path, event_date)
-SELECT b.id, 2, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-2.svg', '2025-05-20'
+INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
+SELECT b.id, 2, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-2.svg', '2025-05-20', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'evenements';
 
-INSERT INTO cards (block_id, position, title, description, media_path, event_date)
-SELECT b.id, 3, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-3.svg', '2025-07-10'
+INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
+SELECT b.id, 3, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-3.svg', '2025-07-10', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'evenements';
 
 -- Cartes: Offres (sans dates)
-INSERT INTO cards (block_id, position, title, description, media_path)
-SELECT b.id, 1, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-drums.svg'
+INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
+SELECT b.id, 1, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-drums.svg', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'offres';
 
-INSERT INTO cards (block_id, position, title, description, media_path)
-SELECT b.id, 2, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-event.svg'
+INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
+SELECT b.id, 2, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-event.svg', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'offres';
 
-INSERT INTO cards (block_id, position, title, description, media_path)
-SELECT b.id, 3, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-training.svg'
+INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
+SELECT b.id, 3, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-training.svg', NULL, NULL, NULL
 FROM blocks b WHERE b.slug = 'offres';
 
 -- Footer
@@ -56,5 +59,5 @@ FROM blocks b WHERE b.slug = 'footer';
 
 -- Admin de test pour E2E (password: SecureP@ss123)
 INSERT INTO admins (email, password_hash, is_active)
-VALUES ('admin@batala.fr', '$argon2id$v=19$m=65536,t=3,p=4$pz+JftZLX2IfbH4g3Wvjaw$hW2b2kV8VqZv3J0S5B7dQcEqZ+FnW7Z4TgW3zJ5M8nQ', TRUE)
+VALUES ('admin@batala.fr', '$argon2id$v=19$m=65536,t=3,p=4$T+ptavBGgyk2ox+u+ZF46g$u9zuOPKAXB2uRRu3pM30Vk/2KpAcQx+4cQiVbOI0mCU', TRUE)
 ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = TRUE;

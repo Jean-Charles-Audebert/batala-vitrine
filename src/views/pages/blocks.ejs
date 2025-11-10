@@ -2,7 +2,7 @@
   include('../partials/head', {
     title,
     subtitle: 'Batala Vitrine',
-    stylesheets: ['/css/admin.css']
+    stylesheets: ['/css/admin.css', '/css/buttons.css']
   })
 %>
   <div class="admin-container">
@@ -60,20 +60,20 @@
               </td>
               <td>
                 <div class="actions" role="group" aria-label="Actions pour le bloc <%= block.title %>">
-                  <a 
-                    href="/blocks/<%= block.id %>/cards" 
-                    class="btn btn-secondary btn-sm"
-                    aria-label="Gérer les cartes du bloc <%= block.title %>"
-                  >
-                    <img src="/icons/image.svg" alt="" role="presentation" class="btn-icon">
-                  </a>
-                  <a 
-                    href="/blocks/<%= block.id %>/edit" 
-                    class="btn btn-secondary btn-sm"
-                    aria-label="Modifier le bloc <%= block.title %>"
-                  >
-                    <img src="/icons/edit.svg" alt="" role="presentation" class="btn-icon">
-                  </a>
+                  <%- include('../components/icon-button', {
+                    type: 'a',
+                    href: `/cards?blockId=${block.id}`,
+                    className: 'btn btn-secondary btn-sm',
+                    icon: 'image',
+                    ariaLabel: `Gérer les cartes du bloc ${block.title}`
+                  }) %>
+                  <%- include('../components/icon-button', {
+                    type: 'a',
+                    href: `/blocks/${block.id}/edit`,
+                    className: 'btn btn-secondary btn-sm',
+                    icon: 'edit',
+                    ariaLabel: `Modifier le bloc ${block.title}`
+                  }) %>
                   <% if (!block.is_locked) { %>
                     <form 
                       method="POST" 
@@ -82,13 +82,12 @@
                       onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bloc ?');"
                       aria-label="Formulaire de suppression"
                     >
-                      <button 
-                        type="submit" 
-                        class="btn btn-danger btn-sm"
-                        aria-label="Supprimer le bloc <%= block.title %>"
-                      >
-                        <img src="/icons/trash.svg" alt="" role="presentation" class="btn-icon">
-                      </button>
+                      <%- include('../components/icon-button', {
+                        type: 'submit',
+                        className: 'btn btn-danger btn-sm',
+                        icon: 'trash',
+                        ariaLabel: `Supprimer le bloc ${block.title}`
+                      }) %>
                     </form>
                   <% } %>
                 </div>
@@ -100,10 +99,14 @@
     <% } else { %>
       <div class="empty-state">
         <p>Aucun bloc pour le moment.</p>
-        <a href="/blocks/new" class="btn btn-primary">
-          <img src="/icons/plus.svg" alt="" class="btn-icon">
-          Créer le premier bloc
-        </a>
+        <%- include('../components/icon-button', {
+          type: 'a',
+          href: '/blocks/new',
+          className: 'btn btn-primary',
+          icon: 'plus',
+          text: 'Créer le premier bloc',
+          ariaLabel: 'Créer le premier bloc'
+        }) %>
       </div>
     <% } %>
   </div>

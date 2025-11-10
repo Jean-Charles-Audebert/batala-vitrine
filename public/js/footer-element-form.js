@@ -22,7 +22,6 @@
     const linkFields = document.getElementById('link-fields');
 
     if (!typeSelect) {
-      console.warn('[FooterElementForm] Type select not found');
       return;
     }
 

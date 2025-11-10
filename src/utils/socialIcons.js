@@ -41,7 +41,7 @@ export function getSocialIcon(network) {
   else if (network?.includes('whatsapp.com')) detectedNetwork = 'whatsapp';
   else if (network?.includes('reddit.com')) detectedNetwork = 'reddit';
   
-  const iconPath = icons[detectedNetwork] || '/icons/twitter.svg'; // fallback raisonnable
+  const iconPath = icons[detectedNetwork] || '/icons/twitter.svg';
   return `<img src="${iconPath}" alt="${detectedNetwork}" class="social-icon" />`;
 }
 
