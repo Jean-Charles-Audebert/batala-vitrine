@@ -4,6 +4,9 @@ set -e
 # Script de déploiement sur NAS Synology
 # À placer dans /volume1/docker/batala-vitrine/ sur le NAS
 
+# Ajouter les chemins Docker Synology
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
 PROJECT_DIR="/volume1/docker/batala-vitrine"
 COMPOSE_FILE="docker-compose.prod.yml"
 IMAGE="${DOCKER_IMAGE:-your-dockerhub-username/batala-vitrine:latest}"

@@ -37,9 +37,8 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - ./db:/docker-entrypoint-initdb.d:ro
-      # Pas de volume persistant pour permettre réinitialisation facile
+    # Pas de volume persistant pour permettre réinitialisation facile
+    # Les scripts SQL sont dans l'image app, copiés au build
     networks:
       - batala-network
     healthcheck:

@@ -80,10 +80,16 @@ DB_USER=batala_user
 DB_PASSWORD=ChangeMe123!SecurePassword
 DB_NAME=batala_vitrine
 
-# JWT Secrets (générer avec: openssl rand -base64 32)
+# JWT Secrets (générer manuellement des chaînes base64)
+# Vous pouvez utiliser: https://generate-random.org/base64-string-generator
+# ou depuis Node.js: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 JWT_SECRET=your_generated_secret_here
 JWT_REFRESH_SECRET=your_generated_refresh_secret_here
 EOF
+
+echo ""
+echo "⚠️  IMPORTANT: Éditez le fichier .env et remplacez JWT_SECRET et JWT_REFRESH_SECRET"
+echo "   par des valeurs aléatoires (32+ caractères en base64)"
 
 # Créer le docker-compose.prod.yml
 # Copier le contenu depuis le repo GitHub ou créer directement :
@@ -127,7 +133,8 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    # Pas de volume pour permettre réinitialisation facile
+    # Pas de volume persistant pour permettre réinitialisation facile
+    # Les scripts SQL sont dans l'image app, exécutés au démarrage
     networks:
       - batala-network
     healthcheck:
@@ -146,8 +153,11 @@ cat > deploy.sh << 'EOF'
 #!/bin/bash
 set -e
 
+# Ajouter les chemins Docker Synology
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
 PROJECT_DIR="/volume1/docker/batala-vitrine"
-IMAGE="${DOCKER_IMAGE:-your-dockerhub-username/batala-vitrine:latest}"
+IMAGE="${DOCKER_IMAGE:-iousco/batala-vitrine:latest}"
 
 echo "🚀 Déploiement Batala Vitrine"
 echo "📦 Image: $IMAGE"
