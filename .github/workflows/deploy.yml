@@ -10,7 +10,7 @@ on:
       - '.vscode/**'
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/batala-vitrine
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/batala-vitrine
   NODE_VERSION: '24'
 
 jobs:
