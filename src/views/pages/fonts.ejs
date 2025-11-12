@@ -1,0 +1,91 @@
+<%-
+  include('../partials/head', {
+    title,
+    subtitle: 'Batala Vitrine',
+    stylesheets: ['/css/admin.css', '/css/buttons.css']
+  })
+%>
+  <div class="admin-container">
+    <%-
+      include('../partials/admin-toolbar', {
+        title,
+        toolbarButtons: [
+          { href: '/blocks', class: 'btn-secondary', icon: 'arrow_back', label: 'Retour' },
+          { href: '/fonts/google/new', class: 'btn-primary', icon: 'add', label: 'Google Fonts' }
+        ]
+      })
+    %>
+
+    <%- include('../partials/alerts') %>
+
+    <!-- Formulaire d'upload rapide -->
+    <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+      <h3 style="margin: 0 0 1rem 0;">📁 Uploader une police depuis votre PC</h3>
+      <form method="POST" action="/fonts/upload" enctype="multipart/form-data" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: end;">
+        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+          <label for="font_name">Nom de la police *</label>
+          <input type="text" id="font_name" name="name" required placeholder="Roboto Bold">
+        </div>
+        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+          <label for="font_family">Famille CSS *</label>
+          <input type="text" id="font_family" name="font_family" required placeholder="'Roboto', sans-serif">
+        </div>
+        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+          <label for="font_file">Fichier (woff2, woff, ttf, otf) *</label>
+          <input type="file" id="font_file" name="font_file" required accept=".woff2,.woff,.ttf,.otf">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0;">
+          <img src="/icons/upload.svg" alt="" class="icon">
+          Uploader
+        </button>
+      </form>
+    </div>
+
+    <!-- Liste des polices -->
+    <h2 style="margin: 2rem 0 1rem 0;">📚 Bibliothèque de polices</h2>
+    
+    <% if (fonts && fonts.length > 0) { %>
+      <div style="display: grid; gap: 1rem;">
+        <% fonts.forEach(font => { %>
+          <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">
+                <%= font.name %>
+                <% if (font.source === 'system') { %>
+                  <span style="background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">SYSTÈME</span>
+                <% } else if (font.source === 'google') { %>
+                  <span style="background: #fff3e0; color: #f57c00; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">GOOGLE</span>
+                <% } else { %>
+                  <span style="background: #f3e5f5; color: #7b1fa2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">UPLOAD</span>
+                <% } %>
+              </h3>
+              <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                <code style="background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 4px;"><%= font.font_family %></code>
+              </p>
+              <% if (font.url) { %>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #999;">
+                  🔗 <a href="<%= font.url %>" target="_blank" rel="noopener" style="color: #1976d2;"><%= font.url %></a>
+                </p>
+              <% } %>
+              <% if (font.file_path) { %>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #999;">
+                  📁 <%= font.file_path %>
+                </p>
+              <% } %>
+            </div>
+            <% if (font.source !== 'system') { %>
+              <form method="POST" action="/fonts/<%= font.id %>/delete" style="margin: 0;" onsubmit="return confirm('Supprimer cette police ?');">
+                <button type="submit" class="btn-delete-card">
+                  <img src="/icons/delete.svg" alt="Supprimer" class="icon">
+                </button>
+              </form>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p style="text-align: center; color: #999; padding: 2rem;">Aucune police disponible.</p>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -12,6 +12,7 @@ import refreshRoutes from "./routes/refreshRoutes.js";
 import blockRoutes from "./routes/blockRoutes.js";
 import cardRoutes from "./routes/cardRoutes.js";
 import footerElementRoutes from "./routes/footerElementRoutes.js";
+import fontRoutes from "./routes/fontRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -31,8 +32,8 @@ app.use(
       directives: {
         "default-src": ["'self'"],
         "script-src": ["'self'", "'unsafe-inline'"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-        "font-src": ["'self'", "https://cdnjs.cloudflare.com"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
         "img-src": ["'self'", "data:", "https:"],
       },
     },
@@ -70,6 +71,7 @@ app.use("/auth", authRoutes);
 app.use("/auth", refreshRoutes);
 app.use("/blocks", blockRoutes);
 app.use("/blocks/:blockId/cards", cardRoutes);
+app.use("/fonts", fontRoutes);
 app.use("/", footerElementRoutes);
 app.use("/api", apiRoutes);
 

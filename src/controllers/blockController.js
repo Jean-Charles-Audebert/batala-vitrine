@@ -74,16 +74,26 @@ export const showEditBlockForm = async (req, res) => {
     
     // Récupérer les paramètres de la page si c'est le header
     let pageSettings = null;
+    let fonts = [];
+    let allBlocks = [];
     if (block.type === 'header') {
       const { rows: pageRows } = await query("SELECT * FROM page WHERE id=1");
       pageSettings = pageRows[0] || null;
+      // Charger toutes les polices disponibles
+      const { rows: fontRows } = await query("SELECT * FROM fonts ORDER BY source, name");
+      fonts = fontRows;
+      // Charger tous les blocs pour la gestion intégrée
+      const { rows: blockRows } = await query("SELECT id, type, title, slug, position, is_locked FROM blocks ORDER BY position ASC");
+      allBlocks = blockRows;
     }
     
     res.render("pages/block-form", { 
       title: block.type === 'header' ? "Paramètres de la page" : "Modifier un bloc", 
       formAction: `/blocks/${id}/edit`,
       block,
-      pageSettings
+      pageSettings,
+      fonts,
+      allBlocks
     });
   } catch (error) {
     logger.error("Erreur récupération bloc", error);
@@ -97,9 +107,11 @@ export const updateBlock = crudActionWrapper(
     const { 
       type, title, slug, position, header_title, header_logo, bg_image,
       // Page theme settings (3 zones: header, main, footer)
-      header_bg_image, header_bg_color, header_title_font, header_title_color,
-      main_bg_image, main_bg_color, main_title_font, main_title_color,
+      header_bg_image, header_bg_color, header_title_color,
+      main_bg_image, main_bg_color, main_title_color,
       footer_bg_image, footer_bg_color, footer_text_color,
+      // Global title font
+      title_font_id,
       // Block theme settings
       is_transparent, block_bg_color, block_title_font, block_title_color
     } = req.body;
@@ -124,18 +136,20 @@ export const updateBlock = crudActionWrapper(
         [header_title, header_logo || null, bg_image || null, id]
       );
       
-      // Mise à jour des paramètres de la page (thème global avec 3 zones)
+      // Mise à jour des paramètres de la page (thème global simplifié)
       await query(
         `UPDATE page SET 
-          header_bg_image=$1, header_bg_color=$2, header_title_font=$3, header_title_color=$4,
-          main_bg_image=$5, main_bg_color=$6, main_title_font=$7, main_title_color=$8,
-          footer_bg_image=$9, footer_bg_color=$10, footer_text_color=$11,
+          header_bg_image=$1, header_bg_color=$2, header_title_color=$3,
+          main_bg_image=$4, main_bg_color=$5, main_title_color=$6,
+          footer_bg_image=$7, footer_bg_color=$8, footer_text_color=$9,
+          title_font_id=$10,
           updated_at=NOW() 
         WHERE id=1`,
         [
-          header_bg_image || null, header_bg_color || '#ffffff', header_title_font || 'Arial, sans-serif', header_title_color || '#333333',
-          main_bg_image || null, main_bg_color || '#f5f5f5', main_title_font || 'Arial, sans-serif', main_title_color || '#333333',
-          footer_bg_image || null, footer_bg_color || '#2c3e50', footer_text_color || '#ecf0f1'
+          header_bg_image || null, header_bg_color || '#ffffff', header_title_color || '#333333',
+          main_bg_image || null, main_bg_color || '#f5f5f5', main_title_color || '#333333',
+          footer_bg_image || null, footer_bg_color || '#2c3e50', footer_text_color || '#ecf0f1',
+          title_font_id || 1
         ]
       );
     } else {

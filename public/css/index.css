@@ -99,8 +99,15 @@
   margin-bottom: var(--spacing-md);
 }
 
+/* Police globale pour TOUS les titres du site */
+h1, h2, h3, h4, h5, h6,
+.header-block h1, .header-block h2, .header-block h3, .header-block h4, .header-block h5, .header-block h6,
+.main-content-wrapper h1, .main-content-wrapper h2, .main-content-wrapper h3, .main-content-wrapper h4, .main-content-wrapper h5, .main-content-wrapper h6 {
+  font-family: var(--global-title-font, Arial, sans-serif) !important;
+}
+
 .site-title {
-  font-family: var(--header-title-font, Arial, sans-serif);
+  font-family: var(--global-title-font, Arial, sans-serif);
   font-size: var(--font-size-3xl);
   font-weight: bold;
   margin: var(--spacing-md) 0;
@@ -169,7 +176,7 @@
 }
 
 .section-title {
-  font-family: var(--main-title-font, Arial, sans-serif);
+  font-family: var(--global-title-font, Arial, sans-serif);
   font-size: var(--font-size-2xl);
   font-weight: 600;
   color: var(--main-title-color, var(--color-text-primary));
@@ -194,9 +201,9 @@
 
 .card {
   background: var(--color-bg-white);
-  border-radius: var(--radius-md);
+  /* border-radius: var(--radius-md); */
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  /* box-shadow: var(--shadow-md); */
   transition: transform var(--transition-base), box-shadow var(--transition-base);
   position: relative;
 }
@@ -221,6 +228,22 @@
   justify-content: center;
   color: #757575;
   font-weight: bold;
+  transition: filter 0.3s ease;
+}
+
+/* Style pour les images dans les cartes */
+.card > img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.3s ease;
+}
+
+/* Effet grayscale au survol */
+.card:hover .card-image,
+.card:hover > img {
+  filter: grayscale(100%);
 }
 
 .card-body {
@@ -229,10 +252,12 @@
 
 .card-title,
 .card h3 {
+  font-family: var(--global-title-font, Arial, sans-serif);
   font-size: 1.25rem !important;
   font-weight: 600 !important;
   margin: 0 0 0.5rem 0;
   color: #212121;
+  text-align: center;
 }
 
 .card-description,
@@ -453,17 +478,24 @@ footer a:hover,
 
 /* ==========================================================================
    Icônes sociales du footer
-   Les icônes sont rendues blanches (comme le texte du footer par défaut)
-   Le footer doit avoir un fond foncé (limitation dans le formulaire)
+   Les icônes s'adaptent automatiquement à la couleur du texte du footer
    ========================================================================== */
 footer .social-icon,
 .footer-section .social-icon {
   width: 24px;
   height: 24px;
-  /* Rendre les icônes blanches pour qu'elles soient visibles sur fond foncé */
-  filter: brightness(0) saturate(100%) invert(1);
+  /* Adapter la couleur des icônes à la couleur du texte du footer */
+  /* Si le texte est clair (blanc/gris clair), les icônes deviennent claires */
+  /* Si le texte est foncé (noir), les icônes deviennent foncées */
+  filter: brightness(0) saturate(100%) invert(var(--footer-icon-invert, 1));
   opacity: 0.9;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s, filter 0.3s;
+}
+
+/* Pour un texte foncé (noir), désactiver l'inversion */
+footer[data-dark-text="true"] .social-icon,
+.footer-section[data-dark-text="true"] .social-icon {
+  --footer-icon-invert: 0;
 }
 
 footer .social-link:hover .social-icon,

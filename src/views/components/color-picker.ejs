@@ -1,0 +1,53 @@
+<%#
+  Composant de sélection de couleur
+  
+  Props:
+  - name: nom du champ (ex: "header_bg_color")
+  - label: libellé affiché (ex: "Couleur de fond du header")
+  - value: valeur actuelle de la couleur (ex: "#ffffff")
+  - helpText: texte d'aide optionnel
+  - id: identifiant personnalisé (optionnel, utilise name par défaut)
+%>
+
+<% 
+  const fieldId = locals.id || locals.name;
+  const displayId = `${fieldId}_display`;
+  const colorValue = locals.value || '#ffffff';
+%>
+
+<div class="form-group">
+  <label for="<%= fieldId %>"><%= locals.label %></label>
+  <div style="display: flex; gap: 1rem; align-items: center;">
+    <input 
+      type="color" 
+      id="<%= fieldId %>" 
+      name="<%= locals.name %>" 
+      value="<%= colorValue %>"
+      style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+    >
+    <input 
+      type="text" 
+      value="<%= colorValue %>" 
+      readonly
+      style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+      id="<%= displayId %>"
+    >
+  </div>
+  <% if (locals.helpText) { %>
+    <small class="form-help"><%= locals.helpText %></small>
+  <% } %>
+</div>
+
+<script>
+  // Synchroniser le color picker avec le champ texte
+  (function() {
+    const colorInput = document.getElementById('<%= fieldId %>');
+    const textInput = document.getElementById('<%= displayId %>');
+    
+    if (colorInput && textInput) {
+      colorInput.addEventListener('input', function() {
+        textInput.value = this.value;
+      });
+    }
+  })();
+</script>

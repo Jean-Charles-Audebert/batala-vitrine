@@ -33,6 +33,10 @@ document.querySelectorAll('[data-close-modal]').forEach(btn => {
     const modalId = e.target.dataset.closeModal + 'Modal';
     const modalEl = document.getElementById(modalId);
     if (modalEl) {
+      // Retirer le focus avant de cacher la modale
+      if (document.activeElement && modalEl.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
       modalEl.classList.remove('active');
       modalEl.setAttribute('aria-hidden', 'true');
     }
@@ -44,6 +48,10 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     const modalEl = document.getElementById('cardModal');
     if (modalEl && modalEl.classList.contains('active')) {
+      // Retirer le focus avant de cacher la modale
+      if (document.activeElement && modalEl.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
       modalEl.classList.remove('active');
       modalEl.setAttribute('aria-hidden', 'true');
     }
@@ -88,6 +96,12 @@ editCardButtons.forEach(btn => {
       document.getElementById('cardDescription').value = card.description || '';
       const imgInput = document.getElementById('cardImage');
       if (imgInput) imgInput.value = card.media_path || '';
+      const bgColorInput = document.getElementById('cardDescriptionBgColor');
+      if (bgColorInput) {
+        bgColorInput.value = card.description_bg_color || '#ffffff';
+        const displayInput = document.getElementById('cardDescriptionBgColor_display');
+        if (displayInput) displayInput.value = card.description_bg_color || '#ffffff';
+      }
     } catch (err) {
       window.alert(err.message);
     }
@@ -142,6 +156,12 @@ addCardButtons.forEach(btn => {
     document.getElementById('cardDescription').value = '';
     const imgInput = document.getElementById('cardImage');
     if (imgInput) imgInput.value = '';
+    const bgColorInput = document.getElementById('cardDescriptionBgColor');
+    if (bgColorInput) {
+      bgColorInput.value = '#ffffff';
+      const displayInput = document.getElementById('cardDescriptionBgColor_display');
+      if (displayInput) displayInput.value = '#ffffff';
+    }
   });
 });
 
@@ -156,6 +176,7 @@ if (cardForm) {
     const title = document.getElementById('cardTitle').value.trim();
     const description = document.getElementById('cardDescription').value.trim();
     const imageUrl = document.getElementById('cardImage')?.value?.trim() || '';
+    const descriptionBgColor = document.getElementById('cardDescriptionBgColor')?.value || '#ffffff';
 
     if (!title) {
       window.alert('Le titre est requis');
@@ -163,7 +184,7 @@ if (cardForm) {
       return;
     }
 
-    const payload = { title, description, media_path: imageUrl };
+    const payload = { title, description, media_path: imageUrl, description_bg_color: descriptionBgColor };
     const isCreate = !cardId;
     const url = isCreate 
       ? `/api/blocks/${blockId}/cards`
@@ -180,6 +201,10 @@ if (cardForm) {
       // Fermer modal et recharger pour refléter les changements
       const modalEl = document.getElementById('cardModal');
       if (modalEl) {
+        // Retirer le focus avant de cacher la modale
+        if (document.activeElement && modalEl.contains(document.activeElement)) {
+          document.activeElement.blur();
+        }
         modalEl.classList.remove('active');
         modalEl.setAttribute('aria-hidden', 'true');
       }

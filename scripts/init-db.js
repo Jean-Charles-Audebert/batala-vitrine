@@ -74,6 +74,13 @@ async function initDatabase() {
     const seedPath = join(__dirname, '..', 'db', '002_seed.sql');
     await runSqlFile(seedPath);
 
+    // Exécuter les migrations
+    const migration003Path = join(__dirname, '..', 'db', '003_add_description_bg_color.sql');
+    await runSqlFile(migration003Path);
+
+    const migration006Path = join(__dirname, '..', 'db', '006_simplify_fonts.sql');
+    await runSqlFile(migration006Path);
+
     console.log('✅ Base de données initialisée avec succès');
   } catch (error) {
     console.error('❌ Erreur initialisation DB:', error);

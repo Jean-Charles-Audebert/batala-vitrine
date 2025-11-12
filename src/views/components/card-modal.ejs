@@ -41,6 +41,15 @@
             aria-required="false"
           ></textarea>
         </div>
+
+        <%- include('color-picker', {
+          name: 'description_bg_color',
+          label: 'Couleur de fond de la description',
+          value: '#ffffff',
+          helpText: 'Couleur de fond affichée derrière le texte de description.',
+          id: 'cardDescriptionBgColor'
+        }) %>
+
         <div class="form-group">
           <label for="cardImage">URL de l'image</label>
           <div class="input-with-button">

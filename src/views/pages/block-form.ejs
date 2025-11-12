@@ -206,61 +206,36 @@
             <small class="form-help">Image affichée en arrière-plan du header.</small>
           </div>
 
-          <div class="form-group">
-            <label for="header_bg_color">Couleur de fond du header</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="header_bg_color" 
-                name="header_bg_color" 
-                value="<%= pageSettings.header_bg_color || '#ffffff' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
-              >
-              <input 
-                type="text" 
-                value="<%= pageSettings.header_bg_color || '#ffffff' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="header_bg_color_display"
-              >
-            </div>
-            <small class="form-help">Couleur de fond si aucune image n'est définie.</small>
-          </div>
+          <%- include('../components/color-picker', {
+            name: 'header_bg_color',
+            label: 'Couleur de fond du header',
+            value: pageSettings.header_bg_color || '#ffffff',
+            helpText: 'Couleur de fond si aucune image n\'est définie.'
+          }) %>
 
           <div class="form-group">
-            <label for="header_title_font">Police du titre du header</label>
-            <select id="header_title_font" name="header_title_font">
-              <% const headerTitleFont = pageSettings.header_title_font || 'Arial, sans-serif'; %>
-              <option value="Arial, sans-serif" <%= headerTitleFont === 'Arial, sans-serif' ? 'selected' : '' %>>Arial</option>
-              <option value="'Helvetica Neue', Helvetica, sans-serif" <%= headerTitleFont === "'Helvetica Neue', Helvetica, sans-serif" ? 'selected' : '' %>>Helvetica</option>
-              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <%= headerTitleFont === "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ? 'selected' : '' %>>Segoe UI</option>
-              <option value="Georgia, serif" <%= headerTitleFont === 'Georgia, serif' ? 'selected' : '' %>>Georgia (Serif)</option>
-              <option value="'Times New Roman', Times, serif" <%= headerTitleFont === "'Times New Roman', Times, serif" ? 'selected' : '' %>>Times New Roman</option>
-              <option value="Verdana, sans-serif" <%= headerTitleFont === 'Verdana, sans-serif' ? 'selected' : '' %>>Verdana</option>
+            <label for="title_font_id">Police des titres (h1-h6) *</label>
+            <select id="title_font_id" name="title_font_id" required>
+              <% if (fonts && fonts.length > 0) { %>
+                <% fonts.forEach(font => { %>
+                  <option value="<%= font.id %>" <%= (pageSettings.title_font_id || 1) == font.id ? 'selected' : '' %>>
+                    <%= font.name %><% if (font.source !== 'system') { %> (<%= font.source === 'google' ? 'Google Fonts' : 'Upload' %>)<% } %>
+                  </option>
+                <% }); %>
+              <% } %>
             </select>
-            <small class="form-help">Police utilisée pour le titre du site dans le header.</small>
+            <small class="form-help">
+              Police utilisée pour <strong>TOUS les titres du site</strong> (header, blocs, cartes).<br>
+              📚 <a href="/fonts" style="color: #1976d2; font-weight: bold;">Gérer ma bibliothèque de polices →</a>
+            </small>
           </div>
 
-          <div class="form-group">
-            <label for="header_title_color">Couleur du titre du header</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="header_title_color" 
-                name="header_title_color" 
-                value="<%= pageSettings.header_title_color || '#333333' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
-              >
-              <input 
-                type="text" 
-                value="<%= pageSettings.header_title_color || '#333333' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="header_title_color_display"
-              >
-            </div>
-            <small class="form-help">Couleur du titre du site.</small>
-          </div>
+          <%- include('../components/color-picker', {
+            name: 'header_title_color',
+            label: 'Couleur du titre du header',
+            value: pageSettings.header_title_color || '#333333',
+            helpText: 'Couleur du titre du site.'
+          }) %>
 
           <!-- SECTION 2: MAIN CONTENT -->
           <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #4CAF50; color: #333; font-size: 1.25rem;">
@@ -273,71 +248,59 @@
 
           <div class="form-group">
             <label for="main_bg_image">Image de fond du contenu principal</label>
-            <input 
-              type="text" 
-              id="main_bg_image" 
-              name="main_bg_image" 
-              value="<%= pageSettings.main_bg_image || '' %>" 
-              placeholder="/assets/main-bg.jpg"
-            >
-            <small class="form-help">Image affichée en arrière-plan du contenu principal.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="main_bg_color">Couleur de fond du contenu principal</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="main_bg_color" 
-                name="main_bg_color" 
-                value="<%= pageSettings.main_bg_color || '#f5f5f5' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
-              >
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
               <input 
                 type="text" 
-                value="<%= pageSettings.main_bg_color || '#f5f5f5' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="main_bg_color_display"
-              >
-            </div>
-            <small class="form-help">Couleur de fond visible derrière les blocs transparents.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="main_title_font">Police des titres du contenu</label>
-            <select id="main_title_font" name="main_title_font">
-              <% const mainTitleFont = pageSettings.main_title_font || 'Arial, sans-serif'; %>
-              <option value="Arial, sans-serif" <%= mainTitleFont === 'Arial, sans-serif' ? 'selected' : '' %>>Arial</option>
-              <option value="'Helvetica Neue', Helvetica, sans-serif" <%= mainTitleFont === "'Helvetica Neue', Helvetica, sans-serif" ? 'selected' : '' %>>Helvetica</option>
-              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" <%= mainTitleFont === "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" ? 'selected' : '' %>>Segoe UI</option>
-              <option value="Georgia, serif" <%= mainTitleFont === 'Georgia, serif' ? 'selected' : '' %>>Georgia (Serif)</option>
-              <option value="'Times New Roman', Times, serif" <%= mainTitleFont === "'Times New Roman', Times, serif" ? 'selected' : '' %>>Times New Roman</option>
-              <option value="Verdana, sans-serif" <%= mainTitleFont === 'Verdana, sans-serif' ? 'selected' : '' %>>Verdana</option>
-            </select>
-            <small class="form-help">Police des titres des blocs de contenu.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="main_title_color">Couleur des titres du contenu</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="main_title_color" 
-                name="main_title_color" 
-                value="<%= pageSettings.main_title_color || '#333333' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+                id="main_bg_image" 
+                name="main_bg_image" 
+                value="<%= pageSettings.main_bg_image || '' %>" 
+                placeholder="/assets/main-bg.jpg ou /uploads/bg.gif"
+                style="flex: 1;"
               >
               <input 
-                type="text" 
-                value="<%= pageSettings.main_title_color || '#333333' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="main_title_color_display"
+                type="file" 
+                id="main_bg_image_upload" 
+                accept="image/*"
+                style="display: none;"
+                data-target-field="main_bg_image"
               >
+              <button 
+                type="button" 
+                class="btn btn-secondary btn-sm"
+                onclick="document.getElementById('main_bg_image_upload').click()"
+                title="Uploader une image"
+              >
+                <img src="/icons/image.svg" alt="" class="icon">
+                Choisir
+              </button>
             </div>
-            <small class="form-help">Couleur des titres de section (si non personnalisés au niveau du bloc).</small>
+            <small class="form-help" id="main_bg_image_status">
+              Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
+            </small>
+            <% if (pageSettings.main_bg_image) { %>
+              <div style="margin-top: 0.5rem;" id="main_bg_image_preview">
+                <img src="<%= pageSettings.main_bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+            <% } else { %>
+              <div style="margin-top: 0.5rem; display: none;" id="main_bg_image_preview">
+                <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+            <% } %>
           </div>
+
+          <%- include('../components/color-picker', {
+            name: 'main_bg_color',
+            label: 'Couleur de fond du contenu principal',
+            value: pageSettings.main_bg_color || '#f5f5f5',
+            helpText: 'Couleur de fond visible derrière les blocs transparents.'
+          }) %>
+
+          <%- include('../components/color-picker', {
+            name: 'main_title_color',
+            label: 'Couleur des titres du contenu',
+            value: pageSettings.main_title_color || '#333333',
+            helpText: 'Couleur des titres de section (si non personnalisés au niveau du bloc).'
+          }) %>
 
           <!-- SECTION 3: FOOTER -->
           <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #FF9800; color: #333; font-size: 1.25rem;">
@@ -350,57 +313,59 @@
 
           <div class="form-group">
             <label for="footer_bg_image">Image de fond du footer</label>
-            <input 
-              type="text" 
-              id="footer_bg_image" 
-              name="footer_bg_image" 
-              value="<%= pageSettings.footer_bg_image || '' %>" 
-              placeholder="/assets/footer-bg.jpg"
-            >
-            <small class="form-help">Image affichée en arrière-plan du footer.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="footer_bg_color">Couleur de fond du footer</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="footer_bg_color" 
-                name="footer_bg_color" 
-                value="<%= pageSettings.footer_bg_color || '#2c3e50' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
-              >
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
               <input 
                 type="text" 
-                value="<%= pageSettings.footer_bg_color || '#2c3e50' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="footer_bg_color_display"
+                id="footer_bg_image" 
+                name="footer_bg_image" 
+                value="<%= pageSettings.footer_bg_image || '' %>" 
+                placeholder="/assets/footer-bg.jpg ou /uploads/bg.gif"
+                style="flex: 1;"
               >
+              <input 
+                type="file" 
+                id="footer_bg_image_upload" 
+                accept="image/*"
+                style="display: none;"
+                data-target-field="footer_bg_image"
+              >
+              <button 
+                type="button" 
+                class="btn btn-secondary btn-sm"
+                onclick="document.getElementById('footer_bg_image_upload').click()"
+                title="Uploader une image"
+              >
+                <img src="/icons/image.svg" alt="" class="icon">
+                Choisir
+              </button>
             </div>
-            <small class="form-help">⚠️ Le fond du footer doit être foncé (les icônes des réseaux sociaux sont blanches).</small>
+            <small class="form-help" id="footer_bg_image_status">
+              Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
+            </small>
+            <% if (pageSettings.footer_bg_image) { %>
+              <div style="margin-top: 0.5rem;" id="footer_bg_image_preview">
+                <img src="<%= pageSettings.footer_bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+            <% } else { %>
+              <div style="margin-top: 0.5rem; display: none;" id="footer_bg_image_preview">
+                <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+            <% } %>
           </div>
 
-          <div class="form-group">
-            <label for="footer_text_color">Couleur du texte du footer</label>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="color" 
-                id="footer_text_color" 
-                name="footer_text_color" 
-                value="<%= pageSettings.footer_text_color || '#ecf0f1' %>"
-                style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
-              >
-              <input 
-                type="text" 
-                value="<%= pageSettings.footer_text_color || '#ecf0f1' %>" 
-                readonly
-                style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
-                id="footer_text_color_display"
-              >
-            </div>
-            <small class="form-help">Couleur du texte dans le footer (souvent clair).</small>
-          </div>
+          <%- include('../components/color-picker', {
+            name: 'footer_bg_color',
+            label: 'Couleur de fond du footer',
+            value: pageSettings.footer_bg_color || '#2c3e50',
+            helpText: '⚠️ Le fond du footer doit être foncé (les icônes des réseaux sociaux sont blanches).'
+          }) %>
+
+          <%- include('../components/color-picker', {
+            name: 'footer_text_color',
+            label: 'Couleur du texte du footer',
+            value: pageSettings.footer_text_color || '#ecf0f1',
+            helpText: 'Couleur du texte dans le footer (souvent clair).'
+          }) %>
         <% } %>
       <% } %>
 
@@ -451,15 +416,122 @@
         <input type="hidden" name="position" value="<%= block ? block.position : '' %>">
       <% } %>
 
+      <!-- SECTION 4: GESTION DES BLOCS (uniquement pour header) -->
+      <% if (isHeader && pageSettings && allBlocks) { %>
+        <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+        
+        <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">📦 Gestion des blocs</h2>
+        
+        <p style="margin-bottom: 1.5rem; color: #666;">
+          Les blocs définissent la structure de votre page. Vous pouvez réorganiser, modifier ou supprimer les blocs existants.
+        </p>
+
+        <div style="margin-bottom: 1.5rem;">
+          <%- include('../components/icon-button', {
+            type: 'a',
+            href: '/blocks/new',
+            className: 'btn btn-primary',
+            icon: 'plus',
+            text: 'Nouveau bloc',
+            ariaLabel: 'Créer un nouveau bloc'
+          }) %>
+        </div>
+
+        <% if (allBlocks && allBlocks.length > 0) { %>
+          <table role="table" aria-label="Liste des blocs du site" style="width: 100%; margin-bottom: 2rem;">
+            <thead>
+              <tr>
+                <th scope="col">Position</th>
+                <th scope="col">Type</th>
+                <th scope="col">Titre</th>
+                <th scope="col">Slug</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="blocks-list-embedded">
+              <% allBlocks.forEach(blockItem => { %>
+                <tr data-block-id="<%= blockItem.id %>" data-position="<%= blockItem.position %>" data-block-type="<%= blockItem.type %>">
+                  <td class="block-position">
+                    <span class="position-value"><%= blockItem.position %></span>
+                    <% if (blockItem.type !== 'header' && blockItem.type !== 'footer') { %>
+                      <%- include('../components/position-controls', { itemTitle: blockItem.title, itemType: 'le bloc' }) %>
+                    <% } else { %>
+                      <span class="text-muted" style="font-size: 0.85rem;">
+                        <%= blockItem.type === 'header' ? '🔝 Toujours en premier' : '🔚 Toujours en dernier' %>
+                      </span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <span class="badge badge-type-<%= blockItem.type %>">
+                      <%= blockItem.type %>
+                    </span>
+                  </td>
+                  <td><%= blockItem.title %></td>
+                  <td><code><%= blockItem.slug %></code></td>
+                  <td>
+                    <div class="actions" role="group" aria-label="Actions pour le bloc <%= blockItem.title %>">
+                      <% if (blockItem.type === 'events' || blockItem.type === 'offers') { %>
+                        <%- include('../components/icon-button', {
+                          type: 'a',
+                          href: `/blocks/${blockItem.id}/cards`,
+                          className: 'btn btn-secondary btn-sm',
+                          icon: 'image',
+                          ariaLabel: `Gérer les cartes du bloc ${blockItem.title}`
+                        }) %>
+                      <% } %>
+                      <% if (blockItem.type === 'footer') { %>
+                        <%- include('../components/icon-button', {
+                          type: 'a',
+                          href: `/blocks/${blockItem.id}/footer-elements`,
+                          className: 'btn btn-secondary btn-sm',
+                          icon: 'list',
+                          ariaLabel: `Gérer les éléments du footer`
+                        }) %>
+                      <% } %>
+                      <%- include('../components/icon-button', {
+                        type: 'a',
+                        href: `/blocks/${blockItem.id}/edit`,
+                        className: 'btn btn-secondary btn-sm',
+                        icon: 'edit',
+                        ariaLabel: `Modifier le bloc ${blockItem.title}`
+                      }) %>
+                      <% if (!blockItem.is_locked) { %>
+                        <form 
+                          method="POST" 
+                          action="/blocks/<%= blockItem.id %>/delete" 
+                          style="display: inline;"
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bloc ?');"
+                          aria-label="Formulaire de suppression"
+                        >
+                          <%- include('../components/icon-button', {
+                            type: 'submit',
+                            className: 'btn btn-danger btn-sm',
+                            icon: 'trash',
+                            ariaLabel: `Supprimer le bloc ${blockItem.title}`
+                          }) %>
+                        </form>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <div class="empty-state">
+            <p>Aucun bloc pour le moment.</p>
+          </div>
+        <% } %>
+      <% } %>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
           <img src="/icons/save.svg" alt="" class="icon">
           <%= block ? 'Mettre à jour' : 'Créer' %>
         </button>
-        <a href="/blocks" class="btn btn-secondary">
+        <a href="<%= isHeader ? '/' : '/blocks' %>" class="btn btn-secondary">
           <img src="/icons/cancel.svg" alt="" class="icon">
-          Annuler
+          <%= isHeader ? 'Retour à l\'accueil' : 'Annuler' %>
         </a>
       </div>
     </form>
@@ -511,6 +583,103 @@
             e.target.value = '#2c3e50';
             document.getElementById('footer_bg_color_display').value = '#2C3E50';
             alert('Le fond du footer doit être foncé pour que les icônes blanches soient visibles.');
+          }
+        });
+      }
+
+      // Réordonnancement des blocs (gestion intégrée)
+      const blocksList = document.getElementById('blocks-list-embedded');
+      if (blocksList) {
+        const rows = Array.from(blocksList.querySelectorAll('tr'));
+
+        // Fonction pour échanger deux lignes
+        function swapRows(index1, index2) {
+          if (index2 < 0 || index2 >= rows.length) return;
+          
+          const row1 = rows[index1];
+          const row2 = rows[index2];
+          
+          // Empêcher de déplacer ou échanger avec le header ou le footer
+          const type1 = row1.getAttribute('data-block-type');
+          const type2 = row2.getAttribute('data-block-type');
+          const isFixed1 = type1 === 'header' || type1 === 'footer';
+          const isFixed2 = type2 === 'header' || type2 === 'footer';
+          
+          if (isFixed1 || isFixed2) {
+            console.log('Le header et le footer ne peuvent pas être déplacés');
+            return;
+          }
+          
+          if (index1 < index2) {
+            row2.parentNode.insertBefore(row1, row2.nextSibling);
+          } else {
+            row1.parentNode.insertBefore(row2, row1);
+          }
+          
+          // Inverser dans le tableau local
+          [rows[index1], rows[index2]] = [rows[index2], rows[index1]];
+          
+          // Mettre à jour les positions visuelles
+          updatePositions();
+          
+          // Envoyer au serveur
+          saveOrder();
+        }
+
+        // Mettre à jour les numéros de position affichés
+        function updatePositions() {
+          rows.forEach((row, index) => {
+            const positionSpan = row.querySelector('.position-value');
+            if (positionSpan) {
+              positionSpan.textContent = index + 1;
+            }
+            row.setAttribute('data-position', index + 1);
+          });
+        }
+
+        // Enregistrer l'ordre sur le serveur
+        function saveOrder() {
+          const order = rows
+            .filter(row => {
+              const type = row.getAttribute('data-block-type');
+              return type !== 'header' && type !== 'footer';
+            })
+            .map((row, index) => ({
+              id: parseInt(row.getAttribute('data-block-id'), 10),
+              position: index + 1
+            }));
+
+          fetch('/api/blocks/reorder', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ order })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              console.error('Erreur lors de la sauvegarde:', data.error);
+              alert('Erreur lors de la sauvegarde de l\'ordre');
+            }
+          })
+          .catch(error => {
+            console.error('Erreur réseau:', error);
+            alert('Erreur réseau lors de la sauvegarde');
+          });
+        }
+
+        // Attacher les événements aux boutons
+        rows.forEach((row, index) => {
+          const btnUp = row.querySelector('.btn-move-up');
+          const btnDown = row.querySelector('.btn-move-down');
+
+          if (btnUp) {
+            btnUp.addEventListener('click', () => swapRows(index, index - 1));
+          }
+
+          if (btnDown) {
+            btnDown.addEventListener('click', () => swapRows(index, index + 1));
           }
         });
       }

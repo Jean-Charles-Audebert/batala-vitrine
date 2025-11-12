@@ -11,7 +11,7 @@ export const listCards = async (req, res) => {
   const { blockId } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, block_id, position, title, description, media_path, event_date FROM cards WHERE block_id=$1 ORDER BY position ASC",
+      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color FROM cards WHERE block_id=$1 ORDER BY position ASC",
       [blockId]
     );
     
@@ -75,9 +75,11 @@ export const createCard = crudActionWrapper(
       });
     }
     
+    const { description_bg_color } = req.body;
+    
     await query(
-      "INSERT INTO cards (block_id, title, description, media_path, event_date, position) VALUES ($1, $2, $3, $4, $5, $6)",
-      [blockId, title, description || null, media_path || null, event_date || null, position || 999]
+      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [blockId, title, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff']
     );
   },
   {
@@ -123,15 +125,15 @@ export const showEditCardForm = async (req, res) => {
 export const updateCard = crudActionWrapper(
   async (req, res) => {
     const { blockId, id } = req.params;
-    const { title, description, media_path, event_date, position } = req.body;
+    const { title, description, media_path, event_date, position, description_bg_color } = req.body;
     
     if (!title) {
       return res.status(400).send("Le titre est requis");
     }
     
     await query(
-      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, updated_at=NOW() WHERE id=$6 AND block_id=$7",
-      [title, description || null, media_path || null, event_date || null, position || 999, id, blockId]
+      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, description_bg_color=$6, updated_at=NOW() WHERE id=$7 AND block_id=$8",
+      [title, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', id, blockId]
     );
   },
   {
@@ -193,7 +195,7 @@ export const getCardJson = async (req, res) => {
   const { blockId, id } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, block_id, position, title, description, media_path, event_date FROM cards WHERE id=$1 AND block_id=$2",
+      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color FROM cards WHERE id=$1 AND block_id=$2",
       [id, blockId]
     );
     if (rows.length === 0) {
@@ -212,15 +214,15 @@ export const getCardJson = async (req, res) => {
  */
 export const updateCardJson = async (req, res) => {
   const { blockId, id } = req.params;
-  const { title, description, media_path, event_date, position } = req.body;
+  const { title, description, media_path, event_date, position, description_bg_color } = req.body;
 
   if (!title || !title.trim()) {
     return res.status(400).json({ success: false, message: "Le titre est requis" });
   }
   try {
     const { rows } = await query(
-      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=COALESCE($5, position), updated_at=NOW() WHERE id=$6 AND block_id=$7 RETURNING id, block_id, position, title, description, media_path, event_date",
-      [title.trim(), description || null, media_path || null, event_date || null, position || null, id, blockId]
+      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=COALESCE($5, position), description_bg_color=$6, updated_at=NOW() WHERE id=$7 AND block_id=$8 RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
+      [title.trim(), description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff', id, blockId]
     );
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: "Carte non trouvée" });
@@ -238,14 +240,14 @@ export const updateCardJson = async (req, res) => {
  */
 export const createCardJson = async (req, res) => {
   const { blockId } = req.params;
-  const { title, description, media_path, event_date, position } = req.body;
+  const { title, description, media_path, event_date, position, description_bg_color } = req.body;
   if (!title || !title.trim()) {
     return res.status(400).json({ success: false, message: "Le titre est requis" });
   }
   try {
     const { rows } = await query(
-      "INSERT INTO cards (block_id, title, description, media_path, event_date, position) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 999)) RETURNING id, block_id, position, title, description, media_path, event_date",
-      [blockId, title.trim(), description || null, media_path || null, event_date || null, position || null]
+      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 999), $7) RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
+      [blockId, title.trim(), description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff']
     );
     res.status(201).json({ success: true, message: SUCCESS_MESSAGES.CARD_CREATED, card: rows[0] });
   } catch (error) {

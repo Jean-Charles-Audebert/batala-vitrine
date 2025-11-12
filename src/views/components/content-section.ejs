@@ -62,8 +62,13 @@
           ><%= card.title %></h3>
           <% if (card.description) { %>
             <p
-              <% if (card.description_color) { %>
-              style="color: <%= card.description_color %>;"
+              <% 
+                const descStyles = [];
+                if (card.description_color) descStyles.push(`color: ${card.description_color}`);
+                if (card.description_bg_color) descStyles.push(`background-color: ${card.description_bg_color}`, 'padding: 0.75rem', 'border-radius: 4px');
+              %>
+              <% if (descStyles.length > 0) { %>
+              style="<%= descStyles.join('; ') %>;"
               <% } %>
             ><%= card.description %></p>
           <% } %>

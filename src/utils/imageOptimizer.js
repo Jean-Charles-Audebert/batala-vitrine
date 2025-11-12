@@ -93,8 +93,15 @@ export function detectPresetFromField(fieldName) {
  * @returns {Promise<string>} - Chemin du fichier optimisé
  */
 export async function createOptimizedVersion(originalPath, fieldName = "media_path") {
+  const ext = path.extname(originalPath).toLowerCase();
+  
+  // Ne pas optimiser les GIF (pour préserver les animations) ni les SVG (format vectoriel)
+  if (ext === ".gif" || ext === ".svg") {
+    logger.info(`[ImageOptimizer] GIF ou SVG détecté, pas d'optimisation: ${path.basename(originalPath)}`);
+    return originalPath;
+  }
+  
   const preset = detectPresetFromField(fieldName);
-  const ext = path.extname(originalPath);
   const baseName = path.basename(originalPath, ext);
   const dir = path.dirname(originalPath);
   

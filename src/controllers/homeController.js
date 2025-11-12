@@ -9,8 +9,13 @@ export const showHome = async (req, res, deps = {}) => {
     const dbCheck = await _query("SELECT current_database()");
     logger.info(`Base de données connectée: ${dbCheck.rows[0].current_database}`);
     
-    // Récupérer les paramètres de la page (thème global)
-    const { rows: pageRows } = await _query("SELECT * FROM page WHERE id=1");
+    // Récupérer les paramètres de la page (thème global) avec la police
+    const { rows: pageRows } = await _query(`
+      SELECT p.*, f.name AS font_name, f.font_family, f.url AS font_url, f.file_path AS font_file
+      FROM page p
+      LEFT JOIN fonts f ON p.title_font_id = f.id
+      WHERE p.id=1
+    `);
     const pageSettings = pageRows[0] || { theme: {} };
     
     // Récupérer tous les blocs dans l'ordre de position (avec nouveaux champs de thème)
@@ -35,7 +40,7 @@ export const showHome = async (req, res, deps = {}) => {
       } else if (block.type !== 'header') {
         // Autres blocs (actus, offres, ...): charger les cartes normalisées (avec nouveaux champs de thème)
         const { rows: cards } = await _query(
-          "SELECT id, position, title, description, media_path, bg_color, title_color, description_color FROM cards WHERE block_id=$1 ORDER BY position ASC",
+          "SELECT id, position, title, description, media_path, bg_color, title_color, description_color, description_bg_color FROM cards WHERE block_id=$1 ORDER BY position ASC",
           [block.id]
         );
         block.cards = cards;

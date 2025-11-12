@@ -40,6 +40,13 @@
         ><%= card ? card.description || '' : '' %></textarea>
       </div>
 
+      <%- include('../components/color-picker', {
+        name: 'description_bg_color',
+        label: 'Couleur de fond de la description',
+        value: card && card.description_bg_color ? card.description_bg_color : '#ffffff',
+        helpText: 'Couleur de fond affichée derrière le texte de description.'
+      }) %>
+
       <div class="form-group">
         <label for="media_path">Image de la carte</label>
         <div style="display: flex; gap: 0.5rem; align-items: flex-start;">

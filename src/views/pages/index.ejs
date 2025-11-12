@@ -1,49 +1,67 @@
+<%
+  // Extraire les thèmes et la police AVANT le head
+  const headerBgImage = pageSettings?.header_bg_image || null;
+  const headerBgColor = pageSettings?.header_bg_color || '#ffffff';
+  const headerTitleColor = pageSettings?.header_title_color || '#333333';
+  
+  const mainBgImage = pageSettings?.main_bg_image || null;
+  const mainBgColor = pageSettings?.main_bg_color || '#f5f5f5';
+  const mainTitleColor = pageSettings?.main_title_color || '#333333';
+  
+  const footerBgImage = pageSettings?.footer_bg_image || null;
+  const footerBgColor = pageSettings?.footer_bg_color || '#2c3e50';
+  const footerTextColor = pageSettings?.footer_text_color || '#ecf0f1';
+  
+  // Police globale unique pour tous les titres
+  const globalTitleFont = pageSettings?.font_family || 'Arial, sans-serif';
+  const fontUrl = pageSettings?.font_url || null;
+  const fontFile = pageSettings?.font_file || null;
+%>
+
 <%-
   include('../partials/head', {
     title,
     stylesheets: ['/css/style.css', '/css/index.css', '/css/buttons.css']
   })
 %>
-  <%
-    // Extraire les thèmes des 3 zones avec valeurs par défaut
-    const headerBgImage = pageSettings?.header_bg_image || null;
-    const headerBgColor = pageSettings?.header_bg_color || '#ffffff';
-    const headerTitleFont = pageSettings?.header_title_font || 'Arial, sans-serif';
-    const headerTitleColor = pageSettings?.header_title_color || '#333333';
-    
-    const mainBgImage = pageSettings?.main_bg_image || null;
-    const mainBgColor = pageSettings?.main_bg_color || '#f5f5f5';
-    const mainTitleFont = pageSettings?.main_title_font || 'Arial, sans-serif';
-    const mainTitleColor = pageSettings?.main_title_color || '#333333';
-    
-    const footerBgImage = pageSettings?.footer_bg_image || null;
-    const footerBgColor = pageSettings?.footer_bg_color || '#2c3e50';
-    const footerTextColor = pageSettings?.footer_text_color || '#ecf0f1';
-  %>
+  
+  <!-- Import de la police globale -->
+  <% if (fontUrl) { %>
+    <link rel="stylesheet" href="<%= fontUrl %>">
+  <% } %>
+  <% if (fontFile) { %>
+    <style>
+      @font-face {
+        font-family: 'CustomFont';
+        src: url('<%= fontFile %>');
+      }
+    </style>
+  <% } %>
   
   <!-- Variables CSS pour le thème (3 zones: header, main, footer) -->
   <style>
     :root {
+      /* POLICE GLOBALE POUR TOUS LES TITRES */
+      --global-title-font: <%- globalTitleFont %>;
+      
       /* ZONE 1: HEADER */
       --header-bg-color: <%= headerBgColor %>;
       <% if (headerBgImage) { %>
-      --header-bg-image: url(<%= headerBgImage %>);
+      --header-bg-image: url('<%= headerBgImage %>');
       <% } %>
-      --header-title-font: <%= headerTitleFont %>;
       --header-title-color: <%= headerTitleColor %>;
       
       /* ZONE 2: MAIN CONTENT */
       --main-bg-color: <%= mainBgColor %>;
       <% if (mainBgImage) { %>
-      --main-bg-image: url(<%= mainBgImage %>);
+      --main-bg-image: url('<%= mainBgImage %>');
       <% } %>
-      --main-title-font: <%= mainTitleFont %>;
       --main-title-color: <%= mainTitleColor %>;
       
       /* ZONE 3: FOOTER */
       --footer-bg-color: <%= footerBgColor %>;
       <% if (footerBgImage) { %>
-      --footer-bg-image: url(<%= footerBgImage %>);
+      --footer-bg-image: url('<%= footerBgImage %>');
       <% } %>
       --footer-text-color: <%= footerTextColor %>;
     }
@@ -80,6 +98,50 @@
     <%- include('../components/footer-modals', { user }) %>
     <%- include('../components/auth-fab', { user }) %>
   </div>
+  
+  <script>
+    // Détecter si le texte du footer est clair ou foncé pour adapter les icônes
+    document.addEventListener('DOMContentLoaded', () => {
+      const footer = document.querySelector('.footer-section');
+      if (!footer) return;
+      
+      const textColor = getComputedStyle(footer).getPropertyValue('--footer-text-color').trim() || 
+                        getComputedStyle(footer).color;
+      
+      // Fonction pour calculer la luminosité d'une couleur hex
+      function getLuminance(color) {
+        // Si c'est rgb/rgba, extraire les valeurs
+        if (color.startsWith('rgb')) {
+          const match = color.match(/\d+/g);
+          if (match) {
+            const [r, g, b] = match.map(Number);
+            return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          }
+        }
+        
+        // Si c'est hex
+        if (color.startsWith('#')) {
+          const hex = color.slice(1);
+          const rgb = parseInt(hex, 16);
+          const r = (rgb >> 16) & 0xff;
+          const g = (rgb >> 8) & 0xff;
+          const b = (rgb >> 0) & 0xff;
+          return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        }
+        
+        return 0.5; // Par défaut, considérer comme ni clair ni foncé
+      }
+      
+      const luminance = getLuminance(textColor);
+      
+      // Si la luminance est faible (< 0.5), le texte est foncé
+      if (luminance < 0.5) {
+        footer.setAttribute('data-dark-text', 'true');
+      } else {
+        footer.removeAttribute('data-dark-text');
+      }
+    });
+  </script>
   
 <%-
   include('../partials/footer', {
