@@ -74,35 +74,38 @@ jobs:
           cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache,mode=max
 
-  deploy-to-nas:
-    name: Deploy to NAS
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          key: ${{ secrets.NAS_SSH_KEY }}
-          port: ${{ secrets.NAS_SSH_PORT }}
-          script: |
-            cd /volume1/docker/batala-vitrine
-            ./deploy.sh
-
-      - name: Wait for deployment
-        run: sleep 15
-
-      - name: Health check
-        run: |
-          for i in {1..10}; do
-            if curl -f ${{ secrets.NAS_APP_URL }}/health; then
-              echo "✅ Deployment successful"
-              exit 0
-            fi
-            echo "⏳ Waiting for app to start (attempt $i/10)..."
-            sleep 5
-          done
-          echo "❌ Health check failed"
-          exit 1
+  # deploy-to-nas:
+  #   name: Deploy to NAS
+  #   needs: build-and-push
+  #   runs-on: ubuntu-latest
+  #   
+  #   steps:
+  #     - name: Deploy via SSH
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.NAS_HOST }}
+  #         username: ${{ secrets.NAS_USER }}
+  #         key: ${{ secrets.NAS_SSH_KEY }}
+  #         port: ${{ secrets.NAS_SSH_PORT }}
+  #         script: |
+  #           cd /volume1/docker/batala-vitrine
+  #           ./deploy.sh
+  #
+  #     - name: Wait for deployment
+  #       run: sleep 15
+  #
+  #     - name: Health check
+  #       run: |
+  #         for i in {1..10}; do
+  #           if curl -f ${{ secrets.NAS_APP_URL }}/health; then
+  #             echo "✅ Deployment successful"
+  #             exit 0
+  #           fi
+  #           echo "⏳ Waiting for app to start (attempt $i/10)..."
+  #           sleep 5
+  #         done
+  #         echo "❌ Health check failed"
+  #         exit 1
+  
+  # NOTE: Déploiement SSH désactivé temporairement (problème de PATH Docker sur Synology)
+  # Pour déployer : ssh admin@nas puis cd /volume1/docker/batala-vitrine && ./deploy.sh

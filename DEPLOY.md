@@ -33,8 +33,8 @@
 
 | Secret Name | Valeur | Description |
 |-------------|--------|-------------|
-| `DOCKERHUB_USERNAME` | `your-username` | Username Docker Hub |
-| `DOCKERHUB_TOKEN` | `dckr_pat_...` | Token d'accès Docker Hub |
+| `DOCKER_USERNAME` | `your-username` | Username Docker Hub |
+| `DOCKER_TOKEN` | `dckr_pat_...` | Token d'accès Docker Hub |
 | `NAS_HOST` | `nas.votredomaine.fr` | Hostname ou IP du NAS |
 | `NAS_USER` | `admin` | Utilisateur SSH (avec droits Docker) |
 | `NAS_SSH_KEY` | `-----BEGIN OPENSSH PRIVATE KEY-----...` | Clé privée SSH |
@@ -390,7 +390,7 @@ docker run -d \
 - [ ] Token Docker Hub généré
 - [ ] Paire de clés SSH générée (ed25519)
 - [ ] Clé publique copiée sur le NAS (`ssh-copy-id`)
-- [ ] Secrets GitHub configurés (7 secrets)
+- [ ] Secrets GitHub configurés (DOCKER_USERNAME, DOCKER_TOKEN, NAS_*, etc.)
 - [ ] Dossier NAS créé (/volume1/docker/batala-vitrine)
 - [ ] 3 fichiers créés sur NAS (.env, docker-compose.prod.yml, deploy.sh)
 - [ ] Script deploy.sh rendu exécutable (chmod +x)
