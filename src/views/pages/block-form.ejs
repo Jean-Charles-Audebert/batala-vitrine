@@ -368,6 +368,160 @@
         <% } %>
       <% } %>
 
+      <!-- Personnalisation du thème du bloc (pour les blocs non-structurels) -->
+      <% if (!isStructural) { %>
+        <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+        
+        <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">🎨 Apparence du bloc</h2>
+        
+        <p style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f5e9; border-left: 4px solid #4CAF50; border-radius: 4px;">
+          <strong>ℹ️ Information :</strong> Personnalisez l'apparence de ce bloc. Si vous ne définissez pas de couleurs, le bloc utilisera les paramètres globaux définis dans la page Header.
+        </p>
+
+        <div class="form-group">
+          <label>
+            <input 
+              type="checkbox" 
+              id="is_transparent" 
+              name="is_transparent" 
+              <%= block && block.is_transparent ? 'checked' : '' %>
+            >
+            Fond transparent
+          </label>
+          <small class="form-help">
+            Si activé, le fond de ce bloc sera transparent et laissera apparaître l'arrière-plan de la page.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="bg_image_block">Image de fond du bloc</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input 
+              type="text" 
+              id="bg_image_block" 
+              name="bg_image" 
+              value="<%= block ? block.bg_image || '' : '' %>" 
+              placeholder="/assets/bg.jpg ou /uploads/bg.png"
+              style="flex: 1;"
+            >
+            <input 
+              type="file" 
+              id="bg_image_block_upload" 
+              accept="image/*"
+              style="display: none;"
+              data-target-field="bg_image_block"
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('bg_image_block_upload').click()"
+              title="Uploader une image"
+            >
+              <img src="/icons/image.svg" alt="" class="icon">
+              Choisir
+            </button>
+          </div>
+          <small class="form-help" id="bg_image_block_status">
+            Image affichée en arrière-plan de ce bloc spécifiquement.
+          </small>
+          <% if (block && block.bg_image) { %>
+            <div style="margin-top: 0.5rem;" id="bg_image_block_preview">
+              <img src="<%= block.bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+          <% } else { %>
+            <div style="margin-top: 0.5rem; display: none;" id="bg_image_block_preview">
+              <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+          <% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="block_bg_color">Couleur de fond du bloc</label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <input 
+              type="color" 
+              id="block_bg_color" 
+              name="block_bg_color" 
+              value="<%= block && block.bg_color ? block.bg_color : '#ffffff' %>"
+              style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+            >
+            <input 
+              type="text" 
+              value="<%= block && block.bg_color ? block.bg_color : '' %>" 
+              placeholder="Non défini (utilise la couleur globale)"
+              style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+              id="block_bg_color_display"
+              readonly
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('block_bg_color').value=''; document.getElementById('block_bg_color_display').value='';"
+              title="Réinitialiser (utiliser le thème global)"
+            >
+              ✕ Réinit
+            </button>
+          </div>
+          <small class="form-help">
+            Couleur de fond de ce bloc (surcharge le thème global). Cliquez sur "Réinit" pour utiliser la couleur globale.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="block_title_color">Couleur du titre du bloc</label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <input 
+              type="color" 
+              id="block_title_color" 
+              name="block_title_color" 
+              value="<%= block && block.title_color ? block.title_color : '#333333' %>"
+              style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+            >
+            <input 
+              type="text" 
+              value="<%= block && block.title_color ? block.title_color : '' %>" 
+              placeholder="Non défini (utilise la couleur globale)"
+              style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+              id="block_title_color_display"
+              readonly
+            >
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('block_title_color').value=''; document.getElementById('block_title_color_display').value='';"
+              title="Réinitialiser (utiliser le thème global)"
+            >
+              ✕ Réinit
+            </button>
+          </div>
+          <small class="form-help">
+            Couleur du titre de ce bloc (surcharge le thème global). Cliquez sur "Réinit" pour utiliser la couleur globale.
+          </small>
+        </div>
+
+        <script>
+          // Synchroniser les color pickers du bloc
+          (function() {
+            const bgColorInput = document.getElementById('block_bg_color');
+            const bgColorDisplay = document.getElementById('block_bg_color_display');
+            const titleColorInput = document.getElementById('block_title_color');
+            const titleColorDisplay = document.getElementById('block_title_color_display');
+            
+            if (bgColorInput && bgColorDisplay) {
+              bgColorInput.addEventListener('input', function() {
+                bgColorDisplay.value = this.value.toUpperCase();
+              });
+            }
+            
+            if (titleColorInput && titleColorDisplay) {
+              titleColorInput.addEventListener('input', function() {
+                titleColorDisplay.value = this.value.toUpperCase();
+              });
+            }
+          })();
+        </script>
+      <% } %>
+
       <!-- Slug (masqué pour les blocs structurels) -->
       <% if (!isStructural) { %>
         <div class="form-group">
