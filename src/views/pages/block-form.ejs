@@ -75,17 +75,16 @@
       <!-- Champs spécifiques au HEADER -->
       <% if (isHeader) { %>
         <div class="form-group">
-          <label for="header_title">Titre du site *</label>
+          <label for="header_title">Titre du site</label>
           <input 
             type="text" 
             id="header_title" 
             name="header_title" 
             value="<%= block ? block.header_title || '' : '' %>" 
-            required
             placeholder="Nom du site"
           >
           <small class="form-help">
-            Le titre principal affiché dans le header.
+            Le titre principal affiché dans le header. <strong>Facultatif</strong> : si votre logo comporte déjà le nom du site, vous pouvez laisser ce champ vide.
           </small>
         </div>
 

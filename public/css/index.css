@@ -506,6 +506,88 @@ footer .social-link:hover .social-icon,
 
 /* Couleurs spécifiques au hover par réseau */
 
+/* ==========================================================================
+   Formulaire de contact dans le footer
+   ========================================================================== */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.form-group-inline {
+  width: 100%;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--footer-text-color, #ecf0f1);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--footer-text-color, #ecf0f1);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--footer-text-color, #ecf0f1);
+  opacity: 0.7;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--footer-text-color, #ecf0f1);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-submit-contact {
+  background: var(--footer-text-color, #ecf0f1);
+  color: var(--footer-bg-color, #2c3e50);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-submit-contact:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-submit-contact:active {
+  transform: translateY(0);
+}
+
+.contact-status {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  display: none;
+}
+
+.contact-status.success {
+  display: block;
+  background: rgba(46, 125, 50, 0.2);
+  border: 1px solid rgba(46, 125, 50, 0.5);
+  color: #4caf50;
+}
+
+.contact-status.error {
+  display: block;
+  background: rgba(211, 47, 47, 0.2);
+  border: 1px solid rgba(211, 47, 47, 0.5);
+  color: #f44336;
+}
 
 /* ==========================================================================
    Modales

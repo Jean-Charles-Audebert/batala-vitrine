@@ -126,14 +126,12 @@ export const updateBlock = crudActionWrapper(
     
     // Pour les blocs header, on met à jour les champs spécifiques + paramètres de la page
     if (blockType === 'header') {
-      if (!header_title) {
-        return res.status(400).send("Le titre du site est requis pour le header");
-      }
+      // Le titre du site est désormais facultatif (le logo peut comporter le titre)
       
       // Mise à jour du bloc header
       await query(
         "UPDATE blocks SET header_title=$1, header_logo=$2, bg_image=$3 WHERE id=$4",
-        [header_title, header_logo || null, bg_image || null, id]
+        [header_title || null, header_logo || null, bg_image || null, id]
       );
       
       // Mise à jour des paramètres de la page (thème global simplifié)

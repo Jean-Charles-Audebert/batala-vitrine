@@ -14,6 +14,7 @@ import cardRoutes from "./routes/cardRoutes.js";
 import footerElementRoutes from "./routes/footerElementRoutes.js";
 import fontRoutes from "./routes/fontRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
+import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
 
@@ -72,7 +73,12 @@ app.use("/auth", refreshRoutes);
 app.use("/blocks", blockRoutes);
 app.use("/blocks/:blockId/cards", cardRoutes);
 app.use("/fonts", fontRoutes);
+
+// Route de contact PUBLIQUE (AVANT footerElementRoutes pour éviter son middleware global)
+app.post("/contact", sendContactEmail);
+
 app.use("/", footerElementRoutes);
+
 app.use("/api", apiRoutes);
 
 // --- Lancement du serveur ---

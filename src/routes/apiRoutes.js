@@ -14,6 +14,8 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
+// Note: La route /api/contact est définie directement dans server.js pour éviter les conflits d'authentification
+
 // Route API pour le réordonnancement des blocs
 router.post("/blocks/reorder", requireAuth, reorderBlocks);
 
