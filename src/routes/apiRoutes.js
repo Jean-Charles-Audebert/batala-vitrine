@@ -53,17 +53,20 @@ router.post(
 
       logger.info(`Image uploadée : ${req.file.filename} (${req.file.size} bytes), champ: ${fieldName}`);
 
-      // Optimiser l'image (remplace l'original)
+      // Créer version optimisée SANS suffixe (fichier uploadé a -original)
+      let optimizedPath;
       try {
-        await createOptimizedVersion(uploadedFilePath, fieldName);
-        logger.info(`Image optimisée: ${req.file.filename}`);
+        optimizedPath = await createOptimizedVersion(uploadedFilePath, fieldName);
+        logger.info(`Image optimisée créée: ${path.basename(optimizedPath)}`);
       } catch (optError) {
         logger.error("Erreur optimisation image (fichier conservé non optimisé):", optError);
         // On continue même si l'optimisation échoue
+        optimizedPath = uploadedFilePath;
       }
 
-      // Retourner le chemin relatif pour stockage en DB
-      const relativePath = `/uploads/${req.file.filename}`;
+      // Retourner le chemin de la version OPTIMISÉE (sans -original) pour stocker en BDD
+      const optimizedFilename = path.basename(optimizedPath);
+      const relativePath = `/uploads/${optimizedFilename}`;
 
       res.status(200).json({
         success: true,

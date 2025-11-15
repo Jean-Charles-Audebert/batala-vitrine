@@ -83,7 +83,7 @@ async function handleImageUpload(event, fieldId) {
         statusEl.style.color = "#27ae60";
       }
       
-      // Mettre à jour le champ texte
+      // Mettre à jour le champ texte (toujours l'original)
       if (pathInput) {
         pathInput.value = result.path;
       }

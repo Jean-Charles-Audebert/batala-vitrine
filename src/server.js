@@ -64,6 +64,10 @@ if (process.env.NODE_ENV === "development") {
   app.set("view cache", false);
 }
 
+// Injecter des helpers globaux dans tous les templates
+import { getOriginalPath } from "./utils/viewHelpers.js";
+app.locals.getOriginalPath = getOriginalPath;
+
 // --- Routes ---
 app.use("/", router);
 app.use("/", healthRoutes);

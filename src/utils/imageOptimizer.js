@@ -87,10 +87,10 @@ export function detectPresetFromField(fieldName) {
 }
 
 /**
- * Crée une version optimisée et retourne le nouveau chemin
- * @param {string} originalPath - Chemin du fichier original
+ * Crée une version optimisée SANS suffixe (fichier original a -original)
+ * @param {string} originalPath - Chemin du fichier original (avec -original)
  * @param {string} fieldName - Nom du champ pour détecter le preset
- * @returns {Promise<string>} - Chemin du fichier optimisé
+ * @returns {Promise<string>} - Chemin du fichier optimisé créé
  */
 export async function createOptimizedVersion(originalPath, fieldName = "media_path") {
   const ext = path.extname(originalPath).toLowerCase();
@@ -105,16 +105,25 @@ export async function createOptimizedVersion(originalPath, fieldName = "media_pa
   const baseName = path.basename(originalPath, ext);
   const dir = path.dirname(originalPath);
   
-  // Créer un fichier temporaire pour l'optimisation
-  const tempPath = path.join(dir, `${baseName}-temp${ext}`);
+  // Le fichier uploadé a -original, on crée la version optimisée SANS suffixe
+  const optimizedPath = path.join(dir, baseName.replace('-original', '') + ext);
   
-  // Optimiser vers le fichier temporaire
-  await optimizeImage(originalPath, tempPath, preset);
+  // Optimiser vers le nouveau fichier (garde l'original intact)
+  await optimizeImage(originalPath, optimizedPath, preset);
   
-  // Supprimer l'original et renommer le fichier temporaire
-  const fs = await import("fs/promises");
-  await fs.unlink(originalPath);
-  await fs.rename(tempPath, originalPath);
-  
-  return originalPath;
+  return optimizedPath;
+}
+
+/**
+ * Génère le chemin du fichier ORIGINAL depuis l'optimisé (ajout -original)
+ * Convention: optimisé = /uploads/photo.jpg, original = /uploads/photo-original.jpg
+ * @param {string} optimizedPath - Chemin de l'image optimisée (stocké en BDD)
+ * @returns {string} - Chemin de l'image originale (haute résolution)
+ */
+export function getOriginalPath(optimizedPath) {
+  if (!optimizedPath) return optimizedPath;
+  const ext = path.extname(optimizedPath);
+  const baseName = path.basename(optimizedPath, ext);
+  const dir = path.dirname(optimizedPath);
+  return path.join(dir, `${baseName}-original${ext}`).replace(/\\/g, '/');
 }

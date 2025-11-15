@@ -42,6 +42,8 @@
             <option value="header" <%= blockType === 'header' ? 'selected' : '' %>>Header</option>
             <option value="events" <%= blockType === 'events' ? 'selected' : '' %>>Événements</option>
             <option value="offers" <%= blockType === 'offers' ? 'selected' : '' %>>Offres</option>
+            <option value="photos" <%= blockType === 'photos' ? 'selected' : '' %>>Photos</option>
+            <option value="videos" <%= blockType === 'videos' ? 'selected' : '' %>>Vidéos</option>
             <option value="footer" <%= blockType === 'footer' ? 'selected' : '' %>>Footer</option>
             <option value="custom" <%= blockType === 'custom' ? 'selected' : '' %>>Personnalisé</option>
           </select>
@@ -60,15 +62,15 @@
       <!-- Titre du bloc (pour tous sauf header qui a header_title) -->
       <% if (!isHeader) { %>
         <div class="form-group">
-          <label for="title">Titre *</label>
+          <label for="title">Titre</label>
           <input 
             type="text" 
             id="title" 
             name="title" 
             value="<%= block ? block.title || '' : '' %>" 
-            required
-            placeholder="Titre du bloc"
+            placeholder="Titre du bloc (facultatif)"
           >
+          <small class="form-help">Le titre est facultatif. Si vide, seul le contenu sera affiché.</small>
         </div>
       <% } %>
 
@@ -90,20 +92,20 @@
 
         <div class="form-group">
           <label for="header_logo">Logo (URL ou chemin) *</label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div class="upload-field-row center">
             <input 
               type="text" 
               id="header_logo" 
               name="header_logo" 
               value="<%= block ? block.header_logo || '' : '' %>" 
               placeholder="/assets/logo.svg ou /uploads/logo.png"
-              style="flex: 1;"
+              class="flex-1"
             >
             <input 
               type="file" 
               id="header_logo_upload" 
               accept="image/*"
-              style="display: none;"
+              class="upload-file-input"
               data-target-field="header_logo"
             >
             <button 
@@ -119,15 +121,9 @@
           <small class="form-help" id="header_logo_status">
             Entrez un chemin (ex: <code>/assets/logo.svg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
           </small>
-          <% if (block && block.header_logo) { %>
-            <div style="margin-top: 0.5rem;" id="header_logo_preview">
-              <img src="<%= block.header_logo %>" alt="Logo" style="max-width: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem;">
-            </div>
-          <% } else { %>
-            <div style="margin-top: 0.5rem; display: none;" id="header_logo_preview">
-              <img src="" alt="Logo" style="max-width: 150px; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem;">
-            </div>
-          <% } %>
+          <div class="preview-container <%= block && block.header_logo ? '' : 'd-none' %>" id="header_logo_preview">
+            <img src="<%= block ? block.header_logo : '' %>" alt="Logo" class="preview-img-logo">
+          </div>
         </div>
 
         <div class="form-group">
@@ -161,35 +157,31 @@
           <small class="form-help" id="bg_image_status">
             Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
           </small>
-          <% if (block && block.bg_image) { %>
-            <div style="margin-top: 0.5rem;" id="bg_image_preview">
-              <img src="<%= block.bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-          <% } else { %>
-            <div style="margin-top: 0.5rem; display: none;" id="bg_image_preview">
-              <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-          <% } %>
+          <div class="preview-container <%= block && block.bg_image ? '' : 'd-none' %>" id="bg_image_preview">
+            <img src="<%= block ? block.bg_image : '' %>" alt="Fond" class="preview-img">
+          </div>
         </div>
 
         <!-- Paramètres globaux de la page (uniquement pour header) -->
         <% if (pageSettings) { %>
-          <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+          <hr class="section-divider">
           
-          <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">🎨 Thème de la page</h2>
+          <h2 class="admin-section-title">🎨 Thème de la page</h2>
           
-          <p style="margin-bottom: 2rem; padding: 1rem; background: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 4px;">
-            <strong>ℹ️ Information :</strong> Personnalisez l'apparence de votre site en définissant les thèmes pour chaque zone (Header, Contenu principal, Footer).
-            <br><br>
-            <a href="/" target="_blank" style="color: #1976D2; text-decoration: underline;">👁️ Aperçu du site dans un nouvel onglet</a>
-          </p>
+          <div class="alert-box alert-info">
+            <p>
+              <strong>ℹ️ Information :</strong> Personnalisez l'apparence de votre site en définissant les thèmes pour chaque zone (Header, Contenu principal, Footer).
+              <br><br>
+              <a href="/" target="_blank">👁️ Aperçu du site dans un nouvel onglet</a>
+            </p>
+          </div>
           
           <!-- SECTION 1: HEADER -->
-          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #2196F3; color: #333; font-size: 1.25rem;">
+          <h3 class="admin-subsection-title header-section">
             📋 Zone 1 : En-tête (Header)
           </h3>
           
-          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+          <p class="text-muted mb-2">
             Personnalisez l'apparence de la zone d'en-tête du site (logo, titre principal).
           </p>
 
@@ -237,30 +229,30 @@
           }) %>
 
           <!-- SECTION 2: MAIN CONTENT -->
-          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #4CAF50; color: #333; font-size: 1.25rem;">
+          <h3 class="admin-subsection-title main-section">
             📄 Zone 2 : Contenu principal (Main)
           </h3>
           
-          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+          <p class="text-muted mb-2">
             Personnalisez l'apparence de la zone de contenu principal (tous les blocs entre le header et le footer).
           </p>
 
           <div class="form-group">
             <label for="main_bg_image">Image de fond du contenu principal</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="upload-field-row center">
               <input 
                 type="text" 
                 id="main_bg_image" 
                 name="main_bg_image" 
                 value="<%= pageSettings.main_bg_image || '' %>" 
                 placeholder="/assets/main-bg.jpg ou /uploads/bg.gif"
-                style="flex: 1;"
+                class="flex-1"
               >
               <input 
                 type="file" 
                 id="main_bg_image_upload" 
                 accept="image/*"
-                style="display: none;"
+                class="upload-file-input"
                 data-target-field="main_bg_image"
               >
               <button 
@@ -276,15 +268,9 @@
             <small class="form-help" id="main_bg_image_status">
               Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
             </small>
-            <% if (pageSettings.main_bg_image) { %>
-              <div style="margin-top: 0.5rem;" id="main_bg_image_preview">
-                <img src="<%= pageSettings.main_bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-              </div>
-            <% } else { %>
-              <div style="margin-top: 0.5rem; display: none;" id="main_bg_image_preview">
-                <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-              </div>
-            <% } %>
+            <div class="preview-container <%= pageSettings.main_bg_image ? '' : 'd-none' %>" id="main_bg_image_preview">
+              <img src="<%= pageSettings.main_bg_image || '' %>" alt="Fond" class="preview-img">
+            </div>
           </div>
 
           <%- include('../components/color-picker', {
@@ -302,30 +288,30 @@
           }) %>
 
           <!-- SECTION 3: FOOTER -->
-          <h3 style="margin: 2rem 0 1rem 0; padding: 0.75rem; background: #f5f5f5; border-left: 4px solid #FF9800; color: #333; font-size: 1.25rem;">
+          <h3 class="admin-subsection-title footer-section">
             🔖 Zone 3 : Pied de page (Footer)
           </h3>
           
-          <p style="margin-bottom: 1rem; color: #666; font-size: 0.95rem;">
+          <p class="text-muted mb-2">
             Personnalisez l'apparence de la zone de pied de page (informations, contact, liens sociaux).
           </p>
 
           <div class="form-group">
             <label for="footer_bg_image">Image de fond du footer</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="upload-field-row center">
               <input 
                 type="text" 
                 id="footer_bg_image" 
                 name="footer_bg_image" 
                 value="<%= pageSettings.footer_bg_image || '' %>" 
                 placeholder="/assets/footer-bg.jpg ou /uploads/bg.gif"
-                style="flex: 1;"
+                class="flex-1"
               >
               <input 
                 type="file" 
                 id="footer_bg_image_upload" 
                 accept="image/*"
-                style="display: none;"
+                class="upload-file-input"
                 data-target-field="footer_bg_image"
               >
               <button 
@@ -341,15 +327,9 @@
             <small class="form-help" id="footer_bg_image_status">
               Entrez un chemin (ex: <code>/assets/bg.jpg</code>) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
             </small>
-            <% if (pageSettings.footer_bg_image) { %>
-              <div style="margin-top: 0.5rem;" id="footer_bg_image_preview">
-                <img src="<%= pageSettings.footer_bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-              </div>
-            <% } else { %>
-              <div style="margin-top: 0.5rem; display: none;" id="footer_bg_image_preview">
-                <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-              </div>
-            <% } %>
+            <div class="preview-container <%= pageSettings.footer_bg_image ? '' : 'd-none' %>" id="footer_bg_image_preview">
+              <img src="<%= pageSettings.footer_bg_image || '' %>" alt="Fond" class="preview-img">
+            </div>
           </div>
 
           <%- include('../components/color-picker', {
@@ -370,13 +350,13 @@
 
       <!-- Personnalisation du thème du bloc (pour les blocs non-structurels) -->
       <% if (!isStructural) { %>
-        <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+        <hr class="section-divider">
         
-        <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">🎨 Apparence du bloc</h2>
+        <h2 class="admin-section-title">🎨 Apparence du bloc</h2>
         
-        <p style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f5e9; border-left: 4px solid #4CAF50; border-radius: 4px;">
-          <strong>ℹ️ Information :</strong> Personnalisez l'apparence de ce bloc. Si vous ne définissez pas de couleurs, le bloc utilisera les paramètres globaux définis dans la page Header.
-        </p>
+        <div class="alert-box alert-success">
+          <p><strong>ℹ️ Information :</strong> Personnalisez l'apparence de ce bloc. Si vous ne définissez pas de couleurs, le bloc utilisera les paramètres globaux définis dans la page Header.</p>
+        </div>
 
         <div class="form-group">
           <label>
@@ -395,20 +375,20 @@
 
         <div class="form-group">
           <label for="bg_image_block">Image de fond du bloc</label>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div class="upload-field-row center">
             <input 
               type="text" 
               id="bg_image_block" 
               name="bg_image" 
               value="<%= block ? block.bg_image || '' : '' %>" 
               placeholder="/assets/bg.jpg ou /uploads/bg.png"
-              style="flex: 1;"
+              class="flex-1"
             >
             <input 
               type="file" 
               id="bg_image_block_upload" 
               accept="image/*"
-              style="display: none;"
+              class="upload-file-input"
               data-target-field="bg_image_block"
             >
             <button 
@@ -424,32 +404,26 @@
           <small class="form-help" id="bg_image_block_status">
             Image affichée en arrière-plan de ce bloc spécifiquement.
           </small>
-          <% if (block && block.bg_image) { %>
-            <div style="margin-top: 0.5rem;" id="bg_image_block_preview">
-              <img src="<%= block.bg_image %>" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-          <% } else { %>
-            <div style="margin-top: 0.5rem; display: none;" id="bg_image_block_preview">
-              <img src="" alt="Fond" style="max-width: 300px; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-          <% } %>
+          <div class="preview-container <%= block && block.bg_image ? '' : 'd-none' %>" id="bg_image_block_preview">
+            <img src="<%= block ? block.bg_image : '' %>" alt="Fond" class="preview-img">
+          </div>
         </div>
 
         <div class="form-group">
           <label for="block_bg_color">Couleur de fond du bloc</label>
-          <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="color-picker-row">
             <input 
               type="color" 
               id="block_bg_color" 
               name="block_bg_color" 
               value="<%= block && block.bg_color ? block.bg_color : '#ffffff' %>"
-              style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              class="color-input"
             >
             <input 
               type="text" 
               value="<%= block && block.bg_color ? block.bg_color : '' %>" 
               placeholder="Non défini (utilise la couleur globale)"
-              style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+              class="color-hex-input"
               id="block_bg_color_display"
               readonly
             >
@@ -469,19 +443,19 @@
 
         <div class="form-group">
           <label for="block_title_color">Couleur du titre du bloc</label>
-          <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="color-picker-row">
             <input 
               type="color" 
               id="block_title_color" 
               name="block_title_color" 
               value="<%= block && block.title_color ? block.title_color : '#333333' %>"
-              style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+              class="color-input"
             >
             <input 
               type="text" 
               value="<%= block && block.title_color ? block.title_color : '' %>" 
               placeholder="Non défini (utilise la couleur globale)"
-              style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+              class="color-hex-input"
               id="block_title_color_display"
               readonly
             >
@@ -571,15 +545,15 @@
 
       <!-- SECTION 4: GESTION DES BLOCS (uniquement pour header) -->
       <% if (isHeader && pageSettings && allBlocks) { %>
-        <hr style="margin: 2rem 0; border: 1px solid #e0e0e0;">
+        <hr class="section-divider">
         
-        <h2 style="margin-bottom: 2rem; color: #333; font-size: 1.5rem;">📦 Gestion des blocs</h2>
+        <h2 class="admin-section-title">📦 Gestion des blocs</h2>
         
-        <p style="margin-bottom: 1.5rem; color: #666;">
+        <p class="text-muted mb-3">
           Les blocs définissent la structure de votre page. Vous pouvez réorganiser, modifier ou supprimer les blocs existants.
         </p>
 
-        <div style="margin-bottom: 1.5rem;">
+        <div class="mb-3">
           <%- include('../components/icon-button', {
             type: 'a',
             href: '/blocks/new',
@@ -591,7 +565,7 @@
         </div>
 
         <% if (allBlocks && allBlocks.length > 0) { %>
-          <table role="table" aria-label="Liste des blocs du site" style="width: 100%; margin-bottom: 2rem;">
+          <table role="table" aria-label="Liste des blocs du site" class="table mb-3">
             <thead>
               <tr>
                 <th scope="col">Position</th>

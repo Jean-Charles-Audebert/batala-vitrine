@@ -17,19 +17,19 @@
 
 <div class="form-group">
   <label for="<%= fieldId %>"><%= locals.label %></label>
-  <div style="display: flex; gap: 1rem; align-items: center;">
+  <div class="color-picker-row">
     <input 
       type="color" 
       id="<%= fieldId %>" 
       name="<%= locals.name %>" 
       value="<%= colorValue %>"
-      style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;"
+      class="color-input"
     >
     <input 
       type="text" 
       value="<%= colorValue %>" 
       readonly
-      style="flex: 1; background: #f5f5f5; border: 1px solid #ddd; padding: 0.5rem; border-radius: 4px; font-family: monospace;"
+      class="color-hex-input"
       id="<%= displayId %>"
     >
   </div>

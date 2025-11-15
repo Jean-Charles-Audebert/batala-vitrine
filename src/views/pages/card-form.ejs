@@ -17,26 +17,32 @@
 
     <%- include('../partials/alerts') %>
 
+    <%
+      const isVideosBlock = block && block.type === 'videos';
+      const mediaLabel = isVideosBlock ? 'URL de la vidéo YouTube' : 'Image de la carte';
+      const mediaPlaceholder = isVideosBlock ? 'https://www.youtube.com/watch?v=...' : '/uploads/image.jpg ou /assets/placeholder-1.svg';
+      const mediaHelpText = isVideosBlock ? 'Collez l\'URL complète de la vidéo YouTube (ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ)' : 'Entrez un chemin (ex: /uploads/image.jpg) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.';
+    %>
+    
     <form method="POST" action="<%= formAction %>" class="form-card">
       <div class="form-group">
-        <label for="title">Titre de la carte *</label>
+        <label for="title">Titre (facultatif)</label>
         <input 
           type="text" 
           id="title" 
           name="title" 
           value="<%= card ? card.title : '' %>" 
-          required
           placeholder="Titre de la carte"
         >
       </div>
 
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="description">Description (facultatif)</label>
         <textarea 
           id="description" 
           name="description" 
           rows="5"
-          placeholder="Description détaillée de la carte"
+          placeholder="Description de la carte"
         ><%= card ? card.description || '' : '' %></textarea>
       </div>
 
@@ -48,46 +54,48 @@
       }) %>
 
       <div class="form-group">
-        <label for="media_path">Image de la carte</label>
-        <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+        <label for="media_path"><%= mediaLabel %></label>
+        <div class="upload-field-row flex-start">
           <input 
             type="text" 
             id="media_path" 
             name="media_path" 
             value="<%= card ? card.media_path || '' : '' %>" 
-            placeholder="/uploads/image.jpg ou /assets/placeholder-1.svg"
-            style="flex: 1;"
+            placeholder="<%= mediaPlaceholder %>"
+            class="flex-1"
           >
-          <input 
-            type="file" 
-            id="media_path_upload" 
-            accept="image/*"
-            style="display: none;"
-            data-target-field="media_path"
-          >
-          <button 
-          <button 
-            class="btn btn-secondary btn-sm"
-            onclick="document.getElementById('media_path_upload').click()"
-            title="Uploader une image"
-          >
-            <img src="/icons/image.svg" alt="" class="icon">
-            Choisir
-          </button>
+          <% if (!isVideosBlock) { %>
+            <input 
+              type="file" 
+              id="media_path_upload" 
+              accept="image/*"
+              class="upload-file-input"
+              data-target-field="media_path"
+            >
+            <button 
+              type="button"
+              class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('media_path_upload').click()"
+              title="Uploader une image"
+            >
+              <img src="/icons/image.svg" alt="" class="icon">
+              Choisir
+            </button>
+          <% } %>
         </div>
         <small class="form-help" id="media_path_status">
-          Entrez un chemin (ex: /uploads/image.jpg) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
+          <%= mediaHelpText %>
         </small>
       </div>
 
       <!-- Preview de l'image -->
-      <div class="form-group" id="media_path_preview_container" style="<%= card && card.media_path ? '' : 'display: none;' %>">
+      <div class="form-group <%= card && card.media_path ? '' : 'd-none' %>" id="media_path_preview_container">
         <label>Aperçu de l'image</label>
         <div class="image-preview" id="media_path_preview">
           <% if (card && card.media_path) { %>
-            <img src="<%= card.media_path %>" alt="<%= card.title %>" style="max-width: 300px; border-radius: 8px;">
+            <img src="<%= card.media_path %>" alt="<%= card.title %>" class="preview-img-responsive">
           <% } else { %>
-            <img src="" alt="Preview" style="max-width: 300px; border-radius: 8px;">
+            <img src="" alt="Preview" class="preview-img-responsive">
           <% } %>
         </div>
       </div>

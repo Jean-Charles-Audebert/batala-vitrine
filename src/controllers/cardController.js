@@ -10,8 +10,8 @@ import { getBlockBasicInfo } from "../services/index.js";
 export const listCards = async (req, res) => {
   const { blockId } = req.params;
   try {
-    const { rows } = await query(
-      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color FROM cards WHERE block_id=$1 ORDER BY position ASC",
+    const { rows: cards } = await query(
+      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
       [blockId]
     );
     
@@ -25,7 +25,7 @@ export const listCards = async (req, res) => {
     res.render("pages/cards", {
       title: `Cartes du bloc "${block.title}"`,
       block,
-      cards: rows,
+      cards,
       success: req.query.success || null,
       error: req.query.error || null
     });
@@ -61,25 +61,24 @@ export const showNewCardForm = async (req, res) => {
  * Crée une nouvelle carte
  */
 export const createCard = crudActionWrapper(
-  async (req, res) => {
+  async (req) => {
     const { blockId } = req.params;
-    const { title, description, media_path, event_date, position } = req.body;
+    const { title, description, media_path, event_date, position, description_bg_color } = req.body;
     
-    if (!title) {
-      return res.render("pages/card-form", {
-        title: "Créer une nouvelle carte",
-        formAction: `/blocks/${blockId}/cards/new`,
-        block: { id: blockId },
-        card: null,
-        error: "Le titre est requis."
-      });
+    // Récupérer le type de bloc pour détecter le type de média
+    const block = await getBlockBasicInfo(blockId);
+    
+    // Détecter le type de média
+    let mediaType = 'image';
+    if (block && block.type === 'photos') {
+      mediaType = 'photo';
+    } else if (block && block.type === 'videos') {
+      mediaType = 'youtube';
     }
     
-    const { description_bg_color } = req.body;
-    
     await query(
-      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-      [blockId, title, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff']
+      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color, media_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      [blockId, title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType]
     );
   },
   {
@@ -123,17 +122,24 @@ export const showEditCardForm = async (req, res) => {
  * Met à jour une carte
  */
 export const updateCard = crudActionWrapper(
-  async (req, res) => {
+  async (req) => {
     const { blockId, id } = req.params;
     const { title, description, media_path, event_date, position, description_bg_color } = req.body;
     
-    if (!title) {
-      return res.status(400).send("Le titre est requis");
+    // Récupérer le type de bloc pour détecter le type de média
+    const block = await getBlockBasicInfo(blockId);
+    
+    // Détecter le type de média
+    let mediaType = 'image';
+    if (block && block.type === 'photos') {
+      mediaType = 'photo';
+    } else if (block && block.type === 'videos') {
+      mediaType = 'youtube';
     }
     
     await query(
-      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, description_bg_color=$6, updated_at=NOW() WHERE id=$7 AND block_id=$8",
-      [title, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', id, blockId]
+      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, description_bg_color=$6, media_type=$7, updated_at=NOW() WHERE id=$8 AND block_id=$9",
+      [title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType, id, blockId]
     );
   },
   {
@@ -216,13 +222,10 @@ export const updateCardJson = async (req, res) => {
   const { blockId, id } = req.params;
   const { title, description, media_path, event_date, position, description_bg_color } = req.body;
 
-  if (!title || !title.trim()) {
-    return res.status(400).json({ success: false, message: "Le titre est requis" });
-  }
   try {
     const { rows } = await query(
       "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=COALESCE($5, position), description_bg_color=$6, updated_at=NOW() WHERE id=$7 AND block_id=$8 RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
-      [title.trim(), description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff', id, blockId]
+      [title?.trim() || null, description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff', id, blockId]
     );
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: "Carte non trouvée" });
@@ -241,13 +244,11 @@ export const updateCardJson = async (req, res) => {
 export const createCardJson = async (req, res) => {
   const { blockId } = req.params;
   const { title, description, media_path, event_date, position, description_bg_color } = req.body;
-  if (!title || !title.trim()) {
-    return res.status(400).json({ success: false, message: "Le titre est requis" });
-  }
+  
   try {
     const { rows } = await query(
       "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 999), $7) RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
-      [blockId, title.trim(), description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff']
+      [blockId, title?.trim() || null, description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff']
     );
     res.status(201).json({ success: true, message: SUCCESS_MESSAGES.CARD_CREATED, card: rows[0] });
   } catch (error) {

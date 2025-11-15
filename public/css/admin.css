@@ -587,3 +587,169 @@ th {
   display: none;
 }
 
+/* ==========================================================================
+   Admin Section Headers
+   ========================================================================== */
+.admin-section-title {
+  margin-bottom: 2rem;
+  color: var(--text-primary, #333);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.admin-subsection-title {
+  margin: 2rem 0 1rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary, #f5f5f5);
+  border-left: 4px solid var(--color-primary, #2196F3);
+  color: var(--text-primary, #333);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-subsection-title.header-section {
+  border-color: #2196F3;
+}
+
+.admin-subsection-title.main-section {
+  border-color: #4CAF50;
+}
+
+.admin-subsection-title.footer-section {
+  border-color: #FF9800;
+}
+
+/* ==========================================================================
+   Alert Boxes / Info Panels
+   ========================================================================== */
+.alert-box {
+  padding: 1.5rem;
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 2rem;
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background: #e3f2fd;
+  border-color: #1976d2;
+  color: #0d47a1;
+}
+
+.alert-success {
+  background: #e8f5e9;
+  border-color: #4CAF50;
+  color: #1b5e20;
+}
+
+.alert-warning {
+  background: #fff3e0;
+  border-color: #f57c00;
+  color: #e65100;
+}
+
+.alert-box p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Badges / Tags
+   ========================================================================== */
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.badge-primary {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-warning {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-purple {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.badge-success {
+  background: #e8f5e9;
+  color: #4CAF50;
+}
+
+/* ==========================================================================
+   Color Picker Component
+   ========================================================================== */
+.color-picker-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.color-input {
+  width: 60px;
+  height: 40px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+}
+
+.color-hex-input {
+  flex: 1;
+  background: var(--bg-secondary, #f5f5f5);
+  border: 1px solid var(--border-color, #ddd);
+  padding: var(--spacing-sm, 0.5rem);
+  border-radius: var(--radius-sm, 4px);
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Upload Field with Preview
+   ========================================================================== */
+.upload-field-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.upload-field-row.center {
+  align-items: center;
+}
+
+.upload-file-input {
+  display: none;
+}
+
+/* ==========================================================================
+   Dividers / Separators
+   ========================================================================== */
+.section-divider {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+/* ==========================================================================
+   Text Utilities for Admin
+   ========================================================================== */
+.text-small {
+  font-size: 0.85rem;
+}
+
+.text-mono {
+  font-family: monospace;
+  font-size: 0.9rem;
+  background: var(--bg-secondary, #f5f5f5);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm, 4px);
+}
+

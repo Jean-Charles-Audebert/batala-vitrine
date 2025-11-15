@@ -370,10 +370,12 @@ table tbody tr:last-child td {
   white-space: nowrap;
 }
 
+.mt-0 { margin-top: 0 !important; }
 .mt-1 { margin-top: var(--spacing-sm); }
 .mt-2 { margin-top: var(--spacing-md); }
 .mt-3 { margin-top: var(--spacing-lg); }
 
+.mb-0 { margin-bottom: 0 !important; }
 .mb-1 { margin-bottom: var(--spacing-sm); }
 .mb-2 { margin-bottom: var(--spacing-md); }
 .mb-3 { margin-bottom: var(--spacing-lg); }
@@ -381,3 +383,116 @@ table tbody tr:last-child td {
 .gap-1 { gap: var(--spacing-sm); }
 .gap-2 { gap: var(--spacing-md); }
 .gap-3 { gap: var(--spacing-lg); }
+
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+
+/**
+ * Bouton d'ajout de carte - visible sur tout fond (clair ou sombre)
+ */
+.add-card-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.add-card-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.add-card-btn .icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/**
+ * Layout Utilities - Flexbox
+ */
+.flex-row {
+  display: flex;
+}
+
+.flex-center {
+  align-items: center;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.flex-start {
+  align-items: flex-start;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/**
+ * Display Utilities
+ */
+.d-none {
+  display: none !important;
+}
+
+.d-inline {
+  display: inline !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.d-grid {
+  display: grid;
+}
+
+/**
+ * Image Previews
+ */
+.preview-img {
+  max-width: 300px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.preview-img-logo {
+  max-width: 150px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+}
+
+.preview-img-responsive {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.preview-container {
+  margin-top: var(--spacing-sm);
+}
+
+/**
+ * Grid Utilities
+ */
+.grid-gap-1 {
+  gap: var(--spacing-md);
+}

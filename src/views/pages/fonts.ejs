@@ -19,18 +19,18 @@
     <%- include('../partials/alerts') %>
 
     <!-- Formulaire d'upload rapide -->
-    <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-      <h3 style="margin: 0 0 1rem 0;">📁 Uploader une police depuis votre PC</h3>
-      <form method="POST" action="/fonts/upload" enctype="multipart/form-data" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: end;">
-        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+    <div class="alert-box alert-info mb-3">
+      <h3 class="mt-0 mb-2">📁 Uploader une police depuis votre PC</h3>
+      <form method="POST" action="/fonts/upload" enctype="multipart/form-data" class="flex-row flex-wrap gap-md">
+        <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
           <label for="font_name">Nom de la police *</label>
           <input type="text" id="font_name" name="name" required placeholder="Roboto Bold">
         </div>
-        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+        <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
           <label for="font_family">Famille CSS *</label>
           <input type="text" id="font_family" name="font_family" required placeholder="'Roboto', sans-serif">
         </div>
-        <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+        <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
           <label for="font_file">Fichier (woff2, woff, ttf, otf) *</label>
           <input type="file" id="font_file" name="font_file" required accept=".woff2,.woff,.ttf,.otf">
         </div>
@@ -42,41 +42,41 @@
     </div>
 
     <!-- Liste des polices -->
-    <h2 style="margin: 2rem 0 1rem 0;">📚 Bibliothèque de polices</h2>
+    <h2 class="admin-section-title">📚 Bibliothèque de polices</h2>
     
     <% if (fonts && fonts.length > 0) { %>
-      <div style="display: grid; gap: 1rem;">
+      <div class="d-grid grid-gap-1">
         <% fonts.forEach(font => { %>
-          <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+          <div class="card flex-row flex-between flex-center" style="padding: 1.5rem;">
             <div>
-              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">
+              <h3 class="mt-0 mb-1" style="font-size: 1.25rem;">
                 <%= font.name %>
                 <% if (font.source === 'system') { %>
-                  <span style="background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">SYSTÈME</span>
+                  <span class="badge badge-primary">SYSTÈME</span>
                 <% } else if (font.source === 'google') { %>
-                  <span style="background: #fff3e0; color: #f57c00; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">GOOGLE</span>
+                  <span class="badge badge-warning">GOOGLE</span>
                 <% } else { %>
-                  <span style="background: #f3e5f5; color: #7b1fa2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">UPLOAD</span>
+                  <span class="badge badge-purple">UPLOAD</span>
                 <% } %>
               </h3>
-              <p style="margin: 0; color: #666; font-size: 0.9rem;">
-                <code style="background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 4px;"><%= font.font_family %></code>
+              <p class="mb-0 text-muted text-small">
+                <code class="text-mono"><%= font.font_family %></code>
               </p>
               <% if (font.url) { %>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #999;">
-                  🔗 <a href="<%= font.url %>" target="_blank" rel="noopener" style="color: #1976d2;"><%= font.url %></a>
+                <p class="mt-1 mb-0 text-small text-muted">
+                  🔗 <a href="<%= font.url %>" target="_blank" rel="noopener"><%= font.url %></a>
                 </p>
               <% } %>
               <% if (font.file_path) { %>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #999;">
+                <p class="mt-1 mb-0 text-small text-muted">
                   📁 <%= font.file_path %>
                 </p>
               <% } %>
             </div>
             <% if (font.source !== 'system') { %>
-              <form method="POST" action="/fonts/<%= font.id %>/delete" style="margin: 0;" onsubmit="return confirm('Supprimer cette police ?');">
+              <form method="POST" action="/fonts/<%= font.id %>/delete" class="d-inline" onsubmit="return confirm('Supprimer cette police ?');">
                 <button type="submit" class="btn-delete-card">
-                  <img src="/icons/delete.svg" alt="Supprimer" class="icon">
+                  <img src="/icons/trash.svg" alt="Supprimer" class="icon">
                 </button>
               </form>
             <% } %>
@@ -84,7 +84,7 @@
         <% }); %>
       </div>
     <% } else { %>
-      <p style="text-align: center; color: #999; padding: 2rem;">Aucune police disponible.</p>
+      <p class="text-center text-muted" style="padding: 2rem;">Aucune police disponible.</p>
     <% } %>
   </div>
 </body>

@@ -178,12 +178,6 @@ if (cardForm) {
     const imageUrl = document.getElementById('cardImage')?.value?.trim() || '';
     const descriptionBgColor = document.getElementById('cardDescriptionBgColor')?.value || '#ffffff';
 
-    if (!title) {
-      window.alert('Le titre est requis');
-      document.getElementById('cardTitle').focus();
-      return;
-    }
-
     const payload = { title, description, media_path: imageUrl, description_bg_color: descriptionBgColor };
     const isCreate = !cardId;
     const url = isCreate 

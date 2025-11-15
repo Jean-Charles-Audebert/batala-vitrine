@@ -24,13 +24,11 @@
         <input type="hidden" name="cardId" aria-hidden="true">
         <input type="hidden" name="blockId" aria-hidden="true">
         <div class="form-group">
-          <label for="cardTitle">Titre</label>
+          <label for="cardTitle">Titre (facultatif)</label>
           <input 
             id="cardTitle" 
             type="text" 
-            name="title" 
-            required
-            aria-required="true"
+            name="title"
           >
         </div>
         <div class="form-group">
@@ -70,15 +68,15 @@
               type="file" 
               accept="image/*" 
               data-target-field="cardImage" 
-              style="display:none"
+              class="upload-file-input"
             >
           </div>
           <span id="cardImageHelp" class="form-help">Optionnel : URL complète ou chemin relatif (ex: /uploads/xxx.jpg), ou utilisez le bouton pour téléverser.</span>
           <div id="cardImage_status" class="form-status" role="status" aria-live="polite"></div>
         </div>
-        <div class="form-group" id="cardImage_preview" style="display:none">
+        <div class="form-group d-none" id="cardImage_preview">
           <label class="sr-only" for="cardImage_preview_img">Aperçu de l'image</label>
-          <img id="cardImage_preview_img" src="" alt="Aperçu" style="max-width:100%;height:auto;"/>
+          <img id="cardImage_preview_img" src="" alt="Aperçu" class="preview-img-responsive"/>
         </div>
         <button type="submit" aria-label="Enregistrer la carte">Enregistrer</button>
       </form>

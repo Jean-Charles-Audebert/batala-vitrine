@@ -31,14 +31,14 @@ export const showNewBlockForm = (req, res) => {
 
 export const createBlock = crudActionWrapper(
   async (req, res) => {
-    const { type, title, slug, position } = req.body;
+    const { type, title, slug, position, bg_image, is_transparent, block_bg_color, block_title_font, block_title_color } = req.body;
     
-    if (!type || !title || !slug) {
+    if (!type || !slug) {
       return res.render("pages/block-form", { 
         title: "Créer un nouveau bloc", 
         formAction: "/blocks/new",
         block: null,
-        error: "Type, titre et slug requis." 
+        error: "Type et slug requis." 
       });
     }
     
@@ -46,8 +46,19 @@ export const createBlock = crudActionWrapper(
     const newPosition = await calculateBlockPosition(position || null);
     
     await query(
-      "INSERT INTO blocks (type, title, slug, position, is_locked) VALUES ($1, $2, $3, $4, FALSE)",
-      [type, title, slug, newPosition]
+      `INSERT INTO blocks (type, title, slug, position, is_locked, bg_image, is_transparent, bg_color, title_font, title_color) 
+       VALUES ($1, $2, $3, $4, FALSE, $5, $6, $7, $8, $9)`,
+      [
+        type, 
+        title || null, 
+        slug, 
+        newPosition,
+        bg_image || null,
+        is_transparent === 'true' || is_transparent === true,
+        block_bg_color || null,
+        block_title_font || null,
+        block_title_color || null
+      ]
     );
   },
   {
@@ -152,8 +163,8 @@ export const updateBlock = crudActionWrapper(
       );
     } else {
       // Pour les autres blocs, mise à jour standard + thème du bloc
-      if (!type || !title || !slug) {
-        return res.status(400).send("Type, titre et slug requis");
+      if (!type || !slug) {
+        return res.status(400).send("Type et slug requis");
       }
       
       await query(
@@ -162,7 +173,7 @@ export const updateBlock = crudActionWrapper(
           is_transparent=$6, bg_color=$7, title_font=$8, title_color=$9
         WHERE id=$10`,
         [
-          type, title, slug, position || 999, bg_image || null,
+          type, title || null, slug, position || 999, bg_image || null,
           is_transparent === 'true' || is_transparent === true, 
           block_bg_color || null, 
           block_title_font || null, 

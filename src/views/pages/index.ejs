@@ -21,7 +21,7 @@
 <%-
   include('../partials/head', {
     title,
-    stylesheets: ['/css/style.css', '/css/index.css', '/css/buttons.css']
+    stylesheets: ['/css/common.css', '/css/style.css', '/css/index.css', '/css/buttons.css']
   })
 %>
   
@@ -84,7 +84,11 @@
       <!-- ZONE 2: MAIN CONTENT WRAPPER (tous les blocs sauf header/footer) -->
       <div class="main-content-wrapper">
         <% mainBlocks.forEach(contentBlock => { %>
-          <%- include('../components/content-section', { contentBlock, user }) %>
+          <% if (contentBlock.type === 'photos' || contentBlock.type === 'videos') { %>
+            <%- include('../components/media-gallery', { contentBlock, user }) %>
+          <% } else { %>
+            <%- include('../components/content-section', { contentBlock, user }) %>
+          <% } %>
         <% }) %>
       </div>
       

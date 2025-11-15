@@ -17,9 +17,9 @@
 
     <%- include('../partials/alerts') %>
 
-    <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #1976d2;">
-      <h3 style="margin: 0 0 1rem 0; color: #1976d2;">💡 Comment utiliser Google Fonts</h3>
-      <ol style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+    <div class="alert-box alert-info mb-3">
+      <h3 class="mt-0 mb-2" style="color: #1976d2;">💡 Comment utiliser Google Fonts</h3>
+      <ol class="mb-0" style="padding-left: 1.5rem; line-height: 1.8;">
         <li>Rendez-vous sur <a href="https://fonts.google.com" target="_blank" rel="noopener" style="color: #1976d2; font-weight: bold;">Google Fonts</a></li>
         <li>Sélectionnez une police (ex: Roboto)</li>
         <li>Choisissez les variantes de poids que vous voulez (400, 700, etc.)</li>
@@ -55,7 +55,7 @@
         >
         <small class="form-help">
           L'URL complète fournie par Google Fonts. Exemple :<br>
-          <code style="font-size: 0.85rem;">https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap</code>
+          <code class="text-small">https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap</code>
         </small>
       </div>
 
@@ -77,8 +77,8 @@
         </small>
       </div>
 
-      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-        <button type="submit" class="btn btn-primary" style="flex: 1;">
+      <div class="flex-row gap-md mt-3">
+        <button type="submit" class="btn btn-primary flex-1">
           <img src="/icons/save.svg" alt="" class="icon">
           Ajouter la police
         </button>
