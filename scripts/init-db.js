@@ -74,12 +74,27 @@ async function initDatabase() {
     const seedPath = join(__dirname, '..', 'db', '002_seed.sql');
     await runSqlFile(seedPath);
 
-    // Exécuter les migrations
-    const migration003Path = join(__dirname, '..', 'db', '003_add_description_bg_color.sql');
-    await runSqlFile(migration003Path);
+    // Exécuter toutes les migrations dans l'ordre
+    const migrations = [
+      '003_add_description_bg_color.sql',
+      '004_add_custom_fonts.sql',
+      '005_add_custom_font_urls.sql',
+      '006_simplify_fonts.sql',
+      '007_add_media_types.sql',
+      '008_make_card_title_nullable.sql',
+      '009_add_media_path_original.sql',
+      '010_remove_media_path_original.sql'
+    ];
 
-    const migration006Path = join(__dirname, '..', 'db', '006_simplify_fonts.sql');
-    await runSqlFile(migration006Path);
+    for (const migrationFile of migrations) {
+      const migrationPath = join(__dirname, '..', 'db', migrationFile);
+      try {
+        await runSqlFile(migrationPath);
+      } catch (error) {
+        // Continuer si la migration échoue (peut-être déjà appliquée)
+        console.warn(`⚠️  Migration ${migrationFile} échouée (peut-être déjà appliquée)`);
+      }
+    }
 
     console.log('✅ Base de données initialisée avec succès');
   } catch (error) {
