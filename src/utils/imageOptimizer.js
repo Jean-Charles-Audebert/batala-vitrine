@@ -101,6 +101,12 @@ export async function createOptimizedVersion(originalPath, fieldName = "media_pa
     return originalPath;
   }
   
+  // Ne pas optimiser les images de fond du header (bg_image) pour garder les dimensions originales
+  if (fieldName === "bg_image") {
+    logger.info(`[ImageOptimizer] bg_image détecté, pas d'optimisation pour garder les dimensions: ${path.basename(originalPath)}`);
+    return originalPath;
+  }
+  
   const preset = detectPresetFromField(fieldName);
   const baseName = path.basename(originalPath, ext);
   const dir = path.dirname(originalPath);
