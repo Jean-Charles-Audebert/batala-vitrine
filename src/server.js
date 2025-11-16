@@ -2,6 +2,10 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+
+// IMPORTANT: charger dotenv EN PREMIER avant tout import qui utilise process.env
+dotenv.config();
+
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import router from "./routes/index.js";
@@ -17,8 +21,6 @@ import apiRoutes from "./routes/apiRoutes.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

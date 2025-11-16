@@ -6,6 +6,7 @@ export const showHome = async (req, res, deps = {}) => {
   const { query: _query = query } = deps;
   try {
     // Debug: vérifier la base de données actuelle
+    logger.info(`ENV check: DB_NAME=${process.env.DB_NAME}, DB_HOST=${process.env.DB_HOST}`);
     const dbCheck = await _query("SELECT current_database()");
     logger.info(`Base de données connectée: ${dbCheck.rows[0].current_database}`);
     
@@ -22,6 +23,8 @@ export const showHome = async (req, res, deps = {}) => {
     const { rows: blocks } = await _query(
       "SELECT id, type, title, slug, position, header_logo, header_title, bg_image, is_transparent, bg_color, title_font, title_color FROM blocks ORDER BY position ASC"
     );
+    
+    logger.info(`Blocs récupérés: ${blocks.length} blocs trouvés`);
     
     // Pour chaque bloc, récupérer ses éléments selon le type
     for (const block of blocks) {
