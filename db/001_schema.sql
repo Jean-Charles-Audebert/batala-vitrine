@@ -1,5 +1,6 @@
 -- ======================================
 --  Schema: Batala Vitrine WMS (consolidé)
+--  Inclut toutes les migrations fusionnées
 -- ======================================
 
 -- Drops (facultatifs en dev)
@@ -7,6 +8,7 @@ DROP TABLE IF EXISTS refresh_tokens CASCADE;
 DROP TABLE IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS footer_elements CASCADE;
 DROP TABLE IF EXISTS blocks CASCADE;
+DROP TABLE IF EXISTS fonts CASCADE;
 DROP TABLE IF EXISTS page CASCADE;
 DROP TABLE IF EXISTS admins CASCADE;
 
@@ -38,6 +40,30 @@ CREATE TABLE refresh_tokens (
 CREATE INDEX idx_refresh_tokens_admin_id ON refresh_tokens(admin_id);
 
 -- ===============================
+--  FONTS (bibliothèque de polices)
+-- ===============================
+CREATE TABLE fonts (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    source VARCHAR(20) NOT NULL CHECK (source IN ('google', 'upload', 'system')),
+    url VARCHAR(1024),
+    font_family VARCHAR(512) NOT NULL,
+    file_path VARCHAR(512),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_fonts_source ON fonts(source);
+
+-- Insérer les polices système par défaut
+INSERT INTO fonts (name, source, font_family) VALUES
+('Arial', 'system', 'Arial, sans-serif'),
+('Helvetica', 'system', '''Helvetica Neue'', Helvetica, sans-serif'),
+('Segoe UI', 'system', '''Segoe UI'', Tahoma, Geneva, Verdana, sans-serif'),
+('Georgia', 'system', 'Georgia, serif'),
+('Times New Roman', 'system', '''Times New Roman'', Times, serif'),
+('Verdana', 'system', 'Verdana, sans-serif');
+
+-- ===============================
 --  PAGE (singleton pour thème global)
 -- ===============================
 CREATE TABLE page (
@@ -47,13 +73,11 @@ CREATE TABLE page (
     -- HEADER THEME
     header_bg_image VARCHAR(512),
     header_bg_color VARCHAR(7) DEFAULT '#ffffff',
-    header_title_font VARCHAR(255) DEFAULT 'Arial, sans-serif',
     header_title_color VARCHAR(7) DEFAULT '#ffffff',
     
     -- MAIN CONTENT THEME (zone entre header et footer)
     main_bg_image VARCHAR(512),
     main_bg_color VARCHAR(7) DEFAULT '#f5f5f5',
-    main_title_font VARCHAR(255) DEFAULT 'Arial, sans-serif',
     main_title_color VARCHAR(7) DEFAULT '#333333',
     
     -- FOOTER THEME
@@ -61,11 +85,14 @@ CREATE TABLE page (
     footer_bg_color VARCHAR(7) DEFAULT '#2c3e50',
     footer_text_color VARCHAR(7) DEFAULT '#ecf0f1',
     
+    -- POLICE GLOBALE (référence vers table fonts)
+    title_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
+    
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Insérer la ligne unique par défaut
-INSERT INTO page (id, title) VALUES (1, 'Mon Site');
+-- Insérer la ligne unique par défaut (avec police Arial par défaut)
+INSERT INTO page (id, title, title_font_id) VALUES (1, 'Mon Site', 1);
 
 -- ===============================
 --  BLOCKS
@@ -104,9 +131,10 @@ CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
     block_id INT NOT NULL REFERENCES blocks(id) ON DELETE CASCADE,
     position INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255), -- nullable pour galeries photos/vidéos
     description TEXT,
     media_path VARCHAR(512),
+    media_type VARCHAR(20) DEFAULT 'image', -- 'image', 'photo', 'youtube'
     style JSONB DEFAULT '{}',
     event_date DATE,
     
@@ -114,6 +142,7 @@ CREATE TABLE cards (
     bg_color VARCHAR(7),
     title_color VARCHAR(7),
     description_color VARCHAR(7),
+    description_bg_color VARCHAR(7) DEFAULT '#ffffff',
     
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
