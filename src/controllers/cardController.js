@@ -216,12 +216,20 @@ export const getCardJson = async (req, res) => {
  */
 export const updateCardJson = async (req, res) => {
   const { blockId, id } = req.params;
-  const { title, description, media_path, event_date, position, description_bg_color } = req.body;
+  const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
+
+  // Détecter le type de média selon le template
+  let mediaType = 'image';
+  if (template === 'photo') {
+    mediaType = 'photo';
+  } else if (template === 'video') {
+    mediaType = 'youtube';
+  }
 
   try {
     const { rows } = await query(
-      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=COALESCE($5, position), description_bg_color=$6, updated_at=NOW() WHERE id=$7 AND block_id=$8 RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
-      [title?.trim() || null, description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff', id, blockId]
+      "UPDATE cards SET template=$1, title=$2, description=$3, media_path=$4, media_type=$5, event_date=$6, position=COALESCE($7, position), description_bg_color=$8, updated_at=NOW() WHERE id=$9 AND block_id=$10 RETURNING id, block_id, template, position, title, description, media_path, media_type, event_date, description_bg_color",
+      [template || 'default', title?.trim() || null, description || null, media_path || null, mediaType, event_date || null, position || null, description_bg_color || '#ffffff', id, blockId]
     );
     if (rows.length === 0) {
       return res.status(404).json({ success: false, message: "Carte non trouvée" });
@@ -239,12 +247,20 @@ export const updateCardJson = async (req, res) => {
  */
 export const createCardJson = async (req, res) => {
   const { blockId } = req.params;
-  const { title, description, media_path, event_date, position, description_bg_color } = req.body;
+  const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
+  
+  // Détecter le type de média selon le template
+  let mediaType = 'image';
+  if (template === 'photo') {
+    mediaType = 'photo';
+  } else if (template === 'video') {
+    mediaType = 'youtube';
+  }
   
   try {
     const { rows } = await query(
-      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 999), $7) RETURNING id, block_id, position, title, description, media_path, event_date, description_bg_color",
-      [blockId, title?.trim() || null, description || null, media_path || null, event_date || null, position || null, description_bg_color || '#ffffff']
+      "INSERT INTO cards (block_id, template, title, description, media_path, media_type, event_date, position, description_bg_color) VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, 999), $9) RETURNING id, block_id, template, position, title, description, media_path, media_type, event_date, description_bg_color",
+      [blockId, template || 'default', title?.trim() || null, description || null, media_path || null, mediaType, event_date || null, position || null, description_bg_color || '#ffffff']
     );
     res.status(201).json({ success: true, message: SUCCESS_MESSAGES.CARD_CREATED, card: rows[0] });
   } catch (error) {
