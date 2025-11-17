@@ -43,7 +43,7 @@ export const showHome = async (req, res, deps = {}) => {
       } else if (block.type !== 'header') {
         // Autres blocs (actus, offres, photos, vidéos, ...): charger les cartes normalisées (avec nouveaux champs de thème)
         const { rows: cards } = await _query(
-          "SELECT id, position, title, description, media_path, bg_color, title_color, description_color, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
+          "SELECT id, position, template, title, description, media_path, bg_color, title_color, description_color, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
           [block.id]
         );
         block.cards = cards;

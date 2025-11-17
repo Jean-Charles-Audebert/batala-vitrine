@@ -132,6 +132,7 @@ CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
     block_id INT NOT NULL REFERENCES blocks(id) ON DELETE CASCADE,
     position INT NOT NULL,
+    template VARCHAR(50) DEFAULT 'default', -- 'default', 'image_left', 'image_right', 'photo', 'video', 'text_only'
     title VARCHAR(255), -- nullable pour galeries photos/vidéos
     description TEXT,
     media_path VARCHAR(512),

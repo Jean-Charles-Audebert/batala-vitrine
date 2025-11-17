@@ -304,6 +304,135 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ==========================================================================
+   Card Templates (variations de layout)
+   ========================================================================== */
+
+/* Card Image Left/Right - Layout horizontal */
+.card-image-left,
+.card-image-right {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 1.5rem;
+}
+
+.card-image-left .card-media,
+.card-image-right .card-media {
+  flex: 0 0 40%;
+  min-height: 200px;
+}
+
+.card-image-left .card-media img,
+.card-image-right .card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-image-left .card-content,
+.card-image-right .card-content {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-image-right {
+  flex-direction: row-reverse;
+}
+
+/* Card Photo - Pleine largeur */
+.card-photo {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.card-photo .card-photo-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.card-photo .card-photo-caption {
+  padding: 0.75rem 0;
+  text-align: center;
+  font-style: italic;
+  color: #666;
+}
+
+.card-photo:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Card Video - Format responsive */
+.card-video {
+  padding: 1rem;
+}
+
+.card-video h3 {
+  margin-bottom: 1rem;
+}
+
+.card-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* Ratio 16:9 */
+  height: 0;
+  overflow: hidden;
+  background: #000;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.card-video-wrapper iframe,
+.card-video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.card-video-description {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Card Text Only - Sans image */
+.card-text-only {
+  padding: 2rem;
+  text-align: center;
+}
+
+.card-text-only .card-content h3 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.card-text-only .card-content p {
+  line-height: 1.8;
+}
+
+/* Responsive pour layouts horizontaux */
+@media (max-width: 768px) {
+  .card-image-left,
+  .card-image-right {
+    flex-direction: column;
+  }
+  
+  .card-image-left .card-media,
+  .card-image-right .card-media {
+    flex: 0 0 auto;
+    min-height: 250px;
+  }
+}
+
+/* ==========================================================================
    Boutons
    ========================================================================== */
 .btn,

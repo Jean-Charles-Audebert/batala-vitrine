@@ -42,59 +42,19 @@
     <div class="cards-grid" role="list" aria-label="<%= sectionLabel %>">
       <% (contentBlock.cards || []).forEach(card => { %>
         <%
-          // Construire le style de la carte avec couleurs personnalisées
-          const cardStyles = [];
-          if (card.bg_color) cardStyles.push(`background-color: ${card.bg_color}`);
-          const cardStyleAttr = cardStyles.length > 0 ? `style="${cardStyles.join('; ')}"` : '';
+          // Sélectionner le template de card approprié
+          const template = card.template || 'default';
+          const templateMap = {
+            'default': 'cards/card-default',
+            'image_left': 'cards/card-image-left',
+            'image_right': 'cards/card-image-right',
+            'photo': 'cards/card-photo',
+            'video': 'cards/card-video',
+            'text_only': 'cards/card-text-only'
+          };
+          const templatePath = templateMap[template] || 'cards/card-default';
         %>
-        <article class="card" data-card-id="<%= card.id %>" role="listitem" <%- cardStyleAttr %>>
-          <% if (card.media_path) { %>
-            <img 
-              src="<%= card.media_path %>" 
-              alt="<%= card.title %> - <%= card.description ? card.description.substring(0, 100) : 'Illustration' %>"
-              loading="lazy"
-            >
-          <% } %>
-          <h3 
-            <% if (card.title_color) { %>
-            style="color: <%= card.title_color %>;"
-            <% } %>
-          ><%= card.title %></h3>
-          <% if (card.description) { %>
-            <p
-              <% 
-                const descStyles = [];
-                if (card.description_color) descStyles.push(`color: ${card.description_color}`);
-                if (card.description_bg_color) descStyles.push(`background-color: ${card.description_bg_color}`, 'padding: 0.75rem', 'border-radius: 4px');
-              %>
-              <% if (descStyles.length > 0) { %>
-              style="<%= descStyles.join('; ') %>;"
-              <% } %>
-            ><%= card.description %></p>
-          <% } %>
-          <% if (user) { %>
-            <div class="card-controls" role="toolbar" aria-label="Actions pour <%= card.title %>">
-              <%-
-                include('icon-button', {
-                  type: 'button',
-                  className: 'edit-card-btn',
-                  icon: 'edit',
-                  ariaLabel: `Modifier la carte ${card.title}`,
-                  dataAttrs: { 'data-card-id': card.id }
-                })
-              %>
-              <%-
-                include('icon-button', {
-                  type: 'button',
-                  className: 'delete-card-btn',
-                  icon: 'trash',
-                  ariaLabel: `Supprimer la carte ${card.title}`,
-                  dataAttrs: { 'data-card-id': card.id }
-                })
-              %>
-            </div>
-          <% } %>
-        </article>
+        <%- include(templatePath, { card, user }) %>
       <% }) %>
     </div>
   </div>

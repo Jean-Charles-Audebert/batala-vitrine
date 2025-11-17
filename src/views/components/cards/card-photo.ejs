@@ -1,0 +1,39 @@
+<%
+  // Template: Photo (pleine largeur)
+  // Variables: card, user
+%>
+<article class="card card-photo" data-card-id="<%= card.id %>" role="listitem">
+  <% if (card.media_path) { %>
+    <img 
+      src="<%= card.media_path %>" 
+      alt="<%= card.description || 'Photo' %>"
+      loading="lazy"
+      class="card-photo-img"
+    >
+  <% } %>
+  <% if (card.description) { %>
+    <p class="card-photo-caption"><%= card.description %></p>
+  <% } %>
+  <% if (user) { %>
+    <div class="card-controls" role="toolbar" aria-label="Actions">
+      <%-
+        include('../icon-button', {
+          type: 'button',
+          className: 'edit-card-btn',
+          icon: 'edit',
+          ariaLabel: 'Modifier cette photo',
+          dataAttrs: { 'data-card-id': card.id }
+        })
+      %>
+      <%-
+        include('../icon-button', {
+          type: 'button',
+          className: 'delete-card-btn',
+          icon: 'trash',
+          ariaLabel: 'Supprimer cette photo',
+          dataAttrs: { 'data-card-id': card.id }
+        })
+      %>
+    </div>
+  <% } %>
+</article>

@@ -753,3 +753,76 @@ th {
   border-radius: var(--radius-sm, 4px);
 }
 
+/* ==========================================================================
+   Template Selector (Card Templates)
+   ========================================================================== */
+.template-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.template-option {
+  cursor: pointer;
+  display: block;
+}
+
+.template-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.template-card {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.2s;
+  background: white;
+}
+
+.template-option:hover .template-card {
+  border-color: #999;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.template-option.selected .template-card {
+  border-color: #007bff;
+  background: #f0f8ff;
+}
+
+.template-icon {
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+}
+
+.template-icon svg {
+  display: block;
+}
+
+.template-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.template-description {
+  font-size: 0.75rem;
+  color: #666;
+  line-height: 1.3;
+}
+
+.field-optional::after {
+  content: " (facultatif)";
+  font-weight: normal;
+  color: #999;
+  font-size: 0.85em;
+}
+
