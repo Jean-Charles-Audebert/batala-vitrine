@@ -738,6 +738,11 @@ th {
   border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
+/* Dans les modales, séparateur plus compact */
+.modal .section-divider {
+  margin: 1rem 0;
+}
+
 /* ==========================================================================
    Text Utilities for Admin
    ========================================================================== */
@@ -758,14 +763,15 @@ th {
    ========================================================================== */
 .template-selector {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
 .template-option {
   cursor: pointer;
   display: block;
+  position: relative;
 }
 
 .template-option input[type="radio"] {
@@ -776,22 +782,27 @@ th {
 
 .template-card {
   border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
+  border-radius: 6px;
+  padding: 0.75rem;
   text-align: center;
   transition: all 0.2s;
   background: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .template-option:hover .template-card {
   border-color: #999;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .template-option.selected .template-card {
   border-color: #007bff;
   background: #f0f8ff;
+  box-shadow: 0 0 0 1px #007bff;
 }
 
 .template-icon {
@@ -799,24 +810,50 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60px;
+  height: 50px;
 }
 
 .template-icon svg {
   display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 .template-name {
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.25rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
 }
 
 .template-description {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #666;
-  line-height: 1.3;
+  line-height: 1.2;
+  margin-top: 0.25rem;
+}
+
+/* Modale - style plus compact */
+.modal .template-selector {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.modal .template-card {
+  padding: 0.5rem;
+}
+
+.modal .template-icon {
+  height: 40px;
+  margin-bottom: 0.35rem;
+}
+
+.modal .template-name {
+  font-size: 0.75rem;
+}
+
+.modal .template-description {
+  display: none; /* Masquer la description dans la modale pour gagner de la place */
 }
 
 .field-optional::after {
