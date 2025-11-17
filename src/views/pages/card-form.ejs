@@ -105,18 +105,17 @@
         helpText: 'Couleur de fond affichée derrière le texte de description.'
       }) %>
 
-      <div class="form-group">
-        <label for="media_path"><%= mediaLabel %></label>
+      <div class="form-group" id="media_path_group">
+        <label for="media_path" id="media_path_label">Image</label>
         <div class="upload-field-row flex-start">
           <input 
             type="text" 
             id="media_path" 
             name="media_path" 
             value="<%= card ? card.media_path || '' : '' %>" 
-            placeholder="<%= mediaPlaceholder %>"
+            placeholder="/uploads/image.jpg ou /assets/placeholder-1.svg"
             class="flex-1"
           >
-          <% if (!isVideosBlock) { %>
             <input 
               type="file" 
               id="media_path_upload" 
@@ -133,10 +132,9 @@
               <img src="/icons/image.svg" alt="" class="icon">
               Choisir
             </button>
-          <% } %>
         </div>
-        <small class="form-help" id="media_path_status">
-          <%= mediaHelpText %>
+        <small class="form-help" id="media_path_help">
+          Entrez un chemin (ex: /uploads/image.jpg) ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.
         </small>
       </div>
 
@@ -219,38 +217,43 @@
     });
     
     function updateFormFields(template) {
-      const titleField = document.querySelector('[data-template-field="title"]');
-      const descField = document.querySelector('[data-template-field="description"]');
-      const mediaGroup = document.querySelector('#media_path').closest('.form-group');
-      
-      // Adapter les labels selon le template
       const templates = <%= JSON.stringify(CARD_TEMPLATES) %>;
       const selectedTemplate = templates[template];
       
       if (!selectedTemplate) return;
       
-      // Masquer/afficher les champs selon le template
       const fields = selectedTemplate.fields || [];
       
-      // Titre
-      const titleRequired = fields.includes('title');
-      if (titleField) {
-        titleField.textContent = titleRequired ? '' : ' (facultatif)';
-      }
+      // Gérer le champ média
+      const mediaGroup = document.querySelector('#media_path_group');
+      const mediaLabel = document.querySelector('#media_path_label');
+      const mediaHelp = document.querySelector('#media_path_help');
+      const mediaInput = document.querySelector('#media_path');
+      const uploadButton = mediaGroup ? mediaGroup.querySelector('button') : null;
       
-      // Image/Média
       if (mediaGroup) {
         if (fields.includes('media_path')) {
           mediaGroup.style.display = '';
-          const label = mediaGroup.querySelector('label');
+          
+          // Adapter selon le type de template
           if (template === 'video') {
-            label.textContent = 'URL de la vidéo ou fichier';
+            if (mediaLabel) mediaLabel.textContent = 'URL de la vidéo ou fichier';
+            if (mediaInput) mediaInput.placeholder = 'https://www.youtube.com/watch?v=... ou /uploads/video.mp4';
+            if (mediaHelp) mediaHelp.textContent = 'Collez l\'URL complète de la vidéo YouTube ou le chemin d\'un fichier vidéo.';
+            if (uploadButton) uploadButton.style.display = 'none'; // Masquer pour vidéo YouTube
           } else if (template === 'photo') {
-            label.textContent = 'Photo';
+            if (mediaLabel) mediaLabel.textContent = 'Photo';
+            if (mediaInput) mediaInput.placeholder = '/uploads/photo.jpg';
+            if (mediaHelp) mediaHelp.textContent = 'Photo pleine largeur. Formats: JPEG, PNG, WebP.';
+            if (uploadButton) uploadButton.style.display = '';
           } else {
-            label.textContent = 'Image';
+            if (mediaLabel) mediaLabel.textContent = 'Image';
+            if (mediaInput) mediaInput.placeholder = '/uploads/image.jpg ou /assets/placeholder-1.svg';
+            if (mediaHelp) mediaHelp.textContent = 'Entrez un chemin ou cliquez sur "Choisir" pour uploader. Formats: JPEG, PNG, WebP, GIF, SVG.';
+            if (uploadButton) uploadButton.style.display = '';
           }
         } else {
+          // Template text_only : masquer le champ média
           mediaGroup.style.display = 'none';
         }
       }

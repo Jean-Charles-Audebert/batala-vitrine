@@ -165,6 +165,57 @@ addCardButtons.forEach(btn => {
   });
 });
 
+// Gestion de la sélection de template dans la modale
+document.querySelectorAll('#cardModal .template-option').forEach(option => {
+  option.addEventListener('click', function() {
+    // Retirer la sélection précédente
+    document.querySelectorAll('#cardModal .template-option').forEach(opt => opt.classList.remove('selected'));
+    // Sélectionner le nouveau
+    this.classList.add('selected');
+    this.querySelector('input[type="radio"]').checked = true;
+    
+    // Mettre à jour le champ caché
+    const templateId = this.dataset.template;
+    document.getElementById('cardTemplate').value = templateId;
+    
+    // Adapter les champs selon le template
+    updateCardModalFields(templateId);
+  });
+});
+
+function updateCardModalFields(template) {
+  const imageGroup = document.querySelector('#cardModal .form-group:has(#cardImage)');
+  const imageLabel = document.querySelector('#cardModal label[for="cardImage"]');
+  const imageInput = document.getElementById('cardImage');
+  const imageHelp = document.getElementById('cardImageHelp');
+  const uploadButton = imageGroup?.querySelector('button');
+  
+  if (template === 'text_only') {
+    // Masquer le champ image pour text_only
+    if (imageGroup) imageGroup.style.display = 'none';
+  } else {
+    if (imageGroup) imageGroup.style.display = '';
+    
+    // Adapter selon le type
+    if (template === 'video') {
+      if (imageLabel) imageLabel.textContent = 'URL de la vidéo';
+      if (imageInput) imageInput.placeholder = 'https://www.youtube.com/watch?v=...';
+      if (imageHelp) imageHelp.textContent = 'URL YouTube ou chemin vers un fichier vidéo.';
+      if (uploadButton) uploadButton.style.display = 'none';
+    } else if (template === 'photo') {
+      if (imageLabel) imageLabel.textContent = 'Photo';
+      if (imageInput) imageInput.placeholder = '/uploads/photo.jpg';
+      if (imageHelp) imageHelp.textContent = 'Photo pleine largeur.';
+      if (uploadButton) uploadButton.style.display = '';
+    } else {
+      if (imageLabel) imageLabel.textContent = 'URL de l\'image';
+      if (imageInput) imageInput.placeholder = '/uploads/image.jpg';
+      if (imageHelp) imageHelp.textContent = 'Optionnel : URL complète ou chemin relatif, ou utilisez le bouton pour téléverser.';
+      if (uploadButton) uploadButton.style.display = '';
+    }
+  }
+}
+
 // Soumission du formulaire modale (création/mise à jour via API JSON)
 const cardForm = document.getElementById('cardForm');
 if (cardForm) {
@@ -173,12 +224,13 @@ if (cardForm) {
     const form = e.currentTarget;
     const cardId = form.querySelector('[name="cardId"]').value;
     const blockId = form.querySelector('[name="blockId"]').value;
+    const template = document.getElementById('cardTemplate')?.value || 'default';
     const title = document.getElementById('cardTitle').value.trim();
     const description = document.getElementById('cardDescription').value.trim();
     const imageUrl = document.getElementById('cardImage')?.value?.trim() || '';
     const descriptionBgColor = document.getElementById('cardDescriptionBgColor')?.value || '#ffffff';
 
-    const payload = { title, description, media_path: imageUrl, description_bg_color: descriptionBgColor };
+    const payload = { template, title, description, media_path: imageUrl, description_bg_color: descriptionBgColor };
     const isCreate = !cardId;
     const url = isCreate 
       ? `/api/blocks/${blockId}/cards`

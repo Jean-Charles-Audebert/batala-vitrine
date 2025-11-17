@@ -23,8 +23,57 @@
       <form id="cardForm">
         <input type="hidden" name="cardId" aria-hidden="true">
         <input type="hidden" name="blockId" aria-hidden="true">
+        <input type="hidden" name="template" id="cardTemplate" value="default" aria-hidden="true">
+        
+        <!-- Sélection du template -->
         <div class="form-group">
-          <label for="cardTitle">Titre (facultatif)</label>
+          <label>Type de carte</label>
+          <div class="template-selector">
+            <% const templates = [
+              { id: 'default', name: 'Standard', desc: 'Image en haut, texte en dessous' },
+              { id: 'image_left', name: 'Image à gauche', desc: 'Image à gauche, texte à droite' },
+              { id: 'image_right', name: 'Image à droite', desc: 'Image à droite, texte à gauche' },
+              { id: 'photo', name: 'Photo', desc: 'Photo pleine largeur' },
+              { id: 'video', name: 'Vidéo', desc: 'Vidéo YouTube/locale' },
+              { id: 'text_only', name: 'Texte seul', desc: 'Sans image' }
+            ]; %>
+            <% templates.forEach((tpl, index) => { %>
+              <label class="template-option <%= index === 0 ? 'selected' : '' %>" data-template="<%= tpl.id %>">
+                <input type="radio" name="template_radio" value="<%= tpl.id %>" <%= index === 0 ? 'checked' : '' %>>
+                <div class="template-card">
+                  <div class="template-icon">
+                    <svg width="60" height="40" viewBox="0 0 60 40">
+                      <% if (tpl.id === 'default') { %>
+                        <rect x="5" y="5" width="50" height="20" fill="#ddd" rx="2"/>
+                        <rect x="5" y="28" width="50" height="3" fill="#999" rx="1"/>
+                      <% } else if (tpl.id === 'image_left') { %>
+                        <rect x="5" y="8" width="20" height="24" fill="#ddd" rx="2"/>
+                        <rect x="28" y="10" width="27" height="3" fill="#999" rx="1"/>
+                      <% } else if (tpl.id === 'image_right') { %>
+                        <rect x="35" y="8" width="20" height="24" fill="#ddd" rx="2"/>
+                        <rect x="5" y="10" width="27" height="3" fill="#999" rx="1"/>
+                      <% } else if (tpl.id === 'photo') { %>
+                        <rect x="5" y="5" width="50" height="28" fill="#ddd" rx="2"/>
+                      <% } else if (tpl.id === 'video') { %>
+                        <rect x="5" y="8" width="50" height="22" fill="#ddd" rx="2"/>
+                        <polygon points="28,17 28,21 32,19" fill="white"/>
+                      <% } else if (tpl.id === 'text_only') { %>
+                        <rect x="5" y="10" width="50" height="4" fill="#999" rx="1"/>
+                        <rect x="5" y="18" width="45" height="2" fill="#ccc" rx="1"/>
+                      <% } %>
+                    </svg>
+                  </div>
+                  <div class="template-name"><%= tpl.name %></div>
+                </div>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+        
+        <div class="form-group">
+          <label for="cardTitle">Titre <span class="field-optional"></span></label>
           <input 
             id="cardTitle" 
             type="text" 
