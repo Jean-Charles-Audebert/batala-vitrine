@@ -162,6 +162,20 @@
           </div>
         </div>
 
+        <!-- Option header fixe -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              id="is_fixed" 
+              name="is_fixed" 
+              value="true"
+              <%= block && block.is_fixed ? 'checked' : '' %>
+            >
+            <span>Header fixe (reste toujours en haut de la page lors du scroll)</span>
+          </label>
+        </div>
+
         <!-- Paramètres globaux de la page (uniquement pour header) -->
         <% if (pageSettings) { %>
           <hr class="section-divider">

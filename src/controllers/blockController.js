@@ -74,7 +74,7 @@ export const showEditBlockForm = async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, type, title, slug, position, is_locked, bg_image, header_logo, header_title, is_transparent, bg_color, title_font, title_color FROM blocks WHERE id=$1", 
+      "SELECT id, type, title, slug, position, is_locked, bg_image, header_logo, header_title, is_fixed, is_transparent, bg_color, title_font, title_color FROM blocks WHERE id=$1", 
       [id]
     );
     if (rows.length === 0) {
@@ -116,7 +116,7 @@ export const updateBlock = crudActionWrapper(
   async (req, res) => {
     const { id } = req.params;
     const { 
-      type, title, slug, position, header_title, header_logo, bg_image,
+      type, title, slug, position, header_title, header_logo, bg_image, is_fixed,
       // Page theme settings (3 zones: header, main, footer)
       header_bg_image, header_bg_color, header_title_color,
       main_bg_image, main_bg_color, main_title_color,
@@ -141,8 +141,8 @@ export const updateBlock = crudActionWrapper(
       
       // Mise à jour du bloc header
       await query(
-        "UPDATE blocks SET header_title=$1, header_logo=$2, bg_image=$3 WHERE id=$4",
-        [header_title || null, header_logo || null, bg_image || null, id]
+        "UPDATE blocks SET header_title=$1, header_logo=$2, bg_image=$3, is_fixed=$4 WHERE id=$5",
+        [header_title || null, header_logo || null, bg_image || null, is_fixed || false, id]
       );
       
       // Mise à jour des paramètres de la page (thème global simplifié)

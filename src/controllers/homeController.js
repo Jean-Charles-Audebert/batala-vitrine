@@ -21,7 +21,7 @@ export const showHome = async (req, res, deps = {}) => {
     
     // Récupérer tous les blocs dans l'ordre de position (avec nouveaux champs de thème)
     const { rows: blocks } = await _query(
-      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image, is_transparent, bg_color, title_font, title_color FROM blocks ORDER BY position ASC"
+      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image, is_fixed, is_transparent, bg_color, title_font, title_color FROM blocks ORDER BY position ASC"
     );
     
     logger.info(`Blocs récupérés: ${blocks.length} blocs trouvés`);

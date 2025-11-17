@@ -4,9 +4,11 @@
   const bgImage = contentBlock.bg_image || '/assets/header-bg-default.svg';
   const logoSrc = contentBlock.header_logo || '/assets/logo-default.svg';
   const titleText = contentBlock.header_title;
+  const isFixed = contentBlock.is_fixed || false;
+  const fixedClass = isFixed ? 'header-fixed' : '';
 %>
 
-<header class="block-section header-section" data-block-id="<%= contentBlock.id %>" role="banner">
+<header class="block-section header-section <%= fixedClass %>" data-block-id="<%= contentBlock.id %>" role="banner">
   <div class="header-bg" style="background-image: url(<%= bgImage %>)" role="img" aria-label="Image de fond du header">
     <div class="container">
       <div class="header-content">

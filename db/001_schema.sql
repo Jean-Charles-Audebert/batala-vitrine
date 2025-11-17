@@ -110,6 +110,7 @@ CREATE TABLE blocks (
     bg_image VARCHAR(512),
     header_logo VARCHAR(512),
     header_title VARCHAR(255),
+    is_fixed BOOLEAN DEFAULT FALSE,
     
     -- BLOCK THEME CUSTOMIZATION
     is_transparent BOOLEAN DEFAULT FALSE,

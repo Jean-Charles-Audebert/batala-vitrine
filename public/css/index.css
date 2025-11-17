@@ -63,6 +63,20 @@
   background-repeat: no-repeat;
 }
 
+.header-section.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Compensation pour le header fixe */
+body:has(.header-fixed) main#main-content {
+  margin-top: 500px;
+}
+
 .header-bg {
   background-color: var(--color-secondary);
   background-size: cover;
