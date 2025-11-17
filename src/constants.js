@@ -6,7 +6,6 @@
 // Types de blocs
 export const BLOCK_TYPES = {
   HEADER: "header",
-  HERO: "hero",
   CARDS: "cards",
   FOOTER: "footer",
 };

@@ -66,14 +66,11 @@ export const createCard = crudActionWrapper(
     const { blockId } = req.params;
     const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
     
-    // Récupérer le type de bloc pour détecter le type de média
-    const block = await getBlockBasicInfo(blockId);
-    
     // Détecter le type de média selon le template
     let mediaType = 'image';
-    if (template === 'photo' || (block && block.type === 'photos')) {
+    if (template === 'photo') {
       mediaType = 'photo';
-    } else if (template === 'video' || (block && block.type === 'videos')) {
+    } else if (template === 'video') {
       mediaType = 'youtube';
     }
     
@@ -128,14 +125,11 @@ export const updateCard = crudActionWrapper(
     const { blockId, id } = req.params;
     const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
     
-    // Récupérer le type de bloc pour détecter le type de média
-    const block = await getBlockBasicInfo(blockId);
-    
     // Détecter le type de média selon le template
     let mediaType = 'image';
-    if (template === 'photo' || (block && block.type === 'photos')) {
+    if (template === 'photo') {
       mediaType = 'photo';
-    } else if (template === 'video' || (block && block.type === 'videos')) {
+    } else if (template === 'video') {
       mediaType = 'youtube';
     }
     

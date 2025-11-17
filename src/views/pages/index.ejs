@@ -84,11 +84,7 @@
       <!-- ZONE 2: MAIN CONTENT WRAPPER (tous les blocs sauf header/footer) -->
       <div class="main-content-wrapper">
         <% mainBlocks.forEach(contentBlock => { %>
-          <% if (contentBlock.type === 'photos' || contentBlock.type === 'videos') { %>
-            <%- include('../components/media-gallery', { contentBlock, user }) %>
-          <% } else { %>
-            <%- include('../components/content-section', { contentBlock, user }) %>
-          <% } %>
+          <%- include('../components/content-section', { contentBlock, user }) %>
         <% }) %>
       </div>
       
