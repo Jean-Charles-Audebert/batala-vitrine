@@ -1,0 +1,62 @@
+<%
+  // Template: Vidéo
+  // Variables: card, user
+  const isYouTube = card.media_path && (card.media_path.includes('youtube.com') || card.media_path.includes('youtu.be'));
+  let videoEmbedUrl = card.media_path;
+  
+  if (isYouTube) {
+    // Convertir URL YouTube en embed
+    const videoId = card.media_path.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1];
+    if (videoId) {
+      videoEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+  }
+%>
+<article class="card card-video" data-card-id="<%= card.id %>" role="listitem">
+  <% if (card.title) { %>
+    <h3><%= card.title %></h3>
+  <% } %>
+  <% if (card.media_path) { %>
+    <div class="card-video-wrapper">
+      <% if (isYouTube) { %>
+        <iframe 
+          src="<%= videoEmbedUrl %>" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen
+          title="<%= card.title || 'Vidéo' %>"
+        ></iframe>
+      <% } else { %>
+        <video controls preload="metadata">
+          <source src="<%= card.media_path %>" type="video/mp4">
+          Votre navigateur ne supporte pas la lecture de vidéos.
+        </video>
+      <% } %>
+    </div>
+  <% } %>
+  <% if (card.description) { %>
+    <p class="card-video-description"><%= card.description %></p>
+  <% } %>
+  <% if (user) { %>
+    <div class="card-controls" role="toolbar" aria-label="Actions">
+      <%-
+        include('../icon-button', {
+          type: 'button',
+          className: 'edit-card-btn',
+          icon: 'edit',
+          ariaLabel: 'Modifier cette vidéo',
+          dataAttrs: { 'data-card-id': card.id }
+        })
+      %>
+      <%-
+        include('../icon-button', {
+          type: 'button',
+          className: 'delete-card-btn',
+          icon: 'trash',
+          ariaLabel: 'Supprimer cette vidéo',
+          dataAttrs: { 'data-card-id': card.id }
+        })
+      %>
+    </div>
+  <% } %>
+</article>

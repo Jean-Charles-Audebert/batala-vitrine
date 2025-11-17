@@ -1,7 +1,7 @@
 import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
 import { crudActionWrapper } from "../utils/controllerHelpers.js";
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants.js";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES, CARD_TEMPLATES } from "../constants.js";
 import { getBlockBasicInfo } from "../services/index.js";
 
 /**
@@ -49,7 +49,8 @@ export const showNewCardForm = async (req, res) => {
       title: "Créer une nouvelle carte",
       formAction: `/blocks/${blockId}/cards/new`,
       block,
-      card: null
+      card: null,
+      CARD_TEMPLATES
     });
   } catch (error) {
     logger.error("Erreur affichage formulaire carte", error);
@@ -63,22 +64,22 @@ export const showNewCardForm = async (req, res) => {
 export const createCard = crudActionWrapper(
   async (req) => {
     const { blockId } = req.params;
-    const { title, description, media_path, event_date, position, description_bg_color } = req.body;
+    const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
     
     // Récupérer le type de bloc pour détecter le type de média
     const block = await getBlockBasicInfo(blockId);
     
-    // Détecter le type de média
+    // Détecter le type de média selon le template
     let mediaType = 'image';
-    if (block && block.type === 'photos') {
+    if (template === 'photo' || (block && block.type === 'photos')) {
       mediaType = 'photo';
-    } else if (block && block.type === 'videos') {
+    } else if (template === 'video' || (block && block.type === 'videos')) {
       mediaType = 'youtube';
     }
     
     await query(
-      "INSERT INTO cards (block_id, title, description, media_path, event_date, position, description_bg_color, media_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [blockId, title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType]
+      "INSERT INTO cards (block_id, template, title, description, media_path, event_date, position, description_bg_color, media_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+      [blockId, template || 'default', title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType]
     );
   },
   {
@@ -110,7 +111,8 @@ export const showEditCardForm = async (req, res) => {
       title: "Modifier une carte",
       formAction: `/blocks/${blockId}/cards/${id}/edit`,
       block,
-      card: cardRows[0]
+      card: cardRows[0],
+      CARD_TEMPLATES
     });
   } catch (error) {
     logger.error("Erreur récupération carte", error);
@@ -124,22 +126,22 @@ export const showEditCardForm = async (req, res) => {
 export const updateCard = crudActionWrapper(
   async (req) => {
     const { blockId, id } = req.params;
-    const { title, description, media_path, event_date, position, description_bg_color } = req.body;
+    const { template, title, description, media_path, event_date, position, description_bg_color } = req.body;
     
     // Récupérer le type de bloc pour détecter le type de média
     const block = await getBlockBasicInfo(blockId);
     
-    // Détecter le type de média
+    // Détecter le type de média selon le template
     let mediaType = 'image';
-    if (block && block.type === 'photos') {
+    if (template === 'photo' || (block && block.type === 'photos')) {
       mediaType = 'photo';
-    } else if (block && block.type === 'videos') {
+    } else if (template === 'video' || (block && block.type === 'videos')) {
       mediaType = 'youtube';
     }
     
     await query(
-      "UPDATE cards SET title=$1, description=$2, media_path=$3, event_date=$4, position=$5, description_bg_color=$6, media_type=$7, updated_at=NOW() WHERE id=$8 AND block_id=$9",
-      [title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType, id, blockId]
+      "UPDATE cards SET template=$1, title=$2, description=$3, media_path=$4, event_date=$5, position=$6, description_bg_color=$7, media_type=$8, updated_at=NOW() WHERE id=$9 AND block_id=$10",
+      [template || 'default', title || null, description || null, media_path || null, event_date || null, position || 999, description_bg_color || '#ffffff', mediaType, id, blockId]
     );
   },
   {
