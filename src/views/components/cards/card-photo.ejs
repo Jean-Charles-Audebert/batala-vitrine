@@ -4,7 +4,11 @@
 %>
 <article class="card card-photo" data-card-id="<%= card.id %>" role="listitem">
   <% if (card.media_path) { %>
-    <a href="<%= card.media_path %>" target="_blank" rel="noopener noreferrer" aria-label="Voir la photo en plein écran">
+    <%
+      // Extraire le path original (sans -optimized) pour le lien
+      const originalPath = card.media_path.replace(/-(\d+)-(\d+)\.([a-z]+)$/i, '-$1-$2-original.$3');
+    %>
+    <a href="<%= originalPath %>" target="_blank" rel="noopener noreferrer" aria-label="Voir la photo en plein écran">
       <img 
         src="<%= card.media_path %>" 
         alt="<%= card.description || 'Photo' %>"
