@@ -350,11 +350,22 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: none;
 }
 
+.card-photo a {
+  display: block;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.card-photo a:hover {
+  opacity: 0.9;
+}
+
 .card-photo .card-photo-img {
   width: 100%;
   height: auto;
   display: block;
   border-radius: var(--radius-md);
+  cursor: pointer;
 }
 
 .card-photo .card-photo-caption {

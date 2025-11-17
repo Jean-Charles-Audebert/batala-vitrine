@@ -833,27 +833,48 @@ th {
   margin-top: 0.25rem;
 }
 
-/* Modale - style plus compact */
+/* Modale - style ultra compact en ligne horizontale */
 .modal .template-selector {
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.modal .template-option {
+  flex: 0 0 auto;
 }
 
 .modal .template-card {
-  padding: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: auto;
 }
 
 .modal .template-icon {
-  height: 40px;
-  margin-bottom: 0.35rem;
+  height: 32px;
+  width: 40px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.modal .template-icon svg {
+  width: 40px;
+  height: 32px;
 }
 
 .modal .template-name {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  text-align: left;
 }
 
 .modal .template-description {
-  display: none; /* Masquer la description dans la modale pour gagner de la place */
+  display: none;
 }
 
 .field-optional::after {

@@ -4,12 +4,14 @@
 %>
 <article class="card card-photo" data-card-id="<%= card.id %>" role="listitem">
   <% if (card.media_path) { %>
-    <img 
-      src="<%= card.media_path %>" 
-      alt="<%= card.description || 'Photo' %>"
-      loading="lazy"
-      class="card-photo-img"
-    >
+    <a href="<%= card.media_path %>" target="_blank" rel="noopener noreferrer" aria-label="Voir la photo en plein écran">
+      <img 
+        src="<%= card.media_path %>" 
+        alt="<%= card.description || 'Photo' %>"
+        loading="lazy"
+        class="card-photo-img"
+      >
+    </a>
   <% } %>
   <% if (card.description) { %>
     <p class="card-photo-caption"><%= card.description %></p>
