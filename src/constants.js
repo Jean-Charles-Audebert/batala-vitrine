@@ -19,6 +19,52 @@ export const FOOTER_ELEMENT_TYPES = {
   LINK: "link",
 };
 
+// Templates de cards
+export const CARD_TEMPLATES = {
+  default: {
+    id: "default",
+    name: "Card standard",
+    description: "Image en haut, titre et description en dessous (alignement vertical)",
+    icon: "card-default.svg",
+    fields: ["title", "description", "media_path"],
+  },
+  image_left: {
+    id: "image_left",
+    name: "Image à gauche",
+    description: "Image à gauche avec titre et description à droite",
+    icon: "card-image-left.svg",
+    fields: ["title", "description", "media_path"],
+  },
+  image_right: {
+    id: "image_right",
+    name: "Image à droite",
+    description: "Image à droite avec titre et description à gauche",
+    icon: "card-image-right.svg",
+    fields: ["title", "description", "media_path"],
+  },
+  photo: {
+    id: "photo",
+    name: "Photo",
+    description: "Photo pleine largeur avec légende optionnelle",
+    icon: "card-photo.svg",
+    fields: ["media_path", "description"],
+  },
+  video: {
+    id: "video",
+    name: "Vidéo",
+    description: "Vidéo YouTube ou fichier vidéo responsive",
+    icon: "card-video.svg",
+    fields: ["title", "media_path", "description"],
+  },
+  text_only: {
+    id: "text_only",
+    name: "Texte seul",
+    description: "Titre et description sans image",
+    icon: "card-text.svg",
+    fields: ["title", "description"],
+  },
+};
+
 // Présets d'optimisation d'images
 export const IMAGE_PRESETS = {
   logo: {

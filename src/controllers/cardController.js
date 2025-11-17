@@ -11,7 +11,7 @@ export const listCards = async (req, res) => {
   const { blockId } = req.params;
   try {
     const { rows: cards } = await query(
-      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
+      "SELECT id, block_id, position, template, title, description, media_path, event_date, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
       [blockId]
     );
     
@@ -201,7 +201,7 @@ export const getCardJson = async (req, res) => {
   const { blockId, id } = req.params;
   try {
     const { rows } = await query(
-      "SELECT id, block_id, position, title, description, media_path, event_date, description_bg_color FROM cards WHERE id=$1 AND block_id=$2",
+      "SELECT id, block_id, position, template, title, description, media_path, event_date, description_bg_color FROM cards WHERE id=$1 AND block_id=$2",
       [id, blockId]
     );
     if (rows.length === 0) {
