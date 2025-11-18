@@ -36,4 +36,20 @@ export default [
       },
     },
   },
+  {
+    files: ['public/js/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        fetch: 'readonly',
+        FormData: 'readonly',
+        File: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+      },
+    },
+  },
 ];
