@@ -339,8 +339,8 @@ h1, h2, h3, h4, h5, h6,
   justify-content: center;
 }
 
-.card-image-right {
-  flex-direction: row-reverse;
+.card.card-image-right {
+  flex-direction: row-reverse !important;
 }
 
 /* Card Photo - Pleine largeur */
