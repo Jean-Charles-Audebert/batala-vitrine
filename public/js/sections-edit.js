@@ -112,16 +112,27 @@ function createSectionModal(section) {
           <div class="image-upload-field">
             <input type="text" name="bg_image" id="sectionBgImage" value="${section.bg_image || ''}" placeholder="/uploads/..." readonly>
             <button type="button" class="btn btn-sm btn-secondary select-bg-image">📁 Choisir</button>
+            ${section.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image">🗑️</button>' : ''}
           </div>
         </div>
         
         <div class="form-group">
-          <label for="sectionBgVideo">Vidéo de fond (MP4)</label>
+          <label for="sectionBgVideo">🎥 Vidéo locale (MP4)</label>
           <div class="image-upload-field">
             <input type="text" name="bg_video" id="sectionBgVideo" value="${section.bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
             <button type="button" class="btn btn-sm btn-secondary select-bg-video">📁 Choisir</button>
+            ${section.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo">🗑️</button>' : ''}
           </div>
-          <small class="form-hint">La vidéo sera lue en boucle en arrière-plan (hero uniquement)</small>
+          <small class="form-hint">Fichier MP4 local uniquement</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="sectionBgYoutube">▶️ Vidéo YouTube</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" name="bg_youtube" id="sectionBgYoutube" value="${section.bg_youtube || ''}" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." style="flex: 1;">
+            ${section.bg_youtube ? '<button type="button" class="btn btn-sm btn-danger clear-bg-youtube" title="Supprimer l\'URL YouTube">🗑️</button>' : ''}
+          </div>
+          <small class="form-hint">URL YouTube complète (prioritaire sur MP4 local)</small>
         </div>
         
         <div class="form-group">
@@ -165,8 +176,9 @@ function createSectionModal(section) {
       bg_color: formData.get('bg_color') || null,
       bg_image: formData.get('bg_image') || null,
       bg_video: formData.get('bg_video') || null,
+      bg_youtube: formData.get('bg_youtube') || null,
       is_transparent: formData.get('is_transparent') === 'on',
-      is_visible: formData.get('is_visible') === 'on'
+      is_visible: formData.get('is_visible') === 'on',
     };
     
     try {
@@ -191,12 +203,80 @@ function createSectionModal(section) {
     }, 'image');
   });
   
+  // Handler suppression image
+  const clearBgImageBtn = modal.querySelector('.clear-bg-image');
+  if (clearBgImageBtn) {
+    clearBgImageBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#sectionBgImage');
+      const filePath = input.value;
+      
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            const response = await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+            const result = await response.json();
+            
+            if (!result.success && result.usageCount > 0) {
+              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
+              return;
+            }
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
+  
   // Handler sélection vidéo
   modal.querySelector('.select-bg-video').addEventListener('click', () => {
     openMediaPicker((url) => {
       modal.querySelector('#sectionBgVideo').value = url;
     }, 'video');
   });
+  
+  // Handler suppression vidéo
+  const clearBgVideoBtn = modal.querySelector('.clear-bg-video');
+  if (clearBgVideoBtn) {
+    clearBgVideoBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#sectionBgVideo');
+      const filePath = input.value;
+      
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            const response = await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+            const result = await response.json();
+            
+            if (!result.success && result.usageCount > 0) {
+              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
+              return;
+            }
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
+  
+  // Handler suppression YouTube
+  const clearBgYoutubeBtn = modal.querySelector('.clear-bg-youtube');
+  if (clearBgYoutubeBtn) {
+    clearBgYoutubeBtn.addEventListener('click', () => {
+      modal.querySelector('#sectionBgYoutube').value = '';
+    });
+  }
   
   return modal;
 }
@@ -273,6 +353,7 @@ function createContentModal(sectionId, content = {}) {
           <div class="image-upload-field">
             <input type="text" name="media_url" id="contentMediaUrl" value="${content.media_url || ''}" placeholder="/uploads/..." readonly>
             <button type="button" class="btn btn-sm btn-secondary select-media">📁 Choisir</button>
+            ${content.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-content-media" title="Supprimer le média">🗑️</button>' : ''}
           </div>
         </div>
         
@@ -342,6 +423,36 @@ function createContentModal(sectionId, content = {}) {
     }, 'both');
   });
   
+  // Handler suppression média
+  const clearContentMediaBtn = modal.querySelector('.clear-content-media');
+  if (clearContentMediaBtn) {
+    clearContentMediaBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#contentMediaUrl');
+      const filePath = input.value;
+      
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            const response = await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+            const result = await response.json();
+            
+            if (!result.success && result.usageCount > 0) {
+              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
+              return;
+            }
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
+  
   return modal;
 }
 
@@ -391,6 +502,7 @@ function createCardModal(sectionId, card = {}) {
           <div class="image-upload-field">
             <input type="text" name="media_url" id="cardMediaUrl" value="${card.media_url || ''}" placeholder="/uploads/..." readonly>
             <button type="button" class="btn btn-sm btn-secondary select-card-media">📁 Choisir</button>
+            ${card.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-card-media" title="Supprimer le média">🗑️</button>' : ''}
           </div>
         </div>
         
@@ -449,6 +561,36 @@ function createCardModal(sectionId, card = {}) {
       modal.querySelector('#cardMediaUrl').value = url;
     }, 'both');
   });
+  
+  // Handler suppression média
+  const clearCardMediaBtn = modal.querySelector('.clear-card-media');
+  if (clearCardMediaBtn) {
+    clearCardMediaBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#cardMediaUrl');
+      const filePath = input.value;
+      
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            const response = await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+            const result = await response.json();
+            
+            if (!result.success && result.usageCount > 0) {
+              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
+              return;
+            }
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
   
   return modal;
 }

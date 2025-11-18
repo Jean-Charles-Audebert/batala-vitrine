@@ -41,6 +41,8 @@ app.use(
         "style-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
         "img-src": ["'self'", "data:", "https:"],
+        "media-src": ["'self'", "data:", "https:"],
+        "frame-src": ["'self'", "https://www.youtube.com", "https://player.vimeo.com"],
       },
     },
     crossOriginEmbedderPolicy: false,

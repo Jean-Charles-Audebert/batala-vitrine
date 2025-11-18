@@ -190,6 +190,7 @@ CREATE TABLE sections (
     bg_color VARCHAR(7),
     bg_image VARCHAR(512),
     bg_video VARCHAR(512),
+    bg_youtube VARCHAR(512),
     is_transparent BOOLEAN DEFAULT FALSE,
     layout VARCHAR(50),
     padding_top VARCHAR(20) DEFAULT 'medium' CHECK (padding_top IN ('none', 'small', 'medium', 'large')),
