@@ -3,7 +3,10 @@
  * Modales visuelles sur la page d'accueil
  */
 
-/* global document, confirm, window, fetch, alert, prompt */
+/* global document, confirm, window, fetch, alert */
+
+// Import du media picker
+import { openMediaPicker } from './media-picker.js';
 
 // ==========================================================================
 // Gestion des modales
@@ -183,18 +186,16 @@ function createSectionModal(section) {
   
   // Handler sélection image
   modal.querySelector('.select-bg-image').addEventListener('click', () => {
-    const url = prompt('URL de l\'image de fond:');
-    if (url) {
+    openMediaPicker((url) => {
       modal.querySelector('#sectionBgImage').value = url;
-    }
+    }, 'image');
   });
   
   // Handler sélection vidéo
   modal.querySelector('.select-bg-video').addEventListener('click', () => {
-    const url = prompt('URL de la vidéo de fond (MP4):');
-    if (url) {
+    openMediaPicker((url) => {
       modal.querySelector('#sectionBgVideo').value = url;
-    }
+    }, 'video');
   });
   
   return modal;
@@ -336,10 +337,9 @@ function createContentModal(sectionId, content = {}) {
   
   // Handler sélection média
   modal.querySelector('.select-media').addEventListener('click', () => {
-    const url = prompt('URL du média:');
-    if (url) {
+    openMediaPicker((url) => {
       modal.querySelector('#contentMediaUrl').value = url;
-    }
+    }, 'both');
   });
   
   return modal;
@@ -445,10 +445,9 @@ function createCardModal(sectionId, card = {}) {
   
   // Handler sélection média
   modal.querySelector('.select-card-media').addEventListener('click', () => {
-    const url = prompt('URL du média:');
-    if (url) {
+    openMediaPicker((url) => {
       modal.querySelector('#cardMediaUrl').value = url;
-    }
+    }, 'both');
   });
   
   return modal;
