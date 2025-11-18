@@ -29,10 +29,19 @@
   const bgStyle = [];
   if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
   if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
+  
+  const sectionClasses = [
+    'section',
+    'section-hero',
+    `section-hero--${layout}`,
+    `padding-top-${padding_top}`,
+    `padding-bottom-${padding_bottom}`
+  ];
+  if (is_transparent) sectionClasses.push('section-transparent');
 %>
 
 <section 
-  class="section section-hero section-hero--<%= layout %> padding-top-<%= padding_top %> padding-bottom-<%= padding_bottom %>"
+  class="<%= sectionClasses.join(' ') %>"
   data-section-id="<%= id %>"
   style="<%= bgStyle.join('; ') %>"
 >
