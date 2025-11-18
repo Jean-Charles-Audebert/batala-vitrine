@@ -1,0 +1,272 @@
+<%-
+  include('../partials/head', {
+    title,
+    stylesheets: ['/css/admin.css', '/css/buttons.css', '/css/design-system.css']
+  })
+%>
+  <div class="admin-container">
+    <%-
+      include('../partials/admin-toolbar', {
+        title: 'Gestion des sections',
+        toolbarButtons: [
+          { href: '#', class: 'btn-primary', icon: 'plus', label: 'Nouvelle section', dataAction: 'new-section' },
+          { href: '/admins', class: 'btn-secondary', icon: 'settings', label: 'Admins' },
+          { href: '/', class: 'btn-secondary', label: '← Accueil' },
+          { href: '/auth/logout/web', class: 'btn-danger', icon: 'close', label: 'Déconnexion' }
+        ]
+      })
+    %>
+    
+    <%- include('../partials/alerts') %>
+
+    <div class="sections-list">
+      <% if (sections.length === 0) { %>
+        <p class="empty-state">Aucune section pour le moment. Créez-en une !</p>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Type</th>
+              <th>Titre</th>
+              <th>Visibilité</th>
+              <th>Layout</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sections-tbody">
+            <% sections.forEach(section => { %>
+              <tr data-section-id="<%= section.id %>" draggable="true">
+                <td class="drag-handle">
+                  <span class="position-badge"><%= section.position ?? '∞' %></span>
+                  <span class="drag-icon">⋮⋮</span>
+                </td>
+                <td>
+                  <span class="type-badge type-<%= section.type %>"><%= section.type %></span>
+                </td>
+                <td><%= section.title %></td>
+                <td>
+                  <% if (section.is_visible) { %>
+                    <span class="badge badge-active">✓ Visible</span>
+                  <% } else { %>
+                    <span class="badge badge-inactive">✗ Masqué</span>
+                  <% } %>
+                </td>
+                <td><%= section.layout || '—' %></td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-sm btn-secondary" data-action="edit-section" data-section-id="<%= section.id %>">
+                      ✏️ Modifier
+                    </button>
+                    <button class="btn btn-sm btn-info" data-action="view-content" data-section-id="<%= section.id %>">
+                      📝 Contenu
+                    </button>
+                    <% if (section.type === 'card_grid') { %>
+                      <button class="btn btn-sm btn-success" data-action="manage-cards" data-section-id="<%= section.id %>">
+                        🎴 Cartes
+                      </button>
+                    <% } %>
+                    <button class="btn btn-sm btn-danger" data-action="delete-section" data-section-id="<%= section.id %>">
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Modale Nouvelle/Éditer Section -->
+  <div id="sectionModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="sectionModalTitle">Nouvelle section</h2>
+        <button class="modal-close" data-action="close-modal">&times;</button>
+      </div>
+      <form id="sectionForm">
+        <input type="hidden" name="sectionId" id="sectionId">
+        
+        <div class="form-group">
+          <label for="sectionType">Type de section *</label>
+          <select name="type" id="sectionType" required>
+            <option value="hero">Hero (En-tête)</option>
+            <option value="content">Contenu (texte + image)</option>
+            <option value="card_grid">Grille de cartes</option>
+            <option value="gallery">Galerie photos/vidéos</option>
+            <option value="footer">Pied de page</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sectionTitle">Titre *</label>
+          <input type="text" name="title" id="sectionTitle" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sectionPosition">Position</label>
+            <input type="number" name="position" id="sectionPosition" min="0" step="1">
+          </div>
+
+          <div class="form-group">
+            <label for="sectionLayout">Layout</label>
+            <select name="layout" id="sectionLayout">
+              <option value="">— Par défaut —</option>
+              <option value="centered">Centré</option>
+              <option value="image_left">Image à gauche</option>
+              <option value="image_right">Image à droite</option>
+              <option value="grid_2">Grille 2 colonnes</option>
+              <option value="grid_3">Grille 3 colonnes</option>
+              <option value="grid_4">Grille 4 colonnes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sectionBgColor">Couleur de fond</label>
+          <input type="color" name="bg_color" id="sectionBgColor">
+        </div>
+
+        <div class="form-group">
+          <label for="sectionBgImage">Image de fond (URL)</label>
+          <input type="text" name="bg_image" id="sectionBgImage" placeholder="/uploads/...">
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="is_transparent" id="sectionTransparent">
+            Fond transparent
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="is_visible" id="sectionVisible" checked>
+            Visible sur le site
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/sections-admin.js"></script>
+  <script>
+    // Gestion des modales et formulaires
+    const modal = document.getElementById('sectionModal');
+    const form = document.getElementById('sectionForm');
+    const modalTitle = document.getElementById('sectionModalTitle');
+
+    // Ouvrir modale nouvelle section
+    document.querySelector('[data-action="new-section"]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      modalTitle.textContent = 'Nouvelle section';
+      form.reset();
+      document.getElementById('sectionId').value = '';
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+    });
+
+    // Fermer modale
+    document.querySelectorAll('[data-action="close-modal"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      });
+    });
+
+    // Soumettre formulaire section
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const sectionId = formData.get('sectionId');
+      const data = {
+        type: formData.get('type'),
+        title: formData.get('title'),
+        position: formData.get('position') ? parseInt(formData.get('position')) : null,
+        layout: formData.get('layout') || null,
+        bg_color: formData.get('bg_color') || null,
+        bg_image: formData.get('bg_image') || null,
+        is_transparent: formData.get('is_transparent') === 'on',
+        is_visible: formData.get('is_visible') === 'on'
+      };
+
+      try {
+        const url = sectionId ? `/api/sections/${sectionId}` : '/api/sections';
+        const method = sectionId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
+
+        window.location.reload();
+      } catch (error) {
+        alert('Erreur: ' + error.message);
+      }
+    });
+
+    // Éditer section
+    document.querySelectorAll('[data-action="edit-section"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const sectionId = e.currentTarget.dataset.sectionId;
+        
+        try {
+          const response = await fetch(`/api/sections/${sectionId}`);
+          const section = await response.json();
+          
+          modalTitle.textContent = 'Modifier la section';
+          document.getElementById('sectionId').value = section.id;
+          document.getElementById('sectionType').value = section.type;
+          document.getElementById('sectionTitle').value = section.title;
+          document.getElementById('sectionPosition').value = section.position ?? '';
+          document.getElementById('sectionLayout').value = section.layout || '';
+          document.getElementById('sectionBgColor').value = section.bg_color || '#ffffff';
+          document.getElementById('sectionBgImage').value = section.bg_image || '';
+          document.getElementById('sectionTransparent').checked = section.is_transparent;
+          document.getElementById('sectionVisible').checked = section.is_visible;
+          
+          modal.classList.add('active');
+          modal.setAttribute('aria-hidden', 'false');
+        } catch (error) {
+          alert('Erreur lors du chargement de la section');
+        }
+      });
+    });
+
+    // Supprimer section
+    document.querySelectorAll('[data-action="delete-section"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const sectionId = e.currentTarget.dataset.sectionId;
+        
+        if (!confirm('Voulez-vous vraiment supprimer cette section ?')) return;
+        
+        try {
+          const response = await fetch(`/api/sections/${sectionId}`, {
+            method: 'DELETE'
+          });
+          
+          if (!response.ok) throw new Error('Erreur lors de la suppression');
+          
+          window.location.reload();
+        } catch (error) {
+          alert('Erreur: ' + error.message);
+        }
+      });
+    });
+
+    // TODO: Drag & drop pour réorganiser
+    // TODO: Modales pour gérer contenu et cartes
+  </script>
+
+<%- include('../partials/footer') %>
