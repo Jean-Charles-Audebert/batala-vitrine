@@ -15,7 +15,7 @@ export const getAllSections = async () => {
     const { rows: sections } = await query(`
       SELECT 
         id, type, title, position, is_visible,
-        bg_color, bg_image, bg_video, is_transparent,
+        bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
         created_at, updated_at
       FROM sections
@@ -85,7 +85,7 @@ export const getSectionById = async (sectionId) => {
     const { rows } = await query(`
       SELECT 
         id, type, title, position, is_visible,
-        bg_color, bg_image, bg_video, is_transparent,
+        bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
         created_at, updated_at
       FROM sections
