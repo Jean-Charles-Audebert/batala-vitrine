@@ -81,21 +81,7 @@
       <%- include('../components/sections/gallery', { section, user }) %>
       
     <% } else if (section.type === 'footer') { %>
-      <%- include('../components/footer', { 
-        contentBlock: {
-          id: section.id,
-          elements: section.content.map(c => ({
-            id: c.id,
-            type: c.media_type || 'text',
-            parsedContent: {
-              about_content: c.description,
-              links: c.description ? JSON.parse(c.description).links : []
-            }
-          }))
-        },
-        user,
-        getSocialIcon
-      }) %>
+      <%- include('../components/sections/footer', { section, user, getSocialIcon }) %>
     <% } %>
   <% }) %>
   

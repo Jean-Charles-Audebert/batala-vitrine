@@ -265,8 +265,49 @@
       });
     });
 
+    // Voir le contenu d'une section
+    document.querySelectorAll('[data-action="view-content"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const sectionId = e.currentTarget.dataset.sectionId;
+        
+        try {
+          const response = await fetch(`/api/sections/${sectionId}`);
+          const section = await response.json();
+          
+          if (section.content && section.content.length > 0) {
+            alert(`Contenu de la section:\n\n${JSON.stringify(section.content, null, 2)}`);
+          } else {
+            alert('Cette section n\'a pas encore de contenu.');
+          }
+        } catch (error) {
+          alert('Erreur lors du chargement du contenu');
+        }
+      });
+    });
+
+    // Gérer les cartes d'une section
+    document.querySelectorAll('[data-action="manage-cards"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const sectionId = e.currentTarget.dataset.sectionId;
+        
+        try {
+          const response = await fetch(`/api/sections/${sectionId}`);
+          const section = await response.json();
+          
+          if (section.cards && section.cards.length > 0) {
+            const cardsInfo = section.cards.map(c => `- ${c.title || 'Sans titre'}`).join('\n');
+            alert(`Cartes de la section (${section.cards.length}):\n\n${cardsInfo}\n\nModale de gestion des cartes à venir...`);
+          } else {
+            alert('Cette section n\'a pas encore de cartes.\n\nModale d\'ajout de cartes à venir...');
+          }
+        } catch (error) {
+          alert('Erreur lors du chargement des cartes');
+        }
+      });
+    });
+
     // TODO: Drag & drop pour réorganiser
-    // TODO: Modales pour gérer contenu et cartes
+    // TODO: Modales complètes pour gérer contenu et cartes
   </script>
 
 <%- include('../partials/footer') %>
