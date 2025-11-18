@@ -9,16 +9,17 @@
  * Ouvre une modale de sélection média avec onglets Upload/URL
  * @param {Function} callback - Fonction appelée avec l'URL du média sélectionné
  * @param {string} mediaType - Type de média ('image', 'video', 'both')
+ * @param {string} fieldName - Nom du champ pour détection automatique du preset d'optimisation
  */
-export function openMediaPicker(callback, mediaType = 'both') {
-  const modal = createMediaPickerModal(callback, mediaType);
+export function openMediaPicker(callback, mediaType = 'both', fieldName = 'media_path') {
+  const modal = createMediaPickerModal(callback, mediaType, fieldName);
   document.body.appendChild(modal);
   
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
 }
 
-function createMediaPickerModal(callback, mediaType) {
+function createMediaPickerModal(callback, mediaType, fieldName) {
   const modal = document.createElement('div');
   modal.id = 'mediaPickerModal';
   modal.className = 'modal';
@@ -129,7 +130,7 @@ function createMediaPickerModal(callback, mediaType) {
     
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('fieldName', 'media_upload');
+    formData.append('fieldName', fieldName);
     
     try {
       const response = await fetch('/api/upload', {

@@ -200,7 +200,7 @@ function createSectionModal(section) {
   modal.querySelector('.select-bg-image').addEventListener('click', () => {
     openMediaPicker((url) => {
       modal.querySelector('#sectionBgImage').value = url;
-    }, 'image');
+    }, 'image', 'bg_image'); // bg_image = pas d'optimisation (garde dimensions originales)
   });
   
   // Handler suppression image
