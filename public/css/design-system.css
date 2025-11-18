@@ -48,9 +48,9 @@
   background-repeat: no-repeat;
 }
 
-/* Hero : affiche toute la hauteur de l'image */
+/* Hero : couvre l'espace avec position ajustable */
 .section-hero {
-  background-size: contain;
+  background-size: cover;
   background-position: center center;
 }
 
