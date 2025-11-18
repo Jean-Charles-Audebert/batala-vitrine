@@ -48,10 +48,11 @@
   background-repeat: no-repeat;
 }
 
-/* Hero : couvre l'espace avec position ajustable */
+/* Hero : contenu dans un cadre de hauteur limitée */
 .section-hero {
-  background-size: cover;
+  background-size: contain;
   background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .section-bg-video {
@@ -60,32 +61,24 @@
   left: 0;
   width: 100%;
   height: 100%;
+  max-height: 80vh;
   object-fit: cover;
   z-index: 0;
 }
 
 .section-bg-youtube {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 100vh;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 80vh;
+  object-fit: cover;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Zoom pour éviter les bandes noires YouTube */
-@media (min-aspect-ratio: 16/9) {
-  .section-bg-youtube {
-    height: 56.25vw; /* 16:9 */
-  }
-}
-@media (max-aspect-ratio: 16/9) {
-  .section-bg-youtube {
-    width: 177.78vh; /* 16:9 */
-  }
-}
+/* Les vidéos sont maintenant contraintes dans le cadre du hero (max 80vh) */
 
 /* Padding vertical */
 .padding-top-none { padding-top: var(--spacing-none); }
@@ -106,8 +99,10 @@
   align-items: center;
   justify-content: center;
   min-height: var(--hero-medium);
+  max-height: 80vh;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 
 .section-hero--small { min-height: var(--hero-small); }
