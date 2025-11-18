@@ -186,6 +186,7 @@ export const updateSection = async (sectionId, sectionData) => {
       bg_color,
       bg_image,
       bg_video,
+      bg_youtube,
       is_transparent,
       layout,
       padding_top,
@@ -193,24 +194,65 @@ export const updateSection = async (sectionId, sectionData) => {
       is_visible
     } = sectionData;
     
+    // Construire dynamiquement la requête pour ne mettre à jour QUE les champs fournis
+    const updates = [];
+    const values = [];
+    let paramIndex = 1;
+    
+    if (title !== undefined) {
+      updates.push(`title = $${paramIndex++}`);
+      values.push(title);
+    }
+    if (bg_color !== undefined) {
+      updates.push(`bg_color = $${paramIndex++}`);
+      values.push(bg_color);
+    }
+    if (bg_image !== undefined) {
+      updates.push(`bg_image = $${paramIndex++}`);
+      values.push(bg_image);
+    }
+    if (bg_video !== undefined) {
+      updates.push(`bg_video = $${paramIndex++}`);
+      values.push(bg_video);
+    }
+    if (bg_youtube !== undefined) {
+      updates.push(`bg_youtube = $${paramIndex++}`);
+      values.push(bg_youtube);
+    }
+    if (is_transparent !== undefined) {
+      updates.push(`is_transparent = $${paramIndex++}`);
+      values.push(is_transparent);
+    }
+    if (layout !== undefined) {
+      updates.push(`layout = $${paramIndex++}`);
+      values.push(layout);
+    }
+    if (padding_top !== undefined) {
+      updates.push(`padding_top = $${paramIndex++}`);
+      values.push(padding_top);
+    }
+    if (padding_bottom !== undefined) {
+      updates.push(`padding_bottom = $${paramIndex++}`);
+      values.push(padding_bottom);
+    }
+    if (is_visible !== undefined) {
+      updates.push(`is_visible = $${paramIndex++}`);
+      values.push(is_visible);
+    }
+    
+    if (updates.length === 0) {
+      logger.info(`Section #${sectionId} - aucune mise à jour`);
+      const { rows } = await query('SELECT * FROM sections WHERE id = $1', [sectionId]);
+      return rows[0] || null;
+    }
+    
+    values.push(sectionId);
+    
     const { rows } = await query(`
-      UPDATE sections SET
-        title = COALESCE($1, title),
-        bg_color = COALESCE($2, bg_color),
-        bg_image = COALESCE($3, bg_image),
-        bg_video = COALESCE($4, bg_video),
-        is_transparent = COALESCE($5, is_transparent),
-        layout = COALESCE($6, layout),
-        padding_top = COALESCE($7, padding_top),
-        padding_bottom = COALESCE($8, padding_bottom),
-        is_visible = COALESCE($9, is_visible)
-      WHERE id = $10
+      UPDATE sections SET ${updates.join(', ')}
+      WHERE id = $${paramIndex}
       RETURNING *
-    `, [
-      title, bg_color, bg_image, bg_video, is_transparent,
-      layout, padding_top, padding_bottom, is_visible,
-      sectionId
-    ]);
+    `, values);
     
     if (rows.length === 0) {
       logger.info(`Section mise à jour: #${sectionId} - non trouvée`);
