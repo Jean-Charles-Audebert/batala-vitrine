@@ -3,7 +3,7 @@
  * Modales visuelles sur la page d'accueil
  */
 
-/* global document, confirm, window, fetch, alert */
+/* global document, confirm, window, fetch, alert, prompt */
 
 // ==========================================================================
 // Gestion des modales
@@ -22,6 +22,13 @@ function closeModal(modalId) {
   if (modal) {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+function removeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.remove();
   }
 }
 
@@ -70,7 +77,7 @@ function createSectionModal(section) {
     <div class="modal-content">
       <div class="modal-header">
         <h2>Modifier la section</h2>
-        <button class="modal-close" onclick="closeModal('editSectionModal')">&times;</button>
+        <button class="modal-close" data-close-modal="editSectionModal">&times;</button>
       </div>
       <form id="editSectionForm">
         <input type="hidden" name="sectionId" value="${section.id}">
@@ -120,12 +127,20 @@ function createSectionModal(section) {
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('editSectionModal')">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-close-modal="editSectionModal">Annuler</button>
           <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
         </div>
       </form>
     </div>
   `;
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('editSectionModal');
+      removeModal('editSectionModal');
+    });
+  });
   
   // Handler submit
   modal.querySelector('form').addEventListener('submit', async (e) => {
@@ -203,7 +218,7 @@ function createContentModal(sectionId, content = {}) {
     <div class="modal-content">
       <div class="modal-header">
         <h2>${content.id ? 'Modifier le contenu' : 'Ajouter du contenu'}</h2>
-        <button class="modal-close" onclick="closeModal('editContentModal')">&times;</button>
+        <button class="modal-close" data-close-modal="editContentModal">&times;</button>
       </div>
       <form id="editContentForm">
         <input type="hidden" name="sectionId" value="${sectionId}">
@@ -244,12 +259,20 @@ function createContentModal(sectionId, content = {}) {
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('editContentModal')">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-close-modal="editContentModal">Annuler</button>
           <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
         </div>
       </form>
     </div>
   `;
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('editContentModal');
+      removeModal('editContentModal');
+    });
+  });
   
   // Handler submit
   modal.querySelector('form').addEventListener('submit', async (e) => {
@@ -330,7 +353,7 @@ function createCardModal(sectionId, card = {}) {
     <div class="modal-content">
       <div class="modal-header">
         <h2>${card.id ? 'Modifier la carte' : 'Ajouter une carte'}</h2>
-        <button class="modal-close" onclick="closeModal('addCardModal')">&times;</button>
+        <button class="modal-close" data-close-modal="addCardModal">&times;</button>
       </div>
       <form id="addCardForm">
         <input type="hidden" name="sectionId" value="${sectionId}">
@@ -360,12 +383,20 @@ function createCardModal(sectionId, card = {}) {
         </div>
         
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('addCardModal')">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-close-modal="addCardModal">Annuler</button>
           <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
         </div>
       </form>
     </div>
   `;
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('addCardModal');
+      removeModal('addCardModal');
+    });
+  });
   
   // Handler submit
   modal.querySelector('form').addEventListener('submit', async (e) => {
