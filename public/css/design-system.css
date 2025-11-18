@@ -48,11 +48,14 @@
   background-repeat: no-repeat;
 }
 
-/* Hero : contenu dans un cadre de hauteur limitée */
+/* Hero : hauteur adaptée au ratio de bannière horizontale (~4.5:1) */
 .section-hero {
-  background-size: contain;
+  background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  min-height: 22vh;
+  aspect-ratio: 4.5 / 1;
+  max-height: 400px;
 }
 
 .section-bg-video {
@@ -98,13 +101,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--hero-medium);
-  max-height: 80vh;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  position: relative;
 }
 
+/* Variantes de hauteur - optionnelles si le contenu le nécessite */
 .section-hero--small { min-height: var(--hero-small); }
 .section-hero--medium { min-height: var(--hero-medium); }
 .section-hero--large { min-height: var(--hero-large); }
