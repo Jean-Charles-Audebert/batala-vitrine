@@ -917,8 +917,42 @@ th {
 }
 
 .type-footer {
-  background: #4a5568;
+  background: #4c51bf;
   color: white;
+}
+
+/* ===================================
+   Sections Edit - Inline Modals
+   =================================== */
+
+.image-upload-field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.image-upload-field input[type="text"] {
+  flex: 1;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Position et drag handle */

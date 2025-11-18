@@ -82,7 +82,7 @@ router.delete('/sections/:id', async (req, res) => {
 });
 
 // ========== SECTION CONTENT ==========
-// POST /api/sections/:id/content - Ajouter du contenu à une section
+// POST /api/sections/:sectionId/content - Ajouter du contenu
 router.post('/sections/:sectionId/content', async (req, res) => {
   try {
     const content = await addSectionContent({
@@ -90,6 +90,41 @@ router.post('/sections/:sectionId/content', async (req, res) => {
       ...req.body
     });
     res.status(201).json(content);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/sections/:sectionId/content/:contentId - Modifier du contenu
+router.put('/sections/:sectionId/content/:contentId', async (req, res) => {
+  try {
+    const { query } = await import('../config/db.js');
+    const { title, subtitle, description, cta_label, cta_url, media_url, media_type, text_color, text_align } = req.body;
+    
+    await query(`
+      UPDATE section_content 
+      SET title = $1, subtitle = $2, description = $3, 
+          cta_label = $4, cta_url = $5, media_url = $6,
+          media_type = $7, text_color = $8, text_align = $9
+      WHERE id = $10 AND section_id = $11
+    `, [title, subtitle, description, cta_label, cta_url, media_url, media_type, text_color, text_align, 
+        parseInt(req.params.contentId, 10), parseInt(req.params.sectionId, 10)]);
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/sections/:sectionId/content/:contentId - Supprimer du contenu
+router.delete('/sections/:sectionId/content/:contentId', async (req, res) => {
+  try {
+    const { query } = await import('../config/db.js');
+    await query('DELETE FROM section_content WHERE id = $1 AND section_id = $2', [
+      parseInt(req.params.contentId, 10),
+      parseInt(req.params.sectionId, 10)
+    ]);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -101,8 +101,9 @@
         </div>
 
         <div class="form-group">
-          <label for="sectionTitle">Titre *</label>
-          <input type="text" name="title" id="sectionTitle" required>
+          <label for="sectionTitle">Titre (admin uniquement)</label>
+          <input type="text" name="title" id="sectionTitle" placeholder="Label pour identifier la section">
+          <small class="form-hint">Ce titre n'est affiché que dans l'admin. Le contenu visible vient des éléments de contenu.</small>
         </div>
 
         <div class="form-row">
@@ -131,8 +132,12 @@
         </div>
 
         <div class="form-group">
-          <label for="sectionBgImage">Image de fond (URL)</label>
-          <input type="text" name="bg_image" id="sectionBgImage" placeholder="/uploads/...">
+          <label for="sectionBgImage">Image de fond</label>
+          <div class="image-upload-field">
+            <input type="text" name="bg_image" id="sectionBgImage" placeholder="/uploads/..." readonly>
+            <button type="button" class="btn btn-sm btn-secondary" id="selectBgImage">Choisir une image</button>
+          </div>
+          <small class="form-hint">Cliquez pour sélectionner une image depuis vos fichiers</small>
         </div>
 
         <div class="form-group">
@@ -157,9 +162,8 @@
     </div>
   </div>
 
-  <script src="/js/sections-admin.js"></script>
   <script>
-    // Gestion des modales et formulaires
+    // Gestion des modales et formulaires (page admin sections)
     const modal = document.getElementById('sectionModal');
     const form = document.getElementById('sectionForm');
     const modalTitle = document.getElementById('sectionModalTitle');

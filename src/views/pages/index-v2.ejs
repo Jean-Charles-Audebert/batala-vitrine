@@ -90,15 +90,14 @@
   
   <!-- Scripts -->
   <script src="/js/index.js"></script>
-  <script src="/js/sections-admin.js"></script>
   <script src="/js/image-upload.js"></script>
-  <script src="/js/footer-edit.js"></script>
   <script src="/js/contact-form.js"></script>
   
   <% if (user) { %>
+    <script src="/js/sections-edit.js"></script>
     <script>
-      console.log('Mode admin activé - sections v2');
-      // TODO: Ajouter event listeners pour édition sections
+      console.log('✅ Mode admin activé - sections v2');
+      console.log('💡 Cliquez sur les boutons ✏️ pour éditer');
     </script>
   <% } %>
 </body>
