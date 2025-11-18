@@ -50,23 +50,31 @@
   <%# Extraire l'ID YouTube de différents formats d'URL %>
   <% 
     let videoId = '';
-    if (bg_youtube.includes('youtu.be/')) {
-      videoId = bg_youtube.split('youtu.be/')[1].split('?')[0];
-    } else if (bg_youtube.includes('youtube.com/watch')) {
-      const urlParams = new URLSearchParams(bg_youtube.split('?')[1]);
-      videoId = urlParams.get('v');
-    } else if (bg_youtube.includes('youtube.com/embed/')) {
-      videoId = bg_youtube.split('embed/')[1].split('?')[0];
+    try {
+      if (bg_youtube.includes('youtu.be/')) {
+        videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+      } else if (bg_youtube.includes('youtube.com/watch')) {
+        const url = new URL(bg_youtube);
+        videoId = url.searchParams.get('v');
+      } else if (bg_youtube.includes('youtube.com/embed/')) {
+        videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+      } else if (bg_youtube.includes('youtube.com/shorts/')) {
+        videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+      }
+    } catch (e) {
+      console.error('Erreur extraction ID YouTube:', e);
     }
   %>
+  <% if (videoId) { %>
   <iframe 
     class="section-bg-youtube" 
-    src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+    src="https://www.youtube-nocookie.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=<%= `${req.protocol}://${req.get('host')}` %>"
     frameborder="0" 
-    allow="autoplay; encrypted-media" 
+    allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
     allowfullscreen
     style="pointer-events: none;">
   </iframe>
+  <% } %>
   <% } else if (bg_video) { %>
   <video class="section-bg-video" autoplay muted loop playsinline>
     <source src="<%= bg_video %>" type="video/mp4">
