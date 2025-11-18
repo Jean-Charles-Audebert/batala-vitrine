@@ -50,8 +50,7 @@
           <div class="gallery-item" data-card-id="<%= card.id %>">
             <% if (card.media_type === 'photo' && card.media_url) { %>
               <% 
-                const originalPath = card.media_url.replace(/-(
-\d+)-(\d+)\.([a-z]+)$/i, '-$1-$2-original.$3');
+                const originalPath = card.media_url.replace(/-(\d+)-(\d+)\.([a-z]+)$/i, '-$1-$2-original.$3');
               %>
               <a href="<%= originalPath %>" target="_blank" class="gallery-photo">
                 <img src="<%= card.media_url %>" alt="<%= card.title || '' %>" loading="lazy">
