@@ -42,7 +42,7 @@ app.use(
         "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
         "img-src": ["'self'", "data:", "https:"],
         "media-src": ["'self'", "data:", "https:"],
-        "frame-src": ["'self'", "https://www.youtube.com", "https://player.vimeo.com"],
+        "frame-src": ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://player.vimeo.com"],
       },
     },
     crossOriginEmbedderPolicy: false,
