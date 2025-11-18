@@ -27,9 +27,14 @@ export const showHome = async (req, res, deps = {}) => {
       logger.info('📦 Utilisation du système sections v2');
       const sections = await getAllSections();
       
+      // Charger les réseaux sociaux
+      const { getAllSocialLinks } = await import('./socialLinksController.js');
+      const socialLinks = await getAllSocialLinks();
+      
       return res.render("pages/index-v2", {
         title: "Accueil",
         sections,
+        socialLinks,
         pageSettings,
         user: req.user || null,
         getSocialIcon

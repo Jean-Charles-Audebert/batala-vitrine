@@ -113,6 +113,15 @@ function createSectionModal(section) {
         </div>
         
         <div class="form-group">
+          <label for="sectionBgVideo">Vidéo de fond (MP4)</label>
+          <div class="image-upload-field">
+            <input type="text" name="bg_video" id="sectionBgVideo" value="${section.bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
+            <button type="button" class="btn btn-sm btn-secondary select-bg-video">📁 Choisir</button>
+          </div>
+          <small class="form-hint">La vidéo sera lue en boucle en arrière-plan (hero uniquement)</small>
+        </div>
+        
+        <div class="form-group">
           <label>
             <input type="checkbox" name="is_transparent" ${section.is_transparent ? 'checked' : ''}>
             Fond transparent (ignore la couleur)
@@ -152,6 +161,7 @@ function createSectionModal(section) {
       layout: formData.get('layout') || null,
       bg_color: formData.get('bg_color') || null,
       bg_image: formData.get('bg_image') || null,
+      bg_video: formData.get('bg_video') || null,
       is_transparent: formData.get('is_transparent') === 'on',
       is_visible: formData.get('is_visible') === 'on'
     };
@@ -173,10 +183,17 @@ function createSectionModal(section) {
   
   // Handler sélection image
   modal.querySelector('.select-bg-image').addEventListener('click', () => {
-    // TODO: Intégrer avec système d'upload existant
     const url = prompt('URL de l\'image de fond:');
     if (url) {
       modal.querySelector('#sectionBgImage').value = url;
+    }
+  });
+  
+  // Handler sélection vidéo
+  modal.querySelector('.select-bg-video').addEventListener('click', () => {
+    const url = prompt('URL de la vidéo de fond (MP4):');
+    if (url) {
+      modal.querySelector('#sectionBgVideo').value = url;
     }
   });
   
@@ -491,5 +508,100 @@ document.addEventListener('click', async (e) => {
     alert('Erreur: ' + error.message);
   }
 });
+
+// ==========================================================================
+// FAB - Créer une nouvelle section
+// ==========================================================================
+
+const fabAddSection = document.getElementById('fabAddSection');
+if (fabAddSection) {
+  fabAddSection.addEventListener('click', () => {
+    const modal = createNewSectionModal();
+    document.body.appendChild(modal);
+    openModal('newSectionModal');
+  });
+}
+
+function createNewSectionModal() {
+  const modal = document.createElement('div');
+  modal.id = 'newSectionModal';
+  modal.className = 'modal';
+  
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nouvelle section</h2>
+        <button class="modal-close" data-close-modal="newSectionModal">&times;</button>
+      </div>
+      <form id="newSectionForm">
+        <div class="form-group">
+          <label for="newSectionType">Type de section *</label>
+          <select name="type" id="newSectionType" required>
+            <option value="">-- Choisir un type --</option>
+            <option value="hero">🎯 Hero (En-tête principal)</option>
+            <option value="content">📝 Contenu (Texte + image)</option>
+            <option value="card_grid">🎴 Grille de cartes</option>
+            <option value="gallery">🖼️ Galerie (Photos/vidéos)</option>
+            <option value="footer">🔻 Pied de page</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="newSectionTitle">Titre (optionnel)</label>
+          <input type="text" name="title" id="newSectionTitle" placeholder="Label pour l'admin">
+          <small class="form-hint">Ce titre n'est visible que dans l'administration</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="newSectionPosition">Position</label>
+          <input type="number" name="position" id="newSectionPosition" min="0" step="1" placeholder="0">
+          <small class="form-hint">Laissez vide pour ajouter à la fin</small>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="newSectionModal">Annuler</button>
+          <button type="submit" class="btn btn-primary">✨ Créer</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('newSectionModal');
+      removeModal('newSectionModal');
+    });
+  });
+  
+  // Handler submit
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const data = {
+      type: formData.get('type'),
+      title: formData.get('title') || `Section ${formData.get('type')}`,
+      position: formData.get('position') ? parseInt(formData.get('position')) : null,
+      is_visible: true
+    };
+    
+    try {
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la création');
+      
+      window.location.reload();
+    } catch (err) {
+      alert('Erreur: ' + err.message);
+    }
+  });
+  
+  return modal;
+}
 
 console.log('✅ Sections Edit JS initialisé');

@@ -73,9 +73,7 @@
       <div class="footer-column">
         <details>
           <summary>Suivez-nous</summary>
-          <nav class="social-links" aria-label="Réseaux sociaux">
-            <p class="text-muted">Réseaux sociaux à configurer</p>
-          </nav>
+          <%- include('../social-links', { location: 'footer', socialLinks, user, getSocialIcon }) %>
         </details>
       </div>
       

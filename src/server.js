@@ -20,6 +20,7 @@ import fontRoutes from "./routes/fontRoutes.js";
 import apiRoutes from "./routes/apiRoutes.js";
 import sectionsAdminRoutes from "./routes/sectionsAdminRoutes.js";
 import sectionsApiRoutes from "./routes/sectionsApiRoutes.js";
+import socialLinksRoutes from "./routes/socialLinksRoutes.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -90,6 +91,7 @@ app.use("/", footerElementRoutes);
 
 app.use("/api", apiRoutes);
 app.use("/api", sectionsApiRoutes);
+app.use("/api", socialLinksRoutes);
 
 // --- Lancement du serveur ---
 const PORT = process.env.PORT || 3000;

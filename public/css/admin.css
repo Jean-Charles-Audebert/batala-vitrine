@@ -955,6 +955,37 @@ th {
   }
 }
 
+/* FAB Add Section */
+.fab-add-section {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #667eea;
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab-add-section:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  background: #5568d3;
+}
+
+.fab-add-section:active {
+  transform: scale(0.95);
+}
+
 /* Position et drag handle */
 .position-badge {
   display: inline-block;

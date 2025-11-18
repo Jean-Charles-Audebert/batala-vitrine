@@ -1,0 +1,44 @@
+<%
+  /**
+   * Composant: Social Links
+   * Affichage des liens de réseaux sociaux
+   * Props: location ('header', 'footer', 'both'), user (pour édition)
+   */
+  const socialLocation = typeof location !== 'undefined' ? location : 'footer';
+  const showEdit = typeof user !== 'undefined' && user;
+%>
+
+<nav class="social-links social-links--<%= socialLocation %>" aria-label="Réseaux sociaux">
+  <% if (typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
+    <% socialLinks.filter(link => link.location === socialLocation || link.location === 'both').forEach(link => { %>
+      <a 
+        href="<%= link.url %>" 
+        class="social-link social-link--<%= link.platform %>"
+        target="_blank" 
+        rel="noopener noreferrer"
+        aria-label="<%= link.label || link.platform %> (ouvre dans un nouvel onglet)"
+        title="<%= link.label || link.platform %>"
+      >
+        <% if (link.icon_svg) { %>
+          <%- link.icon_svg %>
+        <% } else { %>
+          <%- getSocialIcon(link.platform) %>
+        <% } %>
+      </a>
+    <% }) %>
+  <% } else { %>
+    <p class="text-muted">Aucun réseau social configuré.</p>
+  <% } %>
+  
+  <% if (showEdit) { %>
+    <button 
+      class="edit-btn edit-btn-social"
+      data-action="manage-social"
+      data-location="<%= socialLocation %>"
+      aria-label="Gérer les réseaux sociaux"
+      title="Gérer les réseaux sociaux"
+    >
+      ⚙️
+    </button>
+  <% } %>
+</nav>
