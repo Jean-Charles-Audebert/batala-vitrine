@@ -1,0 +1,27 @@
+<%
+  /**
+   * Composant: Decoration Renderer
+   * Affiche une décoration SVG avec customisation couleur/opacité/scale
+   */
+  const {
+    svg_code,
+    color,
+    opacity = 0.8,
+    scale = 1.0,
+    position = 'top-left',
+    z_index = 1
+  } = decoration;
+  
+  // Injecter la couleur dans le SVG
+  let coloredSvg = svg_code;
+  if (color) {
+    coloredSvg = svg_code.replace(/fill="currentColor"/g, `fill="${color}"`);
+    coloredSvg = coloredSvg.replace(/stroke="currentColor"/g, `stroke="${color}"`);
+  }
+%>
+
+<div 
+  class="decoration decoration--<%= position %>"
+  style="opacity: <%= opacity %>; transform: scale(<%= scale %>); z-index: <%= z_index %>;">
+  <%- coloredSvg %>
+</div>

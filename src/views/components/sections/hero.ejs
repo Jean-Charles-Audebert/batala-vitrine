@@ -1,0 +1,79 @@
+<%
+  /**
+   * Composant: Section Hero
+   * Grande bannière en haut de page avec titre et optionnellement vidéo de fond
+   */
+  const {
+    id,
+    title,
+    bg_color,
+    bg_image,
+    bg_video,
+    is_transparent,
+    padding_top = 'medium',
+    padding_bottom = 'medium',
+    layout = 'centered',
+    content = [],
+    decorations = []
+  } = section;
+  
+  const sectionContent = content[0] || {};
+  const {
+    title: heroTitle,
+    subtitle,
+    cta_label,
+    cta_url,
+    text_align = 'center'
+  } = sectionContent;
+  
+  const bgStyle = [];
+  if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
+  if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
+%>
+
+<section 
+  class="section section-hero section-hero--<%= layout %> padding-top-<%= padding_top %> padding-bottom-<%= padding_bottom %>"
+  data-section-id="<%= id %>"
+  style="<%= bgStyle.join('; ') %>"
+>
+  <% if (bg_video) { %>
+    <video class="section-bg-video" autoplay muted loop playsinline>
+      <source src="<%= bg_video %>" type="video/mp4">
+    </video>
+  <% } %>
+  
+  <% if (decorations && decorations.length > 0) { %>
+    <% decorations.forEach(deco => { %>
+      <%- include('../decorations/renderer', { decoration: deco }) %>
+    <% }) %>
+  <% } %>
+  
+  <div class="container">
+    <div class="hero-content text-<%= text_align %>">
+      <% if (heroTitle) { %>
+        <h1 class="hero-title"><%= heroTitle %></h1>
+      <% } %>
+      
+      <% if (subtitle) { %>
+        <p class="hero-subtitle"><%= subtitle %></p>
+      <% } %>
+      
+      <% if (cta_label && cta_url) { %>
+        <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
+      <% } %>
+    </div>
+  </div>
+  
+  <% if (user) { %>
+    <div class="edit-controls">
+      <button 
+        class="edit-btn" 
+        data-section-id="<%= id %>"
+        data-action="edit-section"
+        aria-label="Modifier la section hero"
+      >
+        ✏️
+      </button>
+    </div>
+  <% } %>
+</section>
