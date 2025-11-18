@@ -79,10 +79,23 @@
         class="edit-btn" 
         data-section-id="<%= id %>"
         data-action="edit-section"
-        aria-label="Modifier la section hero"
+        aria-label="Paramètres section"
+        title="Paramètres (fond, layout)"
       >
-        ✏️
+        ⚙️
       </button>
+      <% if (sectionContent.id) { %>
+        <button 
+          class="edit-btn" 
+          data-section-id="<%= id %>"
+          data-content-id="<%= sectionContent.id %>"
+          data-action="edit-content"
+          aria-label="Éditer le texte"
+          title="Titre, sous-titre, CTA"
+        >
+          ✏️
+        </button>
+      <% } %>
     </div>
   <% } %>
 </section>
