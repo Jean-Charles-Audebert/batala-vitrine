@@ -68,7 +68,7 @@
   <% if (videoId) { %>
   <iframe 
     class="section-bg-youtube" 
-    src="https://www.youtube-nocookie.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=<%= `${req.protocol}://${req.get('host')}` %>"
+    src="https://www.youtube-nocookie.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
     frameborder="0" 
     allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
     allowfullscreen
