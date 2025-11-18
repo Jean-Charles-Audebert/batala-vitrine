@@ -74,7 +74,7 @@
               <% } %>
             </div>
             
-            <% if (user) { %>
+            <% if (typeof user !== 'undefined' && user) { %>
               <div class="card-actions">
                 <button class="edit-btn" data-card-id="<%= card.id %>" data-action="edit-card">✏️</button>
                 <button class="delete-btn" data-card-id="<%= card.id %>" data-action="delete-card">🗑️</button>
@@ -87,14 +87,14 @@
       <% } %>
     </div>
     
-    <% if (user) { %>
+    <% if (typeof user !== 'undefined' && user) { %>
       <button class="btn-add-card" data-section-id="<%= id %>" data-action="add-card">
         + Ajouter une card
       </button>
     <% } %>
   </div>
   
-  <% if (user) { %>
+  <% if (typeof user !== 'undefined' && user) { %>
     <div class="edit-controls">
       <button 
         class="edit-btn" 

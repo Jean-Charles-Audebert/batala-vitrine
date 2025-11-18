@@ -66,7 +66,7 @@
               </div>
             <% } %>
             
-            <% if (user) { %>
+            <% if (typeof user !== 'undefined' && user) { %>
               <div class="gallery-item-actions">
                 <button class="edit-btn" data-card-id="<%= card.id %>">✏️</button>
                 <button class="delete-btn" data-card-id="<%= card.id %>">🗑️</button>
@@ -79,14 +79,14 @@
       <% } %>
     </div>
     
-    <% if (user) { %>
+    <% if (typeof user !== 'undefined' && user) { %>
       <button class="btn-add-media" data-section-id="<%= id %>">
         + Ajouter photo/vidéo
       </button>
     <% } %>
   </div>
   
-  <% if (user) { %>
+  <% if (typeof user !== 'undefined' && user) { %>
     <div class="edit-controls">
       <button 
         class="edit-btn" 
