@@ -25,7 +25,7 @@ export default [
     },
   },
   {
-    files: ['tests/**/*.js'],
+    files: ['tests/unit/**/*.js'],
     languageOptions: {
       globals: {
         describe: 'readonly',
@@ -33,6 +33,18 @@ export default [
         expect: 'readonly',
         beforeEach: 'readonly',
         jest: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['tests/e2e/**/*.js'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        window: 'readonly',
       },
     },
   },
