@@ -1,6 +1,7 @@
 import { query } from "../config/db.js";
 import { getSocialIcon } from "../utils/socialIcons.js";
 import { logger } from "../utils/logger.js";
+import { getAllSections } from "./sectionController.js";
 
 export const showHome = async (req, res, deps = {}) => {
   const { query: _query = query } = deps;
@@ -18,6 +19,25 @@ export const showHome = async (req, res, deps = {}) => {
       WHERE p.id=1
     `);
     const pageSettings = pageRows[0] || { theme: {} };
+    
+    // FEATURE FLAG: Utiliser sections v2 ou blocks legacy
+    const useSectionsV2 = process.env.USE_SECTIONS_V2 === 'true';
+    
+    if (useSectionsV2) {
+      logger.info('📦 Utilisation du système sections v2');
+      const sections = await getAllSections();
+      
+      return res.render("pages/index-v2", {
+        title: "Accueil",
+        sections,
+        pageSettings,
+        user: req.user || null,
+        getSocialIcon
+      });
+    }
+    
+    // LEGACY: Système blocks/cards
+    logger.info('📦 Utilisation du système legacy (blocks/cards)');
     
     // Récupérer tous les blocs dans l'ordre de position (avec nouveaux champs de thème)
     const { rows: blocks } = await _query(
