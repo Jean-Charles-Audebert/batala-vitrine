@@ -48,10 +48,10 @@
   background-repeat: no-repeat;
 }
 
-/* Hero : ajustement pour ne pas couper le contenu important */
+/* Hero : affiche toute la hauteur de l'image */
 .section-hero {
-  background-size: 100% auto;
-  background-position: center top;
+  background-size: contain;
+  background-position: center center;
 }
 
 .section-bg-video {
