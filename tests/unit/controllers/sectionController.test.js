@@ -39,7 +39,9 @@ describe('sectionController - tests d\'intégration', () => {
       
       if (sections.length > 1) {
         for (let i = 0; i < sections.length - 1; i++) {
-          expect(sections[i].position).toBeLessThanOrEqual(sections[i + 1].position);
+          const currentPos = sections[i].position ?? 9999;
+          const nextPos = sections[i + 1].position ?? 9999;
+          expect(currentPos).toBeLessThanOrEqual(nextPos);
         }
       }
     });

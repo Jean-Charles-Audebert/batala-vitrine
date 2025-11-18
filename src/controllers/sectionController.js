@@ -212,6 +212,11 @@ export const updateSection = async (sectionId, sectionData) => {
       sectionId
     ]);
     
+    if (rows.length === 0) {
+      logger.info(`Section mise à jour: #${sectionId} - non trouvée`);
+      return null;
+    }
+    
     logger.info(`Section mise à jour: #${sectionId}`);
     return rows[0];
   } catch (error) {
@@ -225,8 +230,10 @@ export const updateSection = async (sectionId, sectionData) => {
  */
 export const deleteSection = async (sectionId) => {
   try {
-    await query('DELETE FROM sections WHERE id = $1', [sectionId]);
+    const result = await query('DELETE FROM sections WHERE id = $1', [sectionId]);
+    const deleted = result.rowCount > 0;
     logger.info(`Section supprimée: #${sectionId}`);
+    return deleted;
   } catch (error) {
     logger.error('Erreur deleteSection:', error);
     throw error;
