@@ -114,6 +114,11 @@ function createSectionModal(section) {
             <button type="button" class="btn btn-sm btn-secondary select-bg-image">📁 Choisir</button>
             ${section.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image">🗑️</button>' : ''}
           </div>
+          <small class="form-hint">💡 <strong>Tailles recommandées pour hero :</strong><br>
+          • Bannière large : 2700×600px (ratio 4.5:1) - affichage optimal<br>
+          • Standard : 1920×427px (ratio 4.5:1)<br>
+          • Minimum : 1350×300px (ratio 4.5:1)<br>
+          ⚠️ Images carrées ou verticales seront recadrées (haut/bas perdus)</small>
         </div>
         
         <div class="form-group">
@@ -123,7 +128,7 @@ function createSectionModal(section) {
             <button type="button" class="btn btn-sm btn-secondary select-bg-video">📁 Choisir</button>
             ${section.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo">🗑️</button>' : ''}
           </div>
-          <small class="form-hint">Fichier MP4 local uniquement</small>
+          <small class="form-hint">Fichier MP4 local uniquement (max 50 MB)</small>
         </div>
         
         <div class="form-group">

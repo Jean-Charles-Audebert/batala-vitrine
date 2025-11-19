@@ -46,6 +46,9 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Hero : hauteur adaptée au ratio de bannière horizontale (~4.5:1) */
@@ -53,9 +56,24 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Hero avec background image : hauteur définie par l'image */
+.section-hero[style*="background-image"] {
   min-height: 22vh;
   aspect-ratio: 4.5 / 1;
-  max-height: 400px;
+  max-height: min(600px, 22vw); /* S'adapte à la largeur de la fenêtre */
+}
+
+/* Hero sans background : hauteur minimale par défaut */
+.section-hero:not([style*="background-image"]) {
+  min-height: 40vh;
 }
 
 .section-bg-video {
