@@ -104,7 +104,32 @@ function createSectionModal(section) {
         
         <div class="form-group">
           <label for="sectionBgColor">Couleur de fond</label>
-          <input type="color" name="bg_color" id="sectionBgColor" value="${section.bg_color || '#ffffff'}">
+          <div class="color-picker-row">
+            <input type="color" name="bg_color" id="sectionBgColor" class="color-input" value="${section.bg_color || '#ffffff'}">
+            <input type="text" class="color-hex-input" value="${section.bg_color || '#ffffff'}" maxlength="9" pattern="#([0-9a-fA-F]{3,8})" title="Code hexadécimal" style="width: 90px;" autocomplete="off">
+            <span class="color-preview" style="display:inline-block;width:28px;height:28px;border-radius:4px;border:1px solid #ccc;background:${section.bg_color || '#ffffff'};"></span>
+          </div>
+          <script>
+            // Synchronisation input color <-> hex
+            (function() {
+              const colorInput = document.getElementById('sectionBgColor');
+              const hexInput = colorInput?.parentNode?.querySelector('.color-hex-input');
+              const preview = colorInput?.parentNode?.querySelector('.color-preview');
+              if (colorInput && hexInput && preview) {
+                colorInput.addEventListener('input', e => {
+                  hexInput.value = colorInput.value;
+                  preview.style.background = colorInput.value;
+                });
+                hexInput.addEventListener('input', e => {
+                  let v = hexInput.value;
+                  if (/^#([0-9a-fA-F]{3,8})$/.test(v)) {
+                    colorInput.value = v;
+                    preview.style.background = v;
+                  }
+                });
+              }
+            })();
+          </script>
         </div>
         
         <div class="form-group">
@@ -1060,3 +1085,238 @@ function generatePositionGrid(elementName, currentH, currentV) {
 }
 
 console.log('✅ Sections Edit JS initialisé');
+
+// ========================================================================== 
+// Édition du thème global (police + fond principal)
+// ========================================================================== 
+
+// Ajout du bouton flottant si admin
+if (window.userIsAdmin) {
+  const fabTheme = document.createElement('button');
+  fabTheme.id = 'fabEditTheme';
+  fabTheme.className = 'fab-edit-theme fab-edit-theme-large';
+  fabTheme.title = 'Éditer le thème global (police, fond)';
+  fabTheme.innerHTML = '<img src="/icons/settings.svg" alt="Thème" class="icon">';
+  // Placer le bouton en haut de la page, avant le header
+  const firstSection = document.querySelector('.block-section, header, main, body');
+  if (firstSection && firstSection.parentNode) {
+    firstSection.parentNode.insertBefore(fabTheme, firstSection);
+  } else {
+    document.body.insertBefore(fabTheme, document.body.firstChild);
+  }
+  fabTheme.addEventListener('click', async () => {
+    // Charger les polices et les settings actuels
+    const [fontsRes, pageRes] = await Promise.all([
+      fetch('/api/fonts'),
+      fetch('/api/page')
+    ]);
+    const fonts = await fontsRes.json();
+    const page = await pageRes.json();
+    const modal = createThemeModal(fonts, page);
+    document.body.appendChild(modal);
+    openModal('editThemeModal');
+  });
+}
+
+function createThemeModal(fonts, page) {
+  const modal = document.createElement('div');
+  modal.id = 'editThemeModal';
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Thème global&nbsp;: police & fond principal</h2>
+        <button class="modal-close" data-close-modal="editThemeModal">&times;</button>
+      </div>
+      <form id="editThemeForm">
+        <div class="form-group">
+          <label for="themeFont">Police principale</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <select name="title_font_id" id="themeFont" style="flex:1;">
+              ${fonts.map(f => `<option value="${f.id}" ${page.title_font_id == f.id ? 'selected' : ''}>${f.name}</option>`).join('')}
+            </select>
+            <a href="/fonts" target="_blank" class="btn btn-sm btn-secondary" title="Gérer les polices" style="white-space:nowrap;"><img src="/icons/add.svg" class="icon" alt=""> Gérer les polices</a>
+          </div>
+        </div>
+        <div id="fontFormContainer" style="display:none; margin-bottom:1rem;"></div>
+        <div class="form-group">
+          <label for="mainBgColor">Couleur de fond principale</label>
+          <div class="color-picker-row">
+            <input type="color" name="main_bg_color" id="mainBgColor" class="color-input" value="${page.main_bg_color || '#f5f5f5'}">
+            <input type="text" class="color-hex-input" value="${page.main_bg_color || '#f5f5f5'}" maxlength="9" pattern="#([0-9a-fA-F]{3,8})" title="Code hexadécimal" style="width: 90px;" autocomplete="off">
+            <span class="color-preview" style="display:inline-block;width:28px;height:28px;border-radius:4px;border:1px solid #ccc;background:${page.main_bg_color || '#f5f5f5'};"></span>
+          </div>
+          <script>
+            // Synchronisation input color <-> hex pour le thème global
+            (function() {
+              const colorInput = document.getElementById('mainBgColor');
+              const hexInput = colorInput?.parentNode?.querySelector('.color-hex-input');
+              const preview = colorInput?.parentNode?.querySelector('.color-preview');
+              if (colorInput && hexInput && preview) {
+                colorInput.addEventListener('input', e => {
+                  hexInput.value = colorInput.value;
+                  preview.style.background = colorInput.value;
+                });
+                hexInput.addEventListener('input', e => {
+                  let v = hexInput.value;
+                  if (/^#([0-9a-fA-F]{3,8})$/.test(v)) {
+                    colorInput.value = v;
+                    preview.style.background = v;
+                  }
+                });
+              }
+            })();
+          </script>
+        </div>
+        <div class="form-group">
+          <label for="mainBgImage">Image de fond principale</label>
+          <div class="image-upload-field">
+            <input type="text" name="main_bg_image" id="mainBgImage" value="${page.main_bg_image || ''}" placeholder="/uploads/..." readonly>
+            <button type="button" class="btn btn-sm btn-secondary select-main-bg-image"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${page.main_bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-main-bg-image" title="Supprimer l\'image"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+          </div>
+          <div class="flex-row gap-sm mt-1">
+            <label for="mainBgImageRepeat">Répétition</label>
+            <select name="main_bg_image_repeat" id="mainBgImageRepeat">
+              <option value="no-repeat" ${page.main_bg_image_repeat === 'no-repeat' ? 'selected' : ''}>Aucune</option>
+              <option value="repeat" ${page.main_bg_image_repeat === 'repeat' ? 'selected' : ''}>Répéter</option>
+              <option value="repeat-x" ${page.main_bg_image_repeat === 'repeat-x' ? 'selected' : ''}>Répéter horizontalement</option>
+              <option value="repeat-y" ${page.main_bg_image_repeat === 'repeat-y' ? 'selected' : ''}>Répéter verticalement</option>
+            </select>
+            <label for="mainBgImageSize">Taille</label>
+            <select name="main_bg_image_size" id="mainBgImageSize">
+              <option value="cover" ${page.main_bg_image_size === 'cover' ? 'selected' : ''}>Couvrir</option>
+              <option value="contain" ${page.main_bg_image_size === 'contain' ? 'selected' : ''}>Contenir</option>
+              <option value="auto" ${page.main_bg_image_size === 'auto' ? 'selected' : ''}>Auto</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="mainBgVideo">Vidéo de fond principale (MP4)</label>
+          <div class="image-upload-field">
+            <input type="text" name="main_bg_video" id="mainBgVideo" value="${page.main_bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
+            <button type="button" class="btn btn-sm btn-secondary select-main-bg-video"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${page.main_bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-main-bg-video" title="Supprimer la vidéo"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="mainBgYoutube">Vidéo de fond YouTube</label>
+          <input type="text" name="main_bg_youtube" id="mainBgYoutube" value="${page.main_bg_youtube || ''}" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="editThemeModal">Annuler</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  // Handler close
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('editThemeModal');
+      removeModal('editThemeModal');
+    });
+  });
+
+  // Handler bouton "Ajouter une police"
+  // Suppression du formulaire inline d'ajout de police : gestion via la page dédiée /fonts
+
+  // Handler image
+  modal.querySelector('.select-main-bg-image').addEventListener('click', () => {
+    openMediaPicker((url) => {
+      modal.querySelector('#mainBgImage').value = url;
+    }, 'image');
+  });
+  const clearMainBgImageBtn = modal.querySelector('.clear-main-bg-image');
+  if (clearMainBgImageBtn) {
+    clearMainBgImageBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#mainBgImage');
+      const filePath = input.value;
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
+
+  // Handler vidéo
+  modal.querySelector('.select-main-bg-video').addEventListener('click', () => {
+    openMediaPicker((url) => {
+      modal.querySelector('#mainBgVideo').value = url;
+    }, 'video');
+  });
+  const clearMainBgVideoBtn = modal.querySelector('.clear-main-bg-video');
+  if (clearMainBgVideoBtn) {
+    clearMainBgVideoBtn.addEventListener('click', async () => {
+      const input = modal.querySelector('#mainBgVideo');
+      const filePath = input.value;
+      if (filePath && filePath.startsWith('/uploads/')) {
+        if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
+          try {
+            await fetch('/api/upload', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filePath })
+            });
+          } catch (err) {
+            console.warn('Erreur suppression fichier:', err);
+          }
+        }
+      }
+      input.value = '';
+    });
+  }
+
+  // Handler submit
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+      title_font_id: formData.get('title_font_id'),
+      main_bg_color: formData.get('main_bg_color'),
+      main_bg_image: formData.get('main_bg_image'),
+      main_bg_image_repeat: formData.get('main_bg_image_repeat'),
+      main_bg_image_size: formData.get('main_bg_image_size'),
+      main_bg_video: formData.get('main_bg_video'),
+      main_bg_youtube: formData.get('main_bg_youtube')
+    };
+    try {
+      const response = await fetch('/api/page/theme', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
+      showToast('Thème global enregistré !', 'success');
+      setTimeout(() => window.location.reload(), 900);
+    } catch (error) {
+      showToast('Erreur : ' + error.message, 'error');
+    }
+  });
+
+  return modal;
+}
+
+// Toast feedback visuel
+function showToast(message, type = 'info') {
+  let toast = document.createElement('div');
+  toast.className = 'toast-feedback ' + (type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : '');
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.classList.add('visible'); }, 10);
+  setTimeout(() => {
+    toast.classList.remove('visible');
+    setTimeout(() => toast.remove(), 400);
+  }, 1800);
+}

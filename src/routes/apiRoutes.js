@@ -21,6 +21,33 @@ const router = express.Router();
 // Route API pour le réordonnancement des blocs
 router.post("/blocks/reorder", requireAuth, reorderBlocks);
 
+// ===============================
+// Thème global (page) : GET et PUT
+// ===============================
+router.get("/page", requireAuth, async (req, res) => {
+  try {
+    const { rows } = await query(`SELECT id, title_font_id, main_bg_color, main_bg_image, main_bg_video FROM page WHERE id=1`);
+    res.json(rows[0] || {});
+  } catch (error) {
+    logger.error("Erreur chargement page settings:", error);
+    res.status(500).json({ error: "Erreur chargement page settings" });
+  }
+});
+
+router.put("/page/theme", requireAuth, async (req, res) => {
+  try {
+    const { title_font_id, main_bg_color, main_bg_image, main_bg_video } = req.body;
+    await query(
+      `UPDATE page SET title_font_id = $1, main_bg_color = $2, main_bg_image = $3, main_bg_video = $4, updated_at = NOW() WHERE id = 1`,
+      [title_font_id || null, main_bg_color || null, main_bg_image || null, main_bg_video || null]
+    );
+    res.json({ success: true, message: "Thème global mis à jour" });
+  } catch (error) {
+    logger.error("Erreur mise à jour thème global:", error);
+    res.status(500).json({ success: false, message: "Erreur lors de la mise à jour du thème global" });
+  }
+});
+
 // Route API pour le réordonnancement des cartes
 router.post("/blocks/:blockId/cards/reorder", requireAuth, reorderCards);
 

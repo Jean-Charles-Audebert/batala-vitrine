@@ -1,3 +1,13 @@
+/* Aperçu couleur compact pour color picker admin */
+.color-preview {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
 /**
  * Batala Vitrine - Styles pages admin
  * Fichier: public/css/admin.css

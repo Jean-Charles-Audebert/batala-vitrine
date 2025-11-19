@@ -30,7 +30,7 @@
   <style>
     :root {
       <% if (pageSettings.font_family) { %>
-      --font-family-title: <%= pageSettings.font_family %>;
+      --font-family-title: <%= pageSettings.font_family.replace(/['"\\]/g, '') %>;
       <% } %>
       <% if (pageSettings.main_bg_color) { %>
       --main-bg-color: <%= pageSettings.main_bg_color %>;
@@ -39,51 +39,58 @@
       --main-title-color: <%= pageSettings.main_title_color %>;
       <% } %>
     }
-    
-    <% if (pageSettings.main_bg_image) { %>
-    body {
-      background-image: url('<%= pageSettings.main_bg_image %>');
-      background-size: cover;
-      background-attachment: fixed;
-      background-position: center;
-    }
+  </style>
+</head>
+<body class="vitrine-page">
+  <% if (pageSettings.main_bg_image) { %>
+    <div class="global-bg-image" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('<%= pageSettings.main_bg_image %>');background-repeat:<%= pageSettings.main_bg_image_repeat || 'no-repeat' %>;background-size:<%= pageSettings.main_bg_image_size || 'cover' %>;background-position:center;background-attachment:fixed;"></div>
+  <% } %>
+  <% if (pageSettings.main_bg_video) { %>
+    <video class="section-bg-video global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
+      <source src="<%= pageSettings.main_bg_video %>" type="video/mp4">
+    </video>
+  <% } else if (pageSettings.main_bg_youtube) { %>
+    <% /* Extraction ID YouTube */ %>
+    <% let videoId = '';
+      try {
+        if (pageSettings.main_bg_youtube.includes('youtu.be/')) {
+          videoId = pageSettings.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (pageSettings.main_bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(pageSettings.main_bg_youtube);
+          videoId = url.searchParams.get('v');
+        } else if (pageSettings.main_bg_youtube.includes('youtube.com/embed/')) {
+          videoId = pageSettings.main_bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+        } else if (pageSettings.main_bg_youtube.includes('youtube.com/shorts/')) {
+          videoId = pageSettings.main_bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+        }
+      } catch (e) {}
+    %>
+    <% if (videoId) { %>
+      <iframe class="section-bg-youtube global-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></iframe>
     <% } %>
-    
-    <% if (pageSettings.main_bg_video) { %>
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: url('<%= pageSettings.main_bg_video %>') no-repeat center center;
-      background-size: cover;
-    }
-    <% } %>
+  <% } %>
   </style>
 </head>
 <body class="vitrine-page">
   
   <!-- SECTIONS V2 -->
-  <% sections.forEach(section => { %>
-    <% if (section.type === 'hero') { %>
-      <%- include('../components/sections/hero', { section, user }) %>
-      
-    <% } else if (section.type === 'content') { %>
-      <%- include('../components/sections/content', { section, user }) %>
-      
-    <% } else if (section.type === 'card_grid') { %>
-      <%- include('../components/sections/card_grid', { section, user }) %>
-      
-    <% } else if (section.type === 'gallery') { %>
-      <%- include('../components/sections/gallery', { section, user }) %>
-      
-    <% } else if (section.type === 'footer') { %>
-      <%- include('../components/sections/footer', { section, user, getSocialIcon }) %>
-    <% } %>
-  <% }) %>
+  <div class="main-content-wrapper">
+    <% sections.forEach(section => { %>
+      <% if (section.type === 'footer') { return; } %>
+      <% if (section.type === 'hero') { %>
+        <%- include('../components/sections/hero', { section, user }) %>
+      <% } else if (section.type === 'content') { %>
+        <%- include('../components/sections/content', { section, user }) %>
+      <% } else if (section.type === 'card_grid') { %>
+        <%- include('../components/sections/card_grid', { section, user }) %>
+      <% } else if (section.type === 'gallery') { %>
+        <%- include('../components/sections/gallery', { section, user }) %>
+      <% } %>
+    <% }) %>
+  </div>
+  <% sections.forEach(section => { if (section.type === 'footer') { %>
+    <%- include('../components/sections/footer', { section, user, getSocialIcon }) %>
+  <% } }) %>
   
   <!-- FAB Auth -->
   <%- include('../components/auth-fab', { user }) %>
@@ -98,7 +105,8 @@
     <button id="fabAddSection" class="fab-add-section" aria-label="Ajouter une section" title="Ajouter une section">
       ➕
     </button>
-    
+    <!-- Indique au JS que l'utilisateur est connecté (admin unique) -->
+    <script>window.userIsAdmin = true;</script>
     <script type="module" src="/js/sections-edit.js"></script>
     <script>
       console.log('✅ Mode admin activé - sections v2');

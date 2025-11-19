@@ -1,3 +1,94 @@
+/* Fond global vidéo/YouTube (sous tout le contenu) */
+.global-bg-video,
+.global-bg-youtube {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+  background: transparent;
+}
+
+body.vitrine-page {
+  background: none !important;
+}
+
+.main-content-wrapper {
+  background: none !important;
+}
+/* Transparence réelle pour les sections transparentes */
+.section-transparent {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+/* Bouton édition thème global (plus gros, en haut) */
+.fab-edit-theme {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  z-index: 1200;
+  width: 64px;
+  height: 64px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.fab-edit-theme:hover {
+  background: #125ea2;
+  transform: scale(1.08);
+}
+.fab-edit-theme-large {
+  width: 80px;
+  height: 80px;
+}
+.fab-edit-theme .icon {
+  width: 40px;
+  height: 40px;
+  filter: brightness(0) invert(1);
+}
+/* ========================================================================== */
+/* Toast feedback visuel (succès/erreur) */
+/* ========================================================================== */
+.toast-feedback {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  background: #222;
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2000;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.toast-feedback.visible {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.toast-success {
+  background: #27ae60;
+  color: #fff;
+}
+.toast-error {
+  background: #e74c3c;
+  color: #fff;
+}
 /**
  * Design System - Variables CSS pour sections modulaires
  * Copyright © 2025 caixaDev

@@ -131,7 +131,7 @@
     <%# Titre principal %>
     <% if (heroTitle) { %>
       <div class="hero-element hero-title" data-position="<%= title_position_v %>-<%= title_position_h %>">
-        <h1 style="color: <%= title_color %>; <%= title_font_id ? `font-family: var(--font-${title_font_id});` : '' %>">
+        <h1 style="color: <%= title_color %>; <%= title_font_id ? `font-family: var(--font-${title_font_id});` : 'font-family: var(--font-family-title, Arial, sans-serif);' %>">
           <%= heroTitle %>
         </h1>
         <% if (subtitle) { %>
