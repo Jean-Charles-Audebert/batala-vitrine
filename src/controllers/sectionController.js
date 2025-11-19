@@ -17,6 +17,10 @@ export const getAllSections = async () => {
         id, type, title, position, is_visible,
         bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
+        logo_url, logo_width, logo_position_h, logo_position_v,
+        show_social_links, social_position_h, social_position_v,
+        show_nav_links, nav_position_h, nav_position_v,
+        is_sticky,
         created_at, updated_at
       FROM sections
       WHERE is_visible = TRUE
@@ -32,6 +36,7 @@ export const getAllSections = async () => {
           cta_label, cta_url,
           media_url, media_type, media_alt, media_size,
           text_color, text_align, bg_color,
+          title_font_id, title_color, title_position_h, title_position_v,
           position
         FROM section_content
         WHERE section_id = $1
@@ -39,6 +44,20 @@ export const getAllSections = async () => {
       `, [section.id]);
       
       section.content = content;
+      
+      // Si c'est un hero, récupérer les liens de navigation
+      if (section.type === 'hero') {
+        const { rows: navLinks } = await query(`
+          SELECT hnl.id, hnl.target_section_id, hnl.label, hnl.position, hnl.is_visible,
+                 s.title as target_title, s.type as target_type
+          FROM hero_nav_links hnl
+          LEFT JOIN sections s ON s.id = hnl.target_section_id
+          WHERE hnl.section_id = $1 AND hnl.is_visible = TRUE
+          ORDER BY hnl.position ASC
+        `, [section.id]);
+        
+        section.nav_links = navLinks;
+      }
       
       // Récupérer cards_v2 si c'est une card_grid ou gallery
       if (section.type === 'card_grid' || section.type === 'gallery') {
@@ -87,6 +106,10 @@ export const getSectionById = async (sectionId) => {
         id, type, title, position, is_visible,
         bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
+        logo_url, logo_width, logo_position_h, logo_position_v,
+        show_social_links, social_position_h, social_position_v,
+        show_nav_links, nav_position_h, nav_position_v,
+        is_sticky,
         created_at, updated_at
       FROM sections
       WHERE id = $1
@@ -106,6 +129,20 @@ export const getSectionById = async (sectionId) => {
     `, [sectionId]);
     
     section.content = content;
+    
+    // Si c'est un hero, récupérer les liens de navigation
+    if (section.type === 'hero') {
+      const { rows: navLinks } = await query(`
+        SELECT hnl.id, hnl.target_section_id, hnl.label, hnl.position, hnl.is_visible,
+               s.title as target_title, s.type as target_type
+        FROM hero_nav_links hnl
+        LEFT JOIN sections s ON s.id = hnl.target_section_id
+        WHERE hnl.section_id = $1
+        ORDER BY hnl.position ASC
+      `, [sectionId]);
+      
+      section.nav_links = navLinks;
+    }
     
     // Récupérer cards si applicable
     if (section.type === 'card_grid' || section.type === 'gallery') {

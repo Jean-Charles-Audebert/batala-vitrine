@@ -111,8 +111,8 @@ function createSectionModal(section) {
           <label for="sectionBgImage">Image de fond</label>
           <div class="image-upload-field">
             <input type="text" name="bg_image" id="sectionBgImage" value="${section.bg_image || ''}" placeholder="/uploads/..." readonly>
-            <button type="button" class="btn btn-sm btn-secondary select-bg-image">📁 Choisir</button>
-            ${section.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image">🗑️</button>' : ''}
+            <button type="button" class="btn btn-sm btn-secondary select-bg-image"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${section.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">💡 <strong>Tailles recommandées pour hero :</strong><br>
           • Bannière large : 2700×600px (ratio 4.5:1) - affichage optimal<br>
@@ -122,20 +122,20 @@ function createSectionModal(section) {
         </div>
         
         <div class="form-group">
-          <label for="sectionBgVideo">🎥 Vidéo locale (MP4)</label>
+          <label for="sectionBgVideo"><img src="/icons/video.svg" alt="" class="icon"> Vidéo locale (MP4)</label>
           <div class="image-upload-field">
             <input type="text" name="bg_video" id="sectionBgVideo" value="${section.bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
-            <button type="button" class="btn btn-sm btn-secondary select-bg-video">📁 Choisir</button>
-            ${section.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo">🗑️</button>' : ''}
+            <button type="button" class="btn btn-sm btn-secondary select-bg-video"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${section.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">Fichier MP4 local uniquement (max 50 MB)</small>
         </div>
         
         <div class="form-group">
-          <label for="sectionBgYoutube">▶️ Vidéo YouTube</label>
+          <label for="sectionBgYoutube"><img src="/icons/youtube.svg" alt="" class="icon"> Vidéo YouTube</label>
           <div style="display: flex; gap: 0.5rem;">
             <input type="text" name="bg_youtube" id="sectionBgYoutube" value="${section.bg_youtube || ''}" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." style="flex: 1;">
-            ${section.bg_youtube ? '<button type="button" class="btn btn-sm btn-danger clear-bg-youtube" title="Supprimer l\'URL YouTube">🗑️</button>' : ''}
+            ${section.bg_youtube ? '<button type="button" class="btn btn-sm btn-danger clear-bg-youtube" title="Supprimer l\'URL YouTube"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">URL YouTube complète (prioritaire sur MP4 local)</small>
         </div>
@@ -156,7 +156,7 @@ function createSectionModal(section) {
         
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="editSectionModal">Annuler</button>
-          <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
         </div>
       </form>
     </div>
@@ -291,9 +291,16 @@ document.addEventListener('click', async (e) => {
     const section = await response.json();
     const content = section.content.find(c => c.id == contentId) || {};
     
-    const modal = createContentModal(sectionId, content);
-    document.body.appendChild(modal);
-    openModal('editContentModal');
+    // Si c'est un hero, utiliser la modale spéciale avec tabs et positionnement
+    if (section.type === 'hero') {
+      const modal = await createHeroContentModal(sectionId, section, content);
+      document.body.appendChild(modal);
+      openModal('editHeroContentModal');
+    } else {
+      const modal = createContentModal(sectionId, content);
+      document.body.appendChild(modal);
+      openModal('editContentModal');
+    }
     
   } catch (error) {
     alert('Erreur lors du chargement du contenu');
@@ -345,14 +352,14 @@ function createContentModal(sectionId, content = {}) {
           <label for="contentMediaUrl">Média (image/vidéo)</label>
           <div class="image-upload-field">
             <input type="text" name="media_url" id="contentMediaUrl" value="${content.media_url || ''}" placeholder="/uploads/..." readonly>
-            <button type="button" class="btn btn-sm btn-secondary select-media">📁 Choisir</button>
-            ${content.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-content-media" title="Supprimer le média">🗑️</button>' : ''}
+            <button type="button" class="btn btn-sm btn-secondary select-media"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${content.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-content-media" title="Supprimer le média"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
         </div>
         
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="editContentModal">Annuler</button>
-          <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
         </div>
       </form>
     </div>
@@ -488,8 +495,8 @@ function createCardModal(sectionId, card = {}) {
           <label for="cardMediaUrl">Image/Vidéo</label>
           <div class="image-upload-field">
             <input type="text" name="media_url" id="cardMediaUrl" value="${card.media_url || ''}" placeholder="/uploads/..." readonly>
-            <button type="button" class="btn btn-sm btn-secondary select-card-media">📁 Choisir</button>
-            ${card.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-card-media" title="Supprimer le média">🗑️</button>' : ''}
+            <button type="button" class="btn btn-sm btn-secondary select-card-media"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+            ${card.media_url ? '<button type="button" class="btn btn-sm btn-danger clear-card-media" title="Supprimer le média"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
         </div>
         
@@ -500,7 +507,7 @@ function createCardModal(sectionId, card = {}) {
         
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="addCardModal">Annuler</button>
-          <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
         </div>
       </form>
     </div>
@@ -724,6 +731,298 @@ function createNewSectionModal() {
   });
   
   return modal;
+}
+
+// ==========================================================================
+// Édition contenu HERO (logo, titre, social, navigation)
+// ==========================================================================
+async function createHeroContentModal(sectionId, section = {}, content = {}) {
+  // Charger les données nécessaires
+  const [fontsRes, sectionsRes, socialRes] = await Promise.all([
+    fetch('/api/fonts'),
+    fetch('/api/sections'),
+    fetch('/api/social-links?location=header,both')
+  ]);
+  
+  const fonts = await fontsRes.json();
+  const allSections = await sectionsRes.json();
+  const socialLinks = await socialRes.json();
+  
+  // Filtrer les autres sections (pas le hero actuel) pour la navigation
+  const otherSections = allSections.filter(s => s.id !== sectionId && s.type !== 'hero');
+  
+  const modal = document.createElement('div');
+  modal.id = 'editHeroContentModal';
+  modal.className = 'modal modal-large';
+  
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Contenu du Header</h2>
+        <button class="modal-close" data-close-modal="editHeroContentModal">&times;</button>
+      </div>
+      
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="logo">Logo</button>
+        <button class="tab-btn" data-tab="title">Titre</button>
+        <button class="tab-btn" data-tab="social">Réseaux sociaux</button>
+        <button class="tab-btn" data-tab="navigation">Navigation</button>
+      </div>
+      
+      <form id="editHeroContentForm">
+        <input type="hidden" name="sectionId" value="${sectionId}">
+        <input type="hidden" name="contentId" value="${content.id || ''}">
+        
+        <!-- TAB: Logo -->
+        <div class="tab-content active" data-tab-content="logo">
+          <div class="form-group">
+            <label for="heroLogoUrl">Logo</label>
+            <div class="image-upload-field">
+              <input type="text" name="logo_url" id="heroLogoUrl" value="${section.logo_url || ''}" placeholder="/uploads/logo.png" readonly>
+              <button type="button" class="btn btn-sm btn-secondary select-logo"><img src="/icons/folder.svg" alt="" class="icon"> Choisir</button>
+              ${section.logo_url ? '<button type="button" class="btn btn-sm btn-danger clear-logo" title="Supprimer le logo"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="heroLogoWidth">Largeur du logo (px)</label>
+            <input type="number" name="logo_width" id="heroLogoWidth" value="${section.logo_width || 150}" min="50" max="500" step="10">
+          </div>
+          
+          <div class="form-group">
+            <label>Position du logo</label>
+            <div class="position-grid">
+              <input type="hidden" name="logo_position_h" id="logoPositionH" value="${section.logo_position_h || 'center'}">
+              <input type="hidden" name="logo_position_v" id="logoPositionV" value="${section.logo_position_v || 'center'}">
+              ${generatePositionGrid('logo', section.logo_position_h || 'center', section.logo_position_v || 'center')}
+            </div>
+          </div>
+        </div>
+        
+        <!-- TAB: Titre -->
+        <div class="tab-content" data-tab-content="title">
+          <div class="form-group">
+            <label for="heroTitleText">Titre</label>
+            <input type="text" name="title" id="heroTitleText" value="${content.title || ''}" placeholder="Bienvenue sur notre site">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="heroTitleFont">Police</label>
+              <select name="title_font_id" id="heroTitleFont">
+                <option value="">Par défaut</option>
+                ${fonts.map(f => `<option value="${f.id}" ${content.title_font_id == f.id ? 'selected' : ''}>${f.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="heroTitleColor">Couleur</label>
+              <input type="color" name="title_color" id="heroTitleColor" value="${content.title_color || '#ffffff'}">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Position du titre</label>
+            <div class="position-grid">
+              <input type="hidden" name="title_position_h" id="titlePositionH" value="${content.title_position_h || 'center'}">
+              <input type="hidden" name="title_position_v" id="titlePositionV" value="${content.title_position_v || 'center'}">
+              ${generatePositionGrid('title', content.title_position_h || 'center', content.title_position_v || 'center')}
+            </div>
+          </div>
+        </div>
+        
+        <!-- TAB: Réseaux sociaux -->
+        <div class="tab-content" data-tab-content="social">
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="show_social_links" ${section.show_social_links ? 'checked' : ''}>
+              Afficher les icônes des réseaux sociaux
+            </label>
+            <small class="form-hint">Liens configurés : ${socialLinks.length > 0 ? socialLinks.map(s => s.platform).join(', ') : 'Aucun'}</small>
+          </div>
+          
+          <div class="form-group">
+            <label>Position des icônes sociales</label>
+            <div class="position-grid">
+              <input type="hidden" name="social_position_h" id="socialPositionH" value="${section.social_position_h || 'right'}">
+              <input type="hidden" name="social_position_v" id="socialPositionV" value="${section.social_position_v || 'top'}">
+              ${generatePositionGrid('social', section.social_position_h || 'right', section.social_position_v || 'top')}
+            </div>
+          </div>
+        </div>
+        
+        <!-- TAB: Navigation -->
+        <div class="tab-content" data-tab-content="navigation">
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="show_nav_links" ${section.show_nav_links ? 'checked' : ''}>
+              Afficher des liens de navigation
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label>Position de la navigation</label>
+            <div class="position-grid">
+              <input type="hidden" name="nav_position_h" id="navPositionH" value="${section.nav_position_h || 'right'}">
+              <input type="hidden" name="nav_position_v" id="navPositionV" value="${section.nav_position_v || 'center'}">
+              ${generatePositionGrid('nav', section.nav_position_h || 'right', section.nav_position_v || 'center')}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Sections disponibles</label>
+            <div id="navLinksList">
+              ${otherSections.length > 0 ? otherSections.map(s => `
+                <div class="nav-link-item">
+                  <input type="checkbox" name="nav_sections[]" value="${s.id}" id="nav_${s.id}">
+                  <label for="nav_${s.id}">${s.title || s.type}</label>
+                </div>
+              `).join('') : '<p class="text-muted">Aucune autre section disponible</p>'}
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="editHeroContentModal">Annuler</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  // Handler tabs
+  modal.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      modal.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      modal.querySelector(`[data-tab-content="${btn.dataset.tab}"]`).classList.add('active');
+    });
+  });
+  
+  // Handler position grids
+  modal.querySelectorAll('.position-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const element = cell.dataset.element;
+      const h = cell.dataset.h;
+      const v = cell.dataset.v;
+      
+      // Update hidden inputs
+      modal.querySelector(`#${element}PositionH`).value = h;
+      modal.querySelector(`#${element}PositionV`).value = v;
+      
+      // Update visual selection
+      modal.querySelectorAll(`.position-cell[data-element="${element}"]`).forEach(c => c.classList.remove('selected'));
+      cell.classList.add('selected');
+    });
+  });
+  
+  // Handler logo upload
+  modal.querySelector('.select-logo')?.addEventListener('click', () => {
+    openMediaPicker((url) => {
+      modal.querySelector('#heroLogoUrl').value = url;
+    }, 'image');
+  });
+  
+  // Handler clear logo
+  modal.querySelector('.clear-logo')?.addEventListener('click', async () => {
+    const input = modal.querySelector('#heroLogoUrl');
+    const filePath = input.value;
+    
+    if (filePath && filePath.startsWith('/uploads/')) {
+      if (confirm('Supprimer définitivement ce logo du serveur ?')) {
+        try {
+          await fetch('/api/upload', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath })
+          });
+        } catch (err) {
+          console.warn('Erreur suppression logo:', err);
+        }
+      }
+    }
+    input.value = '';
+  });
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('editHeroContentModal');
+      removeModal('editHeroContentModal');
+    });
+  });
+  
+  // Handler submit
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const navSections = [];
+    formData.getAll('nav_sections[]').forEach(id => navSections.push(parseInt(id)));
+    
+    const data = {
+      // Section data (logo, positions, flags)
+      section: {
+        logo_url: formData.get('logo_url'),
+        logo_width: parseInt(formData.get('logo_width')),
+        logo_position_h: formData.get('logo_position_h'),
+        logo_position_v: formData.get('logo_position_v'),
+        show_social_links: formData.get('show_social_links') === 'on',
+        social_position_h: formData.get('social_position_h'),
+        social_position_v: formData.get('social_position_v'),
+        show_nav_links: formData.get('show_nav_links') === 'on',
+        nav_position_h: formData.get('nav_position_h'),
+        nav_position_v: formData.get('nav_position_v')
+      },
+      // Content data (title, font, color, positions)
+      content: {
+        title: formData.get('title'),
+        title_font_id: formData.get('title_font_id') || null,
+        title_color: formData.get('title_color'),
+        title_position_h: formData.get('title_position_h'),
+        title_position_v: formData.get('title_position_v')
+      },
+      // Navigation links
+      nav_sections: navSections
+    };
+    
+    try {
+      const sid = formData.get('sectionId');
+      const response = await fetch(`/api/sections/${sid}/hero-content`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
+      
+      window.location.reload();
+    } catch (error) {
+      alert('Erreur: ' + error.message);
+    }
+  });
+  
+  return modal;
+}
+
+// Helper: Génère une grille 3x3 pour le positionnement visuel
+function generatePositionGrid(elementName, currentH, currentV) {
+  const positions = [
+    { v: 'top', h: 'left', label: '↖' },
+    { v: 'top', h: 'center', label: '↑' },
+    { v: 'top', h: 'right', label: '↗' },
+    { v: 'center', h: 'left', label: '←' },
+    { v: 'center', h: 'center', label: '●' },
+    { v: 'center', h: 'right', label: '→' },
+    { v: 'bottom', h: 'left', label: '↙' },
+    { v: 'bottom', h: 'center', label: '↓' },
+    { v: 'bottom', h: 'right', label: '↘' }
+  ];
+  
+  return positions.map(p => {
+    const isSelected = p.h === currentH && p.v === currentV;
+    return `<button type="button" class="position-cell ${isSelected ? 'selected' : ''}" data-element="${elementName}" data-h="${p.h}" data-v="${p.v}">${p.label}</button>`;
+  }).join('');
 }
 
 console.log('✅ Sections Edit JS initialisé');
