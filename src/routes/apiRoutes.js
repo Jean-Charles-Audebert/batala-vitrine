@@ -187,7 +187,7 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
     const sectionId = parseInt(req.params.id);
     const { section, content, nav_sections } = req.body;
 
-    // 1. Mettre à jour la section (logo, positions, flags)
+    // 1. Mettre à jour la section (logo, positions, flags, styles)
     await query(
       `UPDATE sections SET 
         logo_url = $1, 
@@ -197,11 +197,16 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
         show_social_links = $5, 
         social_position_h = $6, 
         social_position_v = $7,
-        show_nav_links = $8, 
-        nav_position_h = $9, 
-        nav_position_v = $10,
+        social_icon_size = $8,
+        social_icon_color = $9,
+        show_nav_links = $10, 
+        nav_position_h = $11, 
+        nav_position_v = $12,
+        nav_text_color = $13,
+        nav_bg_color = $14,
+        is_sticky = $15,
         updated_at = NOW()
-       WHERE id = $11`,
+       WHERE id = $16`,
       [
         section.logo_url || null,
         section.logo_width || 150,
@@ -210,9 +215,14 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
         section.show_social_links || false,
         section.social_position_h || 'right',
         section.social_position_v || 'top',
+        section.social_icon_size || 24,
+        section.social_icon_color || '#ffffff',
         section.show_nav_links || false,
         section.nav_position_h || 'right',
         section.nav_position_v || 'center',
+        section.nav_text_color || '#ffffff',
+        section.nav_bg_color || 'rgba(255,255,255,0.25)',
+        section.is_sticky || false,
         sectionId
       ]
     );

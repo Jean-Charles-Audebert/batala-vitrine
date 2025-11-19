@@ -840,6 +840,17 @@ async function createHeroContentModal(sectionId, section = {}, content = {}) {
             <small class="form-hint">Liens configurés : ${socialLinks.length > 0 ? socialLinks.map(s => s.platform).join(', ') : 'Aucun'}</small>
           </div>
           
+          <div class="form-row">
+            <div class="form-group">
+              <label for="socialIconSize">Taille des icônes (px)</label>
+              <input type="number" name="social_icon_size" id="socialIconSize" value="${section.social_icon_size || 24}" min="16" max="64" step="2">
+            </div>
+            <div class="form-group">
+              <label for="socialIconColor">Couleur des icônes</label>
+              <input type="color" name="social_icon_color" id="socialIconColor" value="${section.social_icon_color || '#ffffff'}">
+            </div>
+          </div>
+          
           <div class="form-group">
             <label>Position des icônes sociales</label>
             <div class="position-grid">
@@ -857,6 +868,24 @@ async function createHeroContentModal(sectionId, section = {}, content = {}) {
               <input type="checkbox" name="show_nav_links" ${section.show_nav_links ? 'checked' : ''}>
               Afficher des liens de navigation
             </label>
+          </div>
+          
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="is_sticky" ${section.is_sticky ? 'checked' : ''}>
+              Header fixe au scroll (position sticky)
+            </label>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="navTextColor">Couleur du texte</label>
+              <input type="color" name="nav_text_color" id="navTextColor" value="${section.nav_text_color || '#ffffff'}">
+            </div>
+            <div class="form-group">
+              <label for="navBgColor">Couleur de fond (rgba)</label>
+              <input type="text" name="nav_bg_color" id="navBgColor" value="${section.nav_bg_color || 'rgba(255,255,255,0.25)'}" placeholder="rgba(255,255,255,0.25)">
+            </div>
           </div>
           
           <div class="form-group">
@@ -970,9 +999,14 @@ async function createHeroContentModal(sectionId, section = {}, content = {}) {
         show_social_links: formData.get('show_social_links') === 'on',
         social_position_h: formData.get('social_position_h'),
         social_position_v: formData.get('social_position_v'),
+        social_icon_size: parseInt(formData.get('social_icon_size')),
+        social_icon_color: formData.get('social_icon_color'),
         show_nav_links: formData.get('show_nav_links') === 'on',
         nav_position_h: formData.get('nav_position_h'),
-        nav_position_v: formData.get('nav_position_v')
+        nav_position_v: formData.get('nav_position_v'),
+        nav_text_color: formData.get('nav_text_color'),
+        nav_bg_color: formData.get('nav_bg_color'),
+        is_sticky: formData.get('is_sticky') === 'on'
       },
       // Content data (title, font, color, positions)
       content: {

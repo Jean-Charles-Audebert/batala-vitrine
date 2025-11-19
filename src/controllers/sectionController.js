@@ -18,8 +18,8 @@ export const getAllSections = async () => {
         bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
         logo_url, logo_width, logo_position_h, logo_position_v,
-        show_social_links, social_position_h, social_position_v,
-        show_nav_links, nav_position_h, nav_position_v,
+        show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
+        show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
         created_at, updated_at
       FROM sections
@@ -107,8 +107,8 @@ export const getSectionById = async (sectionId) => {
         bg_color, bg_image, bg_video, bg_youtube, is_transparent,
         layout, padding_top, padding_bottom,
         logo_url, logo_width, logo_position_h, logo_position_v,
-        show_social_links, social_position_h, social_position_v,
-        show_nav_links, nav_position_h, nav_position_v,
+        show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
+        show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
         created_at, updated_at
       FROM sections

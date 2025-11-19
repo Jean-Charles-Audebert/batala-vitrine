@@ -122,8 +122,8 @@
             
             <% if (typeof user !== 'undefined' && user) { %>
               <div class="card-actions">
-                <button class="edit-btn" data-card-id="<%= card.id %>" data-section-id="<%= id %>" data-action="edit-card">✏️</button>
-                <button class="delete-btn" data-card-id="<%= card.id %>" data-section-id="<%= id %>" data-action="delete-card">🗑️</button>
+                <button class="edit-btn" data-card-id="<%= card.id %>" data-section-id="<%= id %>" data-action="edit-card"><img src="/icons/edit.svg" alt="" class="icon"></button>
+                <button class="delete-btn" data-card-id="<%= card.id %>" data-section-id="<%= id %>" data-action="delete-card"><img src="/icons/trash.svg" alt="" class="icon"></button>
               </div>
             <% } %>
           </article>
@@ -149,7 +149,7 @@
         aria-label="Paramètres section"
         title="Paramètres (fond, layout)"
       >
-        ⚙️
+        <img src="/icons/settings.svg" alt="" class="icon">
       </button>
     </div>
   <% } %>

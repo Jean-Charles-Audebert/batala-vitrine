@@ -119,14 +119,14 @@
     
     <%# Logo %>
     <% if (logo_url) { %>
-      <div class="hero-element hero-logo" data-position="<%= gridAreas.logo %>">
-        <img src="<%= logo_url %>" alt="Logo" style="max-width: <%= logo_width %>px;">
+      <div class="hero-element hero-logo" data-position="<%= logo_position_v %>-<%= logo_position_h %>">
+        <img src="<%= logo_url %>" alt="Logo" style="max-width: <%= logo_width %>px; max-height: 150px; object-fit: contain;">
       </div>
     <% } %>
     
     <%# Titre principal %>
     <% if (heroTitle) { %>
-      <div class="hero-element hero-title" data-position="<%= gridAreas.title %>">
+      <div class="hero-element hero-title" data-position="<%= title_position_v %>-<%= title_position_h %>">
         <h1 style="color: <%= title_color %>; <%= title_font_id ? `font-family: var(--font-${title_font_id});` : '' %>">
           <%= heroTitle %>
         </h1>
@@ -141,11 +141,12 @@
     
     <%# Social Links %>
     <% if (show_social_links && typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
-      <div class="hero-element hero-social" data-position="<%= gridAreas.social %>">
+      <div class="hero-element hero-social" data-position="<%= social_position_v %>-<%= social_position_h %>">
         <div class="social-icons">
           <% socialLinks.filter(s => s.location === 'header' || s.location === 'both').forEach(social => { %>
             <a href="<%= social.url %>" target="_blank" rel="noopener noreferrer" title="<%= social.label || social.platform %>">
-              <img src="/icons/<%= social.platform %>.svg" alt="<%= social.platform %>" class="icon">
+              <img src="/icons/<%= social.platform %>.svg" alt="<%= social.platform %>" class="icon" 
+                   style="width: <%= social_icon_size || 24 %>px; height: <%= social_icon_size || 24 %>px; filter: brightness(0) saturate(100%) invert(<%= social_icon_color === '#ffffff' ? 100 : 0 %>%);">
             </a>
           <% }) %>
         </div>
@@ -154,10 +155,11 @@
     
     <%# Navigation vers sections %>
     <% if (show_nav_links && nav_links && nav_links.length > 0) { %>
-      <div class="hero-element hero-nav" data-position="<%= gridAreas.nav %>">
+      <div class="hero-element hero-nav" data-position="<%= nav_position_v %>-<%= nav_position_h %>">
         <nav class="hero-nav-links">
           <% nav_links.forEach(link => { %>
-            <a href="#section-<%= link.target_section_id %>" class="nav-link">
+            <a href="#section-<%= link.target_section_id %>" class="nav-link" 
+               style="color: <%= nav_text_color || '#ffffff' %>; background: <%= nav_bg_color || 'rgba(255,255,255,0.25)' %>;">
               <%= link.label %>
             </a>
           <% }) %>

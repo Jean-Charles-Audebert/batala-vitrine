@@ -75,8 +75,8 @@
             
             <% if (typeof user !== 'undefined' && user) { %>
               <div class="gallery-item-actions">
-                <button class="edit-btn" data-card-id="<%= card.id %>">✏️</button>
-                <button class="delete-btn" data-card-id="<%= card.id %>">🗑️</button>
+                <button class="edit-btn" data-card-id="<%= card.id %>"><img src="/icons/edit.svg" alt="" class="icon"></button>
+                <button class="delete-btn" data-card-id="<%= card.id %>"><img src="/icons/trash.svg" alt="" class="icon"></button>
               </div>
             <% } %>
           </div>
@@ -101,7 +101,7 @@
         data-action="edit-section"
         aria-label="Modifier la galerie"
       >
-        ✏️
+        <img src="/icons/edit.svg" alt="" class="icon">
       </button>
     </div>
   <% } %>

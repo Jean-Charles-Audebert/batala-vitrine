@@ -241,21 +241,23 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
   backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s;
 }
 
 .hero-social .social-icons a:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .hero-social .social-icons .icon {
   width: 24px;
   height: 24px;
-  filter: brightness(0) invert(1); /* Blanc */
+  /* Couleur personnalisable via style inline sur .icon ou a */
 }
 
 /* Navigation dans hero */
@@ -268,17 +270,22 @@
 .hero-nav-links .nav-link {
   color: #ffffff;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
-  font-weight: 500;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 1rem;
   transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .hero-nav-links .nav-link:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive hero grid */

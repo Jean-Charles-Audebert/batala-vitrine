@@ -14,9 +14,13 @@ ADD COLUMN IF NOT EXISTS logo_width INT DEFAULT 150, -- Largeur en pixels
 ADD COLUMN IF NOT EXISTS show_social_links BOOLEAN DEFAULT FALSE,
 ADD COLUMN IF NOT EXISTS social_position_h VARCHAR(20) DEFAULT 'right' CHECK (social_position_h IN ('left', 'center', 'right')),
 ADD COLUMN IF NOT EXISTS social_position_v VARCHAR(20) DEFAULT 'top' CHECK (social_position_v IN ('top', 'center', 'bottom')),
+ADD COLUMN IF NOT EXISTS social_icon_size INT DEFAULT 24, -- Taille icônes en pixels
+ADD COLUMN IF NOT EXISTS social_icon_color VARCHAR(7) DEFAULT '#ffffff',
 ADD COLUMN IF NOT EXISTS show_nav_links BOOLEAN DEFAULT FALSE,
 ADD COLUMN IF NOT EXISTS nav_position_h VARCHAR(20) DEFAULT 'right' CHECK (nav_position_h IN ('left', 'center', 'right')),
 ADD COLUMN IF NOT EXISTS nav_position_v VARCHAR(20) DEFAULT 'center' CHECK (nav_position_v IN ('top', 'center', 'bottom')),
+ADD COLUMN IF NOT EXISTS nav_text_color VARCHAR(7) DEFAULT '#ffffff',
+ADD COLUMN IF NOT EXISTS nav_bg_color VARCHAR(30) DEFAULT 'rgba(255,255,255,0.25)',
 ADD COLUMN IF NOT EXISTS is_sticky BOOLEAN DEFAULT FALSE; -- Header fixe au scroll
 
 -- ===============================
