@@ -731,6 +731,78 @@
   }
 }
 
+/* Responsive ultra-mobile pour toutes les sections */
+@media (max-width: 600px) {
+  /* Réduction des espacements généraux */
+  :root {
+    --spacing-small: 1.5rem;
+    --spacing-medium: 2.5rem;
+    --spacing-large: 4rem;
+    --grid-gap: 1.5rem;
+  }
+  
+  /* Section Content : padding réduit */
+  .section-content .content-wrapper {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+  
+  .content-text h2 {
+    font-size: 1.5rem;
+  }
+  
+  .content-text p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Card Grid : titre et cartes adaptés */
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  .cards-grid {
+    gap: 1.5rem;
+  }
+  
+  .card-content {
+    padding: 1rem;
+  }
+  
+  .card-content h3 {
+    font-size: 1.1rem;
+  }
+  
+  .card-content p {
+    font-size: 0.95rem;
+  }
+  
+  /* Gallery : colonnes plus petites */
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .gallery-caption {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+  
+  /* Boutons CTA adaptés */
+  .btn-cta {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .btn-add-card,
+  .btn-add-media {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
 /* ==========================================================================
    Video Wrapper (16:9 responsive)
    ========================================================================== */
