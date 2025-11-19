@@ -56,12 +56,14 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  width: 100vw;
+  width: 100%;
   position: relative;
-  left: 50%;
+  /* Full-width breakout désactivé - le hero reste dans le container */
+  /* Pour activer full-width: décommenter left/margin ci-dessous et remettre width: 100vw */
+  /* left: 50%;
   right: 50%;
   margin-left: -50vw;
-  margin-right: -50vw;
+  margin-right: -50vw; */
 }
 
 /* Hero avec background image : hauteur définie par l'image */
