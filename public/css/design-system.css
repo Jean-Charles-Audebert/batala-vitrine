@@ -125,16 +125,18 @@
 .padding-bottom-large { padding-bottom: var(--spacing-large); }
 
 /* ==========================================================================
-   Section Hero
+   Section Hero - Comportement & Positionnement
    ========================================================================== */
+/* Note: La première définition .section-hero (lignes 55-65) gère déjà:
+   - Full-width breakout (width: 100vw, left: 50%, margin-left: -50vw)
+   - Background (size: cover, position: center)
+   Ici on ajoute juste les styles visuels complémentaires */
 .section-hero {
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  position: relative;
 }
 
 /* Variantes de hauteur - optionnelles si le contenu le nécessite */
