@@ -320,6 +320,61 @@
   }
 }
 
+/* Responsive ultra-mobile : évite chevauchement social/nav */
+@media (max-width: 600px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "top-center"
+      "center-center"
+      "bottom-center";
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+  
+  /* Force tous les éléments en colonne centrée */
+  .hero-element {
+    grid-area: unset !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100%;
+  }
+  
+  /* Social et navigation en colonne */
+  .hero-social .social-icons {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  
+  .hero-nav-links {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .hero-nav-links .nav-link {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Logo plus petit */
+  .hero-logo img {
+    max-width: 200px !important;
+  }
+  
+  /* Titre plus compact */
+  .hero-title h1 {
+    font-size: clamp(1.25rem, 6vw, 2rem);
+    margin-bottom: 0.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+  }
+}
+
 .hero-content {
   max-width: 800px;
   padding: 2rem;
