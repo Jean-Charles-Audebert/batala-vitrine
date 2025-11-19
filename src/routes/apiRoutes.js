@@ -110,7 +110,7 @@ router.delete("/upload", requireAuth, async (req, res) => {
     // Vérifier si le fichier est utilisé dans les tables
     const usageCheck = await query(`
       SELECT 
-        (SELECT COUNT(*) FROM cards WHERE media_url = $1) +
+        (SELECT COUNT(*) FROM cards WHERE media_path = $1) +
         (SELECT COUNT(*) FROM section_content WHERE media_url = $1) +
         (SELECT COUNT(*) FROM cards_v2 WHERE media_url = $1) +
         (SELECT COUNT(*) FROM sections WHERE bg_image = $1 OR bg_video = $1 OR bg_youtube = $1) +
