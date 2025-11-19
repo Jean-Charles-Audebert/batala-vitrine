@@ -1,0 +1,52 @@
+/**
+ * Styles pour les icônes SVG
+ */
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  transition: transform 0.2s ease;
+}
+
+/* Tailles d'icônes */
+.icon-sm {
+  width: 0.875em;
+  height: 0.875em;
+}
+
+.icon-md {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.icon-lg {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* Effets hover */
+button:hover .icon,
+a:hover .icon {
+  transform: scale(1.1);
+}
+
+button:active .icon,
+a:active .icon {
+  transform: scale(0.95);
+}
+
+/* Icônes dans les boutons */
+.btn .icon,
+.edit-btn .icon,
+.delete-btn .icon {
+  margin-right: 0.25rem;
+}
+
+.btn .icon:only-child,
+.edit-btn .icon:only-child,
+.delete-btn .icon:only-child {
+  margin-right: 0;
+}
