@@ -143,6 +143,172 @@
 .section-hero--large { min-height: var(--hero-large); }
 .section-hero--full { min-height: var(--hero-full); }
 
+/* Header sticky */
+.section-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* ==========================================================================
+   Hero Grid - Positionnement flexible 3x3
+   ========================================================================== */
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas: 
+    "top-left     top-center     top-right"
+    "center-left  center-center  center-right"
+    "bottom-left  bottom-center  bottom-right";
+  gap: 1rem;
+  padding: 2rem;
+  min-height: inherit;
+}
+
+.hero-element {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Positionnement dans la grille */
+.hero-element[data-position="top-left"] { grid-area: top-left; justify-content: flex-start; align-items: flex-start; }
+.hero-element[data-position="top-center"] { grid-area: top-center; justify-content: center; align-items: flex-start; }
+.hero-element[data-position="top-right"] { grid-area: top-right; justify-content: flex-end; align-items: flex-start; }
+
+.hero-element[data-position="center-left"] { grid-area: center-left; justify-content: flex-start; align-items: center; }
+.hero-element[data-position="center-center"] { grid-area: center-center; justify-content: center; align-items: center; }
+.hero-element[data-position="center-right"] { grid-area: center-right; justify-content: flex-end; align-items: center; }
+
+.hero-element[data-position="bottom-left"] { grid-area: bottom-left; justify-content: flex-start; align-items: flex-end; }
+.hero-element[data-position="bottom-center"] { grid-area: bottom-center; justify-content: center; align-items: flex-end; }
+.hero-element[data-position="bottom-right"] { grid-area: bottom-right; justify-content: flex-end; align-items: flex-end; }
+
+/* Styles des éléments hero */
+.hero-logo img {
+  display: block;
+  height: auto;
+}
+
+.hero-title h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  margin: 0 0 1.5rem;
+  opacity: 0.9;
+}
+
+.btn-cta {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s;
+}
+
+.btn-cta:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Social icons dans hero */
+.hero-social .social-icons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-social .social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+
+.hero-social .social-icons a:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.hero-social .social-icons .icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1); /* Blanc */
+}
+
+/* Navigation dans hero */
+.hero-nav-links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-nav-links .nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.hero-nav-links .nav-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Responsive hero grid */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "top-center"
+      "center-center"
+      "bottom-center";
+    padding: 1.5rem;
+    text-align: center;
+  }
+  
+  .hero-element {
+    justify-content: center !important;
+    text-align: center;
+  }
+  
+  .hero-title h1 {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+  }
+  
+  .hero-social .social-icons,
+  .hero-nav-links {
+    justify-content: center;
+  }
+}
+
 .hero-content {
   max-width: 800px;
   padding: 2rem;

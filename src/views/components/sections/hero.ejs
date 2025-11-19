@@ -1,7 +1,7 @@
 <%
   /**
    * Composant: Section Hero
-   * Grande bannière en haut de page avec titre et optionnellement vidéo de fond
+   * Header avec logo, titre, social links et navigation positionnables
    */
   const {
     id,
@@ -11,10 +11,22 @@
     bg_video,
     bg_youtube,
     is_transparent,
+    is_sticky = false,
     padding_top = 'medium',
     padding_bottom = 'medium',
     layout = 'centered',
+    logo_url,
+    logo_width = 150,
+    logo_position_h = 'center',
+    logo_position_v = 'center',
+    show_social_links = false,
+    social_position_h = 'right',
+    social_position_v = 'top',
+    show_nav_links = false,
+    nav_position_h = 'right',
+    nav_position_v = 'center',
     content = [],
+    nav_links = [],
     decorations = []
   } = section;
   
@@ -24,6 +36,10 @@
     subtitle,
     cta_label,
     cta_url,
+    title_font_id,
+    title_color = '#ffffff',
+    title_position_h = 'center',
+    title_position_v = 'center',
     text_align = 'center'
   } = sectionContent;
   
@@ -39,6 +55,15 @@
     `padding-bottom-${padding_bottom}`
   ];
   if (is_transparent) sectionClasses.push('section-transparent');
+  if (is_sticky) sectionClasses.push('section-sticky');
+  
+  // CSS Grid areas basées sur les positions
+  const gridAreas = {
+    logo: `${logo_position_v}-${logo_position_h}`,
+    title: `${title_position_v}-${title_position_h}`,
+    social: `${social_position_v}-${social_position_h}`,
+    nav: `${nav_position_v}-${nav_position_h}`
+  };
 %>
 
 <section 
@@ -86,20 +111,59 @@
     <% }) %>
   <% } %>
   
-  <div class="container">
-    <div class="hero-content text-<%= text_align %>">
-      <% if (heroTitle) { %>
-        <h1 class="hero-title"><%= heroTitle %></h1>
-      <% } %>
-      
-      <% if (subtitle) { %>
-        <p class="hero-subtitle"><%= subtitle %></p>
-      <% } %>
-      
-      <% if (cta_label && cta_url) { %>
-        <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
-      <% } %>
-    </div>
+  <div class="hero-grid" 
+       data-logo-area="<%= gridAreas.logo %>" 
+       data-title-area="<%= gridAreas.title %>"
+       data-social-area="<%= gridAreas.social %>"
+       data-nav-area="<%= gridAreas.nav %>">
+    
+    <%# Logo %>
+    <% if (logo_url) { %>
+      <div class="hero-element hero-logo" data-position="<%= gridAreas.logo %>">
+        <img src="<%= logo_url %>" alt="Logo" style="max-width: <%= logo_width %>px;">
+      </div>
+    <% } %>
+    
+    <%# Titre principal %>
+    <% if (heroTitle) { %>
+      <div class="hero-element hero-title" data-position="<%= gridAreas.title %>">
+        <h1 style="color: <%= title_color %>; <%= title_font_id ? `font-family: var(--font-${title_font_id});` : '' %>">
+          <%= heroTitle %>
+        </h1>
+        <% if (subtitle) { %>
+          <p class="hero-subtitle" style="color: <%= title_color %>;"><%= subtitle %></p>
+        <% } %>
+        <% if (cta_label && cta_url) { %>
+          <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
+        <% } %>
+      </div>
+    <% } %>
+    
+    <%# Social Links %>
+    <% if (show_social_links && typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
+      <div class="hero-element hero-social" data-position="<%= gridAreas.social %>">
+        <div class="social-icons">
+          <% socialLinks.filter(s => s.location === 'header' || s.location === 'both').forEach(social => { %>
+            <a href="<%= social.url %>" target="_blank" rel="noopener noreferrer" title="<%= social.label || social.platform %>">
+              <img src="/icons/<%= social.platform %>.svg" alt="<%= social.platform %>" class="icon">
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+    
+    <%# Navigation vers sections %>
+    <% if (show_nav_links && nav_links && nav_links.length > 0) { %>
+      <div class="hero-element hero-nav" data-position="<%= gridAreas.nav %>">
+        <nav class="hero-nav-links">
+          <% nav_links.forEach(link => { %>
+            <a href="#section-<%= link.target_section_id %>" class="nav-link">
+              <%= link.label %>
+            </a>
+          <% }) %>
+        </nav>
+      </div>
+    <% } %>
   </div>
   
   <% if (typeof user !== 'undefined' && user) { %>
@@ -111,7 +175,7 @@
         aria-label="Paramètres section"
         title="Paramètres (fond, layout)"
       >
-        ⚙️
+        <img src="/icons/settings.svg" alt="" class="icon">
       </button>
       <% if (sectionContent.id) { %>
         <button 
@@ -122,7 +186,7 @@
           aria-label="Éditer le texte"
           title="Titre, sous-titre, CTA"
         >
-          ✏️
+          <img src="/icons/edit.svg" alt="" class="icon">
         </button>
       <% } %>
     </div>
