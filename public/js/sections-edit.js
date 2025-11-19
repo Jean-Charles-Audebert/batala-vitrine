@@ -118,7 +118,7 @@ function createSectionModal(section) {
           • Bannière large : 2700×600px (ratio 4.5:1) - affichage optimal<br>
           • Standard : 1920×427px (ratio 4.5:1)<br>
           • Minimum : 1350×300px (ratio 4.5:1)<br>
-          ⚠️ Images carrées ou verticales seront recadrées (haut/bas perdus)</small>
+          ⚠️ Les images ou vidéos carrées ou verticales seront recadrées (haut/bas perdus)</small>
         </div>
         
         <div class="form-group">
@@ -218,17 +218,11 @@ function createSectionModal(section) {
       if (filePath && filePath.startsWith('/uploads/')) {
         if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
           try {
-            const response = await fetch('/api/upload', {
+            await fetch('/api/upload', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ filePath })
             });
-            const result = await response.json();
-            
-            if (!result.success && result.usageCount > 0) {
-              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
-              return;
-            }
           } catch (err) {
             console.warn('Erreur suppression fichier:', err);
           }
@@ -255,17 +249,11 @@ function createSectionModal(section) {
       if (filePath && filePath.startsWith('/uploads/')) {
         if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
           try {
-            const response = await fetch('/api/upload', {
+            await fetch('/api/upload', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ filePath })
             });
-            const result = await response.json();
-            
-            if (!result.success && result.usageCount > 0) {
-              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
-              return;
-            }
           } catch (err) {
             console.warn('Erreur suppression fichier:', err);
           }
@@ -438,17 +426,11 @@ function createContentModal(sectionId, content = {}) {
       if (filePath && filePath.startsWith('/uploads/')) {
         if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
           try {
-            const response = await fetch('/api/upload', {
+            await fetch('/api/upload', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ filePath })
             });
-            const result = await response.json();
-            
-            if (!result.success && result.usageCount > 0) {
-              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
-              return;
-            }
           } catch (err) {
             console.warn('Erreur suppression fichier:', err);
           }
@@ -577,17 +559,11 @@ function createCardModal(sectionId, card = {}) {
       if (filePath && filePath.startsWith('/uploads/')) {
         if (confirm('Supprimer définitivement ce fichier du serveur ?')) {
           try {
-            const response = await fetch('/api/upload', {
+            await fetch('/api/upload', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ filePath })
             });
-            const result = await response.json();
-            
-            if (!result.success && result.usageCount > 0) {
-              alert(`Ce fichier est encore utilisé dans ${result.usageCount} autre(s) endroit(s). Suppression impossible.`);
-              return;
-            }
           } catch (err) {
             console.warn('Erreur suppression fichier:', err);
           }

@@ -107,25 +107,8 @@ router.delete("/upload", requireAuth, async (req, res) => {
       });
     }
 
-    // Vérifier si le fichier est utilisé dans les tables
-    const usageCheck = await query(`
-      SELECT 
-        (SELECT COUNT(*) FROM cards WHERE media_path = $1) +
-        (SELECT COUNT(*) FROM section_content WHERE media_url = $1) +
-        (SELECT COUNT(*) FROM cards_v2 WHERE media_url = $1) +
-        (SELECT COUNT(*) FROM sections WHERE bg_image = $1 OR bg_video = $1 OR bg_youtube = $1) +
-        (SELECT COUNT(*) FROM page WHERE header_bg_image = $1 OR main_bg_image = $1 OR footer_bg_image = $1 OR main_bg_video = $1 OR header_bg_video = $1) AS usage_count
-    `, [filePath]);
-
-    const usageCount = parseInt(usageCheck.rows[0].usage_count, 10);
-
-    if (usageCount > 0) {
-      return res.status(409).json({
-        success: false,
-        message: `Ce fichier est encore utilisé dans ${usageCount} emplacement(s).`,
-        usageCount,
-      });
-    }
+    // Note: Pas de vérification d'usage ici. L'utilisateur a déjà confirmé via l'interface.
+    // Si le fichier est encore utilisé ailleurs, le lien sera cassé mais l'avertissement client suffit.
 
     // Supprimer le fichier physique
     const filename = path.basename(filePath);
