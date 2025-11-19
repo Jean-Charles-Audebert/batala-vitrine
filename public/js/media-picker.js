@@ -117,9 +117,9 @@ function createMediaPickerModal(callback, mediaType, fieldName) {
     const previewImg = modal.querySelector('#previewImage');
     
     // Validation taille
-    const MAX_SIZE = 5 * 1024 * 1024;
+    const MAX_SIZE = 50 * 1024 * 1024; // 50 MB max pour supporter les vidéos
     if (file.size > MAX_SIZE) {
-      statusEl.textContent = `❌ Fichier trop volumineux (max 5 MB)`;
+      statusEl.textContent = `❌ Fichier trop volumineux (max 50 MB)`;
       statusEl.style.color = '#e74c3c';
       fileInput.value = '';
       return;
