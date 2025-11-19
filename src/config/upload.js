@@ -25,19 +25,25 @@ const storage = multer.diskStorage({
 // Validation du type de fichier
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
+    // Images
     "image/jpeg",
     "image/jpg", 
     "image/png",
     "image/webp",
     "image/gif",
-    "image/svg+xml" // Support SVG
+    "image/svg+xml",
+    // Vidéos
+    "video/mp4",
+    "video/webm",
+    "video/ogg",
+    "video/quicktime" // .mov
   ];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        `Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP, GIF, SVG`
+        `Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP, GIF, SVG, MP4, WebM, OGG, MOV`
       ),
       false
     );
