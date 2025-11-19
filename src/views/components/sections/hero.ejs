@@ -177,18 +177,16 @@
       >
         <img src="/icons/settings.svg" alt="" class="icon">
       </button>
-      <% if (sectionContent.id) { %>
-        <button 
-          class="edit-btn" 
-          data-section-id="<%= id %>"
-          data-content-id="<%= sectionContent.id %>"
-          data-action="edit-content"
-          aria-label="Éditer le texte"
-          title="Titre, sous-titre, CTA"
-        >
-          <img src="/icons/edit.svg" alt="" class="icon">
-        </button>
-      <% } %>
+      <button 
+        class="edit-btn" 
+        data-section-id="<%= id %>"
+        data-content-id="<%= sectionContent.id || '' %>"
+        data-action="edit-content"
+        aria-label="Éditer le contenu"
+        title="Logo, titre, social, navigation"
+      >
+        <img src="/icons/edit.svg" alt="" class="icon">
+      </button>
     </div>
   <% } %>
 </section>
