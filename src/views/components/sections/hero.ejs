@@ -147,7 +147,8 @@
     <% if (show_social_links && typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
       <div class="hero-element hero-social" data-position="<%= social_position_v %>-<%= social_position_h %>">
         <div class="social-icons">
-          <% socialLinks.filter(s => s.location === 'header' || s.location === 'both').forEach(social => { %>
+          <% const headerSocials = socialLinks.filter(s => s.location === 'header' || s.location === 'both'); %>
+          <% headerSocials.forEach(social => { %>
             <a href="<%= social.url %>" target="_blank" rel="noopener noreferrer" title="<%= social.label || social.platform %>">
               <img src="/icons/<%= social.platform %>.svg" alt="<%= social.platform %>" class="icon" 
                    style="width: <%= social_icon_size || 24 %>px; height: <%= social_icon_size || 24 %>px; filter: brightness(0) saturate(100%) invert(<%= social_icon_color === '#ffffff' ? 100 : 0 %>%);">
