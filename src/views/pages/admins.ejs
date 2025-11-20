@@ -1,61 +1,58 @@
-<%-
-  include('../partials/head', {
-    title,
-    stylesheets: ['/css/admin.css', '/css/buttons.css']
-  })
-%>
-  <div class="admin-container">
-    <%-
-      include('../partials/admin-toolbar', {
-        title: 'Liste des admins',
-        toolbarButtons: [
-          { href: '/admins/new', class: 'btn-primary', icon: 'plus', label: 'Nouvel admin' },
-          { href: '/sections', class: 'btn-info', icon: 'settings', label: 'Sections' },
-          { href: '/blocks', class: 'btn-secondary', icon: 'settings', label: 'Blocs' },
-          { href: '/', class: 'btn-secondary', label: '← Accueil' },
-          { href: '/auth/logout/web', class: 'btn-danger', icon: 'close', label: 'Déconnexion' }
-        ]
-      })
-    %>
-    
-    <%- include('../partials/alerts') %>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Statut</th>
-          <th>Date de création</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% admins.forEach(admin => { %>
-          <tr>
-            <td><%= admin.email %></td>
-            <td>
-              <% if (admin.is_active) { %>
-                <span class="badge badge-active">Actif</span>
-              <% } else { %>
-                <span class="badge badge-inactive">Inactif</span>
-              <% } %>
-            </td>
-            <td><%= new Date(admin.created_at).toLocaleDateString('fr-FR') %></td>
-            <td>
-              <div class="actions">
-                <a href="/admins/<%= admin.id %>/edit" class="btn btn-secondary">
-                  <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
-                </a>
-                <form action="/admins/<%= admin.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Supprimer cet admin ?')">
-                  <button type="submit" class="btn btn-danger">
-                    <img src="/icons/trash.svg" alt="Supprimer" class="icon" /> Supprimer
-                  </button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+<div class="toolbar">
+  <h1>Liste des administrateurs</h1>
+  <div class="toolbar-actions">
+    <a href="/admins/new" class="btn btn-primary">
+      <img src="/icons/plus.svg" alt="" class="icon"> Nouvel admin
+    </a>
+    <a href="/sections" class="btn btn-info">
+      <img src="/icons/settings.svg" alt="" class="icon"> Sections
+    </a>
+    <a href="/admin?section=blocks" class="btn btn-secondary">
+      <img src="/icons/settings.svg" alt="" class="icon"> Blocs
+    </a>
+    <a href="/" class="btn btn-secondary">← Accueil</a>
+    <a href="/auth/logout/web" class="btn btn-danger">
+      <img src="/icons/close.svg" alt="" class="icon"> Déconnexion
+    </a>
   </div>
-<%- include('../partials/footer') %>
+</div>
+
+<%- include('../partials/alerts') %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Statut</th>
+      <th>Date de création</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% admins.forEach(admin => { %>
+      <tr>
+        <td><%= admin.email %></td>
+        <td>
+          <% if (admin.is_active) { %>
+            <span class="badge badge-active">Actif</span>
+          <% } else { %>
+            <span class="badge badge-inactive">Inactif</span>
+          <% } %>
+        </td>
+        <td><%= new Date(admin.created_at).toLocaleDateString('fr-FR') %></td>
+        <td>
+          <div class="actions">
+            <a href="/admins/<%= admin.id %>/edit" class="btn btn-secondary">
+              <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
+            </a>
+            <form action="/admins/<%= admin.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Supprimer cet admin ?')">
+              <button type="submit" class="btn btn-danger">
+                <img src="/icons/trash.svg" alt="Supprimer" class="icon" /> Supprimer
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

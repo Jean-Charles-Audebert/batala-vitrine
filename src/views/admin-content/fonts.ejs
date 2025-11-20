@@ -1,0 +1,111 @@
+<div class="toolbar">
+  <h1>Gestion des polices</h1>
+  <div class="toolbar-actions">
+    <button class="btn btn-primary" data-action="add-google-font">
+      <img src="/icons/add.svg" alt="" class="icon"> Google Fonts
+    </button>
+    <a href="/" class="btn btn-secondary">
+      <img src="/icons/home.svg" alt="" class="icon">
+      Voir le site
+    </a>
+  </div>
+</div>
+
+<%- include('../partials/alerts') %>
+
+<!-- Formulaire d'upload rapide -->
+<div class="alert-box alert-info mb-3">
+  <h3 class="mt-0 mb-2">📁 Uploader une police depuis votre PC</h3>
+  <form id="uploadFontForm" enctype="multipart/form-data" class="flex-row flex-wrap gap-md">
+    <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
+      <label for="font_name">Nom de la police *</label>
+      <input type="text" id="font_name" name="name" required placeholder="Roboto Bold">
+    </div>
+    <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
+      <label for="font_family">Famille CSS *</label>
+      <input type="text" id="font_family" name="font_family" required placeholder="'Roboto', sans-serif">
+    </div>
+    <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
+      <label for="font_file">Fichier (woff2, woff, ttf, otf) *</label>
+      <input type="file" id="font_file" name="font_file" required accept=".woff2,.woff,.ttf,.otf">
+    </div>
+    <button type="submit" class="btn btn-primary" style="margin: 0;">
+      <img src="/icons/upload.svg" alt="" class="icon">
+      Uploader
+    </button>
+  </form>
+</div>
+
+<!-- Liste des polices -->
+<h2 class="admin-section-title">📚 Bibliothèque de polices</h2>
+
+<% if (fonts && fonts.length > 0) { %>
+  <div class="d-grid grid-gap-1">
+    <% fonts.forEach(font => { %>
+      <div class="card flex-row flex-between flex-center" style="padding: 1.5rem;">
+        <div>
+          <h3 class="mt-0 mb-1" style="font-size: 1.25rem;">
+            <%= font.name %>
+            <% if (font.source === 'system') { %>
+              <span class="badge badge-primary">SYSTÈME</span>
+            <% } else if (font.source === 'google') { %>
+              <span class="badge badge-warning">GOOGLE</span>
+            <% } else { %>
+              <span class="badge badge-purple">UPLOAD</span>
+            <% } %>
+          </h3>
+          <p class="mb-0 text-muted text-small">
+            <code class="text-mono"><%= font.font_family %></code>
+          </p>
+          <% if (font.url) { %>
+            <p class="mt-1 mb-0 text-small text-muted">
+              🔗 <a href="<%= font.url %>" target="_blank" rel="noopener"><%= font.url %></a>
+            </p>
+          <% } %>
+          <% if (font.file_path) { %>
+            <p class="mt-1 mb-0 text-small text-muted">
+              📁 <%= font.file_path %>
+            </p>
+          <% } %>
+        </div>
+        <% if (font.source !== 'system') { %>
+          <button class="btn-delete-card" data-action="delete-font" data-font-id="<%= font.id %>">
+            <img src="/icons/trash.svg" alt="Supprimer" class="icon">
+          </button>
+        <% } %>
+      </div>
+    <% }); %>
+  </div>
+<% } else { %>
+  <p class="text-center text-muted" style="padding: 2rem;">Aucune police disponible.</p>
+<% } %>
+
+<!-- Modale d'ajout de police Google Fonts -->
+<div id="googleFontModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Ajouter une police Google Fonts</h2>
+      <button class="modal-close" data-action="close-google-font-modal">&times;</button>
+    </div>
+    <form id="googleFontForm">
+      <div class="form-group">
+        <label for="googleFontName">Nom de la police *</label>
+        <input type="text" id="googleFontName" name="name" required placeholder="Roboto">
+      </div>
+      <div class="form-group">
+        <label for="googleFontUrl">URL Google Fonts *</label>
+        <input type="url" id="googleFontUrl" name="url" required placeholder="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+      </div>
+      <div class="form-group">
+        <label for="googleFontFamily">Famille CSS *</label>
+        <input type="text" id="googleFontFamily" name="font_family" required placeholder="'Roboto', sans-serif">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-google-font-modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <img src="/icons/save.svg" alt="" class="icon"> Ajouter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

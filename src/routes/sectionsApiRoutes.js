@@ -12,7 +12,8 @@ import {
   addSectionContent,
   addSectionCard,
   addSectionDecoration,
-  getAllDecorations
+  getAllDecorations,
+  getAllFonts
 } from '../controllers/sectionController.js';
 import { requireAuth } from '../middlewares/requireAuth.js';
 
@@ -81,6 +82,28 @@ router.delete('/sections/:id', async (req, res) => {
   }
 });
 
+// POST /api/sections/reorder - Réorganiser les sections
+router.post('/sections/reorder', async (req, res) => {
+  try {
+    const { sectionIds } = req.body; // Array d'IDs dans le nouvel ordre
+    
+    if (!Array.isArray(sectionIds)) {
+      return res.status(400).json({ error: 'sectionIds doit être un tableau' });
+    }
+    
+    const { query } = await import('../config/db.js');
+    
+    // Mettre à jour les positions
+    for (let i = 0; i < sectionIds.length; i++) {
+      await query('UPDATE sections SET position = $1 WHERE id = $2', [i + 1, sectionIds[i]]);
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ========== SECTION CONTENT ==========
 // POST /api/sections/:sectionId/content - Ajouter du contenu
 router.post('/sections/:sectionId/content', async (req, res) => {
@@ -134,11 +157,28 @@ router.delete('/sections/:sectionId/content/:contentId', async (req, res) => {
 // POST /api/sections/:id/cards - Ajouter une carte à une section
 router.post('/sections/:sectionId/cards', async (req, res) => {
   try {
-    const card = await addSectionCard({
-      section_id: parseInt(req.params.sectionId, 10),
-      ...req.body
-    });
+    const card = await addSectionCard(
+      parseInt(req.params.sectionId, 10),
+      req.body
+    );
     res.status(201).json(card);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/sections/:sectionId/cards/:cardId - Mettre à jour une carte
+router.put('/sections/:sectionId/cards/:cardId', async (req, res) => {
+  try {
+    const { updateSectionCard } = await import('../controllers/sectionController.js');
+    const card = await updateSectionCard(
+      parseInt(req.params.cardId, 10),
+      req.body
+    );
+    if (!card) {
+      return res.status(404).json({ error: 'Carte non trouvée' });
+    }
+    res.json(card);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -158,7 +198,64 @@ router.delete('/sections/:sectionId/cards/:cardId', async (req, res) => {
   }
 });
 
-// ========== DECORATIONS ==========
+// ========== MÉDIAS ==========
+// GET /api/media - Liste des fichiers médias disponibles
+router.get('/media', async (req, res) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const uploadsDir = path.join(__dirname, '../../public/uploads');
+    
+    // Lister les fichiers
+    const files = fs.readdirSync(uploadsDir)
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        return ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'].includes(ext);
+      })
+      .map(file => ({
+        name: file,
+        path: `/uploads/${file}`,
+        url: `/uploads/${file}`
+      }));
+    
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/videos - Liste des fichiers vidéos disponibles
+router.get('/videos', async (req, res) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const uploadsDir = path.join(__dirname, '../../public/uploads');
+    
+    // Lister les fichiers vidéos
+    const files = fs.readdirSync(uploadsDir)
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        return ['.mp4', '.webm', '.ogg', '.avi', '.mov'].includes(ext);
+      })
+      .map(file => ({
+        name: file,
+        path: `/uploads/${file}`,
+        url: `/uploads/${file}`
+      }));
+    
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // GET /api/decorations - Liste toutes les décorations
 router.get('/decorations', async (req, res) => {
   try {
@@ -169,13 +266,23 @@ router.get('/decorations', async (req, res) => {
   }
 });
 
+// GET /api/fonts - Liste toutes les polices
+router.get('/fonts', async (req, res) => {
+  try {
+    const fonts = await getAllFonts();
+    res.json(fonts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /api/sections/:id/decorations - Ajouter une décoration à une section
 router.post('/sections/:sectionId/decorations', async (req, res) => {
   try {
-    const decoration = await addSectionDecoration({
-      section_id: parseInt(req.params.sectionId, 10),
-      ...req.body
-    });
+    const decoration = await addSectionDecoration(
+      parseInt(req.params.sectionId, 10),
+      req.body
+    );
     res.status(201).json(decoration);
   } catch (error) {
     res.status(500).json({ error: error.message });

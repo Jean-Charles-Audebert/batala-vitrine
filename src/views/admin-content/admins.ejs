@@ -1,0 +1,84 @@
+<div class="toolbar">
+  <h1>Liste des administrateurs</h1>
+  <div class="toolbar-actions">
+    <a href="#" class="btn btn-primary" data-action="new-admin">
+      <img src="/icons/plus.svg" alt="" class="icon"> Nouvel admin
+    </a>
+  </div>
+</div>
+
+<%- include('../partials/alerts') %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Statut</th>
+      <th>Date de création</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% admins.forEach(admin => { %>
+      <tr>
+        <td><%= admin.email %></td>
+        <td>
+          <% if (admin.is_active) { %>
+            <span class="badge badge-active">Actif</span>
+          <% } else { %>
+            <span class="badge badge-inactive">Inactif</span>
+          <% } %>
+        </td>
+        <td><%= new Date(admin.created_at).toLocaleDateString('fr-FR') %></td>
+        <td>
+          <div class="actions">
+            <a href="#" class="btn btn-secondary" data-action="edit-admin" data-admin-id="<%= admin.id %>">
+              <img src="/icons/edit.svg" alt="Modifier" class="icon" /> Modifier
+            </a>
+            <button class="btn btn-danger" data-action="delete-admin" data-admin-id="<%= admin.id %>">
+              <img src="/icons/trash.svg" alt="Supprimer" class="icon" /> Supprimer
+            </button>
+          </div>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- Modale de gestion des admins -->
+<div id="adminModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="adminModalTitle">Nouvel administrateur</h2>
+      <button class="modal-close" data-action="close-admin-modal">&times;</button>
+    </div>
+    <form id="adminForm">
+      <input type="hidden" name="adminId" id="adminId">
+
+      <div class="form-group">
+        <label for="adminEmail">Email *</label>
+        <input type="email" name="email" id="adminEmail" required>
+      </div>
+
+      <div class="form-group">
+        <label for="adminPassword">Mot de passe *</label>
+        <input type="password" name="password" id="adminPassword" required>
+        <small class="form-hint">Minimum 8 caractères</small>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_active" id="adminActive" checked>
+          Compte actif
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-admin-modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <img src="/icons/save.svg" alt="" class="icon"> Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

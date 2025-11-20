@@ -27,7 +27,9 @@ export const listSections = async (req, res) => {
       title: 'Gestion des sections', 
       sections: rows,
       success: req.query.success || null,
-      user: req.user
+      user: req.user,
+      scripts: ['/js/sections-admin.js'],
+      currentPage: 'sections'
     });
   } catch (error) {
     logger.error('Erreur récupération sections admin', error);

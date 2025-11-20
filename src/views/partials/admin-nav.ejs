@@ -1,0 +1,48 @@
+<nav class="admin-nav">
+  <div class="nav-header">
+    <a href="/" class="nav-brand">
+      <img src="/icons/logo.svg" alt="Logo" class="nav-logo">
+      Batala Admin
+    </a>
+  </div>
+
+  <ul class="nav-menu">
+    <li class="nav-item">
+      <a href="/" class="nav-link <%= currentPage === 'home' ? 'nav-link-active' : '' %>">
+        <img src="/icons/home.svg" alt="" class="nav-icon">
+        Accueil
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/sections" class="nav-link <%= currentPage === 'sections' ? 'nav-link-active' : '' %>">
+        <img src="/icons/sections.svg" alt="" class="nav-icon">
+        Sections
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/admin?section=fonts" class="nav-link <%= currentPage === 'fonts' ? 'nav-link-active' : '' %>">
+        <img src="/icons/font.svg" alt="" class="nav-icon">
+        Polices
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/admin/settings" class="nav-link <%= currentPage === 'settings' ? 'nav-link-active' : '' %>">
+        <img src="/icons/settings.svg" alt="" class="nav-icon">
+        Paramètres
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/admin?section=admins" class="nav-link <%= currentPage === 'admins' ? 'nav-link-active' : '' %>">
+        <img src="/icons/user.svg" alt="" class="nav-icon">
+        Admins
+      </a>
+    </li>
+  </ul>
+
+  <div class="nav-footer">
+    <a href="/auth/logout" class="nav-link nav-link-logout">
+      <img src="/icons/logout.svg" alt="" class="nav-icon">
+      Déconnexion
+    </a>
+  </div>
+</nav>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Batala Admin</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <% if (typeof stylesheets !== 'undefined' && Array.isArray(stylesheets)) { %>
+    <% stylesheets.forEach(stylesheet => { %>
+  <link rel="stylesheet" href="<%= stylesheet %>">
+    <% }) %>
+  <% } %>
+</head>
+<body class="admin-page">
+  <div class="admin-layout">
+    <%-
+      include('../partials/admin-nav', {
+        currentPage: typeof currentPage !== 'undefined' ? currentPage : ''
+      })
+    %>
+
+    <main class="admin-main">
+      <%- body %>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <% if (typeof scripts !== 'undefined' && Array.isArray(scripts)) { %>
+    <% scripts.forEach(script => { %>
+  <script src="<%= script %>"></script>
+    <% }) %>
+  <% } %>
+</body>
+</html>

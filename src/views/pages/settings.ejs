@@ -1,0 +1,116 @@
+<%-
+  include('../layouts/admin', {
+    title: 'Paramètres',
+    currentPage: 'settings',
+    stylesheets: ['/css/admin.css', '/css/buttons.css'],
+    body: `
+      <div class="settings-admin">
+        <!-- Header -->
+        <div class="settings-header">
+          <h1 class="settings-title">
+            <img src="/icons/settings.svg" alt="" class="icon">
+            Paramètres généraux
+          </h1>
+          <p class="settings-subtitle">Configuration générale du site web</p>
+        </div>
+
+        <!-- Formulaire des paramètres -->
+        <form id="settingsForm" class="settings-form">
+          <!-- Informations générales -->
+          <div class="settings-section">
+            <h2 class="section-title">
+              <img src="/icons/user.svg" alt="" class="icon">
+              Informations générales
+            </h2>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="siteTitle" class="form-label">Titre du site *</label>
+                <input type="text" id="siteTitle" name="siteTitle" class="form-control"
+                       value="<%= settings.siteTitle %>" required>
+                <small class="form-text">Titre affiché dans l'onglet du navigateur</small>
+              </div>
+
+              <div class="form-group">
+                <label for="defaultLanguage" class="form-label">Langue par défaut</label>
+                <select id="defaultLanguage" name="defaultLanguage" class="form-control">
+                  <option value="fr" <%= settings.defaultLanguage === 'fr' ? 'selected' : '' %>>Français</option>
+                  <option value="en" <%= settings.defaultLanguage === 'en' ? 'selected' : '' %>>English</option>
+                  <option value="es" <%= settings.defaultLanguage === 'es' ? 'selected' : '' %>>Español</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="siteDescription" class="form-label">Description du site</label>
+              <textarea id="siteDescription" name="siteDescription" class="form-control" rows="3"
+                        placeholder="Description du site pour les moteurs de recherche"><%= settings.siteDescription %></textarea>
+              <small class="form-text">Utilisée pour le référencement (meta description)</small>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="settings-section">
+            <h2 class="section-title">
+              <img src="/icons/settings.svg" alt="" class="icon">
+              Contact
+            </h2>
+
+            <div class="form-group">
+              <label for="contactEmail" class="form-label">Email de contact *</label>
+              <input type="email" id="contactEmail" name="contactEmail" class="form-control"
+                     value="<%= settings.contactEmail %>" required>
+              <small class="form-text">Adresse email pour recevoir les messages du formulaire de contact</small>
+            </div>
+          </div>
+
+          <!-- Analytics -->
+          <div class="settings-section">
+            <h2 class="section-title">
+              <img src="/icons/settings.svg" alt="" class="icon">
+              Analytics & Suivi
+            </h2>
+
+            <div class="form-group">
+              <label for="googleAnalytics" class="form-label">Google Analytics</label>
+              <input type="text" id="googleAnalytics" name="googleAnalytics" class="form-control"
+                     value="<%= settings.googleAnalytics %>"
+                     placeholder="GA4-MEASUREMENT-ID ou G-XXXXXXXXXX">
+              <small class="form-text">ID de suivi Google Analytics 4 (optionnel)</small>
+            </div>
+          </div>
+
+          <!-- Maintenance -->
+          <div class="settings-section">
+            <h2 class="section-title">
+              <img src="/icons/settings.svg" alt="" class="icon">
+              Maintenance
+            </h2>
+
+            <div class="form-group">
+              <label class="form-label">
+                <input type="checkbox" id="maintenanceMode" name="maintenanceMode"
+                       <%= settings.maintenanceMode ? 'checked' : '' %>>
+                Mode maintenance
+              </label>
+              <small class="form-text">Active une page de maintenance pour tous les visiteurs (sauf admins)</small>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="settings-actions">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+              <img src="/icons/arrow-left.svg" alt="" class="icon">
+              Retour
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <img src="/icons/save.svg" alt="" class="icon">
+              Sauvegarder
+            </button>
+          </div>
+        </form>
+      </div>
+    `,
+    scripts: []
+  })
+%>

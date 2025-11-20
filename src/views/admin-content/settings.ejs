@@ -1,0 +1,318 @@
+<div class="toolbar">
+  <h1>Paramètres & Thème</h1>
+  <div class="toolbar-actions">
+    <button class="btn btn-primary" data-action="edit-theme">
+      <img src="/icons/palette.svg" alt="" class="icon">
+      Modifier le thème
+    </button>
+    <a href="/" class="btn btn-secondary">
+      <img src="/icons/home.svg" alt="" class="icon">
+      Voir le site
+    </a>
+  </div>
+</div>
+
+<%- include('../partials/alerts') %>
+
+<!-- Aperçu du thème actuel -->
+<div class="theme-preview">
+  <h2 class="admin-section-title">🎨 Aperçu du thème actuel</h2>
+  <div class="theme-preview-card" style="
+    background-color: <%= settings.backgroundColor %>;
+    color: <%= settings.textColor %>;
+    border-radius: <%= settings.borderRadius %>;
+    box-shadow: <%= settings.shadow === 'none' ? 'none' : settings.shadow === 'small' ? '0 2px 4px rgba(0,0,0,0.1)' : settings.shadow === 'medium' ? '0 4px 8px rgba(0,0,0,0.15)' : '0 8px 16px rgba(0,0,0,0.2)' %>;
+    max-width: <%= settings.maxWidth %>;
+    margin: 0 auto;
+    padding: 2rem;
+  ">
+    <h3 style="color: <%= settings.primaryColor %>; margin-top: 0;">Titre principal</h3>
+    <p style="color: <%= settings.mutedTextColor %>;">Texte secondaire avec <span style="color: <%= settings.accentColor %>;">accent</span></p>
+    <button style="
+      background-color: <%= settings.primaryColor %>;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: <%= settings.borderRadius %>;
+      cursor: pointer;
+    ">Bouton primaire</button>
+  </div>
+</div>
+
+<!-- Paramètres généraux -->
+<div class="settings-grid">
+  <div class="settings-card">
+    <h3>📝 Informations générales</h3>
+    <div class="settings-item">
+      <label>Titre du site</label>
+      <span><%= settings.siteTitle %></span>
+    </div>
+    <div class="settings-item">
+      <label>Description</label>
+      <span><%= settings.siteDescription %></span>
+    </div>
+    <div class="settings-item">
+      <label>Email de contact</label>
+      <span><%= settings.contactEmail %></span>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <h3>🎨 Couleurs du thème</h3>
+    <div class="settings-item">
+      <label>Couleur principale</label>
+      <div class="color-preview" style="background-color: <%= settings.primaryColor %>;"></div>
+      <span><%= settings.primaryColor %></span>
+    </div>
+    <div class="settings-item">
+      <label>Couleur secondaire</label>
+      <div class="color-preview" style="background-color: <%= settings.secondaryColor %>;"></div>
+      <span><%= settings.secondaryColor %></span>
+    </div>
+    <div class="settings-item">
+      <label>Couleur d'accent</label>
+      <div class="color-preview" style="background-color: <%= settings.accentColor %>;"></div>
+      <span><%= settings.accentColor %></span>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <h3>📚 Polices globales</h3>
+    <div class="settings-item">
+      <label>Police des titres</label>
+      <span><%= settings.titleFontId ? fonts.find(f => f.id == settings.titleFontId)?.name : 'Par défaut' %></span>
+    </div>
+    <div class="settings-item">
+      <label>Police des sous-titres</label>
+      <span><%= settings.subtitleFontId ? fonts.find(f => f.id == settings.subtitleFontId)?.name : 'Par défaut' %></span>
+    </div>
+    <div class="settings-item">
+      <label>Police du corps</label>
+      <span><%= settings.bodyFontId ? fonts.find(f => f.id == settings.bodyFontId)?.name : 'Par défaut' %></span>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <h3>📐 Layout global</h3>
+    <div class="settings-item">
+      <label>Largeur maximale</label>
+      <span><%= settings.maxWidth %></span>
+    </div>
+    <div class="settings-item">
+      <label>Rayon des bordures</label>
+      <span><%= settings.borderRadius %></span>
+    </div>
+    <div class="settings-item">
+      <label>Ombre</label>
+      <span><%= settings.shadow %></span>
+    </div>
+  </div>
+</div>
+
+<!-- Modale de modification du thème -->
+<div id="themeModal" class="modal" aria-hidden="true">
+  <div class="modal-content modal-large">
+    <div class="modal-header">
+      <h2>Modifier le thème global</h2>
+      <button class="modal-close" data-action="close-theme-modal">&times;</button>
+    </div>
+    <form id="themeForm">
+      <!-- Couleurs -->
+      <div class="modal-section">
+        <h3>🎨 Palette de couleurs</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="primaryColor">Couleur principale *</label>
+            <div class="color-picker-row">
+              <input type="color" id="primaryColor" name="primaryColor" class="color-input" value="<%= settings.primaryColor %>" required>
+              <input type="text" class="color-hex-input" value="<%= settings.primaryColor %>" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="secondaryColor">Couleur secondaire</label>
+            <div class="color-picker-row">
+              <input type="color" id="secondaryColor" name="secondaryColor" class="color-input" value="<%= settings.secondaryColor %>">
+              <input type="text" class="color-hex-input" value="<%= settings.secondaryColor %>" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="accentColor">Couleur d'accent</label>
+            <div class="color-picker-row">
+              <input type="color" id="accentColor" name="accentColor" class="color-input" value="<%= settings.accentColor %>">
+              <input type="text" class="color-hex-input" value="<%= settings.accentColor %>" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="backgroundColor">Fond de page</label>
+            <div class="color-picker-row">
+              <input type="color" id="backgroundColor" name="backgroundColor" class="color-input" value="<%= settings.backgroundColor %>">
+              <input type="text" class="color-hex-input" value="<%= settings.backgroundColor %>" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="textColor">Couleur du texte</label>
+            <div class="color-picker-row">
+              <input type="color" id="textColor" name="textColor" class="color-input" value="<%= settings.textColor %>">
+              <input type="text" class="color-hex-input" value="<%= settings.textColor %>" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="mutedTextColor">Texte secondaire</label>
+            <div class="color-picker-row">
+              <input type="color" id="mutedTextColor" name="mutedTextColor" class="color-input" value="<%= settings.mutedTextColor %>">
+              <input type="text" class="color-hex-input" value="<%= settings.mutedTextColor %>" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Polices -->
+      <div class="modal-section">
+        <h3>📚 Polices globales</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="titleFontId">Police des titres</label>
+            <select name="titleFontId" id="titleFontId">
+              <option value="">— Police par défaut —</option>
+              <% fonts.forEach(font => { %>
+                <option value="<%= font.id %>" <%= settings.titleFontId == font.id ? 'selected' : '' %>
+                        style="font-family: <%= font.font_family || font.name %>;">
+                  <%= font.name %> (<%= font.source %>)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="subtitleFontId">Police des sous-titres</label>
+            <select name="subtitleFontId" id="subtitleFontId">
+              <option value="">— Police par défaut —</option>
+              <% fonts.forEach(font => { %>
+                <option value="<%= font.id %>" <%= settings.subtitleFontId == font.id ? 'selected' : '' %>
+                        style="font-family: <%= font.font_family || font.name %>;">
+                  <%= font.name %> (<%= font.source %>)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bodyFontId">Police du corps de texte</label>
+          <select name="bodyFontId" id="bodyFontId">
+            <option value="">— Police par défaut —</option>
+            <% fonts.forEach(font => { %>
+              <option value="<%= font.id %>" <%= settings.bodyFontId == font.id ? 'selected' : '' %>
+                      style="font-family: <%= font.font_family || font.name %>;">
+                <%= font.name %> (<%= font.source %>)
+              </option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <!-- Layout -->
+      <div class="modal-section">
+        <h3>📐 Paramètres de layout</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="maxWidth">Largeur maximale du contenu</label>
+            <select name="maxWidth" id="maxWidth">
+              <option value="800px" <%= settings.maxWidth === '800px' ? 'selected' : '' %>>Étroit (800px)</option>
+              <option value="1000px" <%= settings.maxWidth === '1000px' ? 'selected' : '' %>>Moyen (1000px)</option>
+              <option value="1200px" <%= settings.maxWidth === '1200px' ? 'selected' : '' %>>Large (1200px)</option>
+              <option value="1400px" <%= settings.maxWidth === '1400px' ? 'selected' : '' %>>Très large (1400px)</option>
+              <option value="100%" <%= settings.maxWidth === '100%' ? 'selected' : '' %>>Pleine largeur</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="borderRadius">Rayon des bordures</label>
+            <select name="borderRadius" id="borderRadius">
+              <option value="0px" <%= settings.borderRadius === '0px' ? 'selected' : '' %>>Aucun</option>
+              <option value="4px" <%= settings.borderRadius === '4px' ? 'selected' : '' %>>Petit (4px)</option>
+              <option value="8px" <%= settings.borderRadius === '8px' ? 'selected' : '' %>>Moyen (8px)</option>
+              <option value="12px" <%= settings.borderRadius === '12px' ? 'selected' : '' %>>Grand (12px)</option>
+              <option value="16px" <%= settings.borderRadius === '16px' ? 'selected' : '' %>>Très grand (16px)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="shadow">Style d'ombre</label>
+          <select name="shadow" id="shadow">
+            <option value="none" <%= settings.shadow === 'none' ? 'selected' : '' %>>Aucune ombre</option>
+            <option value="small" <%= settings.shadow === 'small' ? 'selected' : '' %>>Petite ombre</option>
+            <option value="medium" <%= settings.shadow === 'medium' ? 'selected' : '' %>>Ombre moyenne</option>
+            <option value="large" <%= settings.shadow === 'large' ? 'selected' : '' %>>Grande ombre</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Paramètres généraux -->
+      <div class="modal-section">
+        <h3>⚙️ Paramètres généraux</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="siteTitle">Titre du site *</label>
+            <input type="text" id="siteTitle" name="siteTitle" value="<%= settings.siteTitle %>" required>
+          </div>
+
+          <div class="form-group">
+            <label for="defaultLanguage">Langue par défaut</label>
+            <select id="defaultLanguage" name="defaultLanguage">
+              <option value="fr" <%= settings.defaultLanguage === 'fr' ? 'selected' : '' %>>Français</option>
+              <option value="en" <%= settings.defaultLanguage === 'en' ? 'selected' : '' %>>English</option>
+              <option value="es" <%= settings.defaultLanguage === 'es' ? 'selected' : '' %>>Español</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="siteDescription">Description du site</label>
+          <textarea id="siteDescription" name="siteDescription" rows="3"><%= settings.siteDescription %></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactEmail">Email de contact *</label>
+            <input type="email" id="contactEmail" name="contactEmail" value="<%= settings.contactEmail %>" required>
+          </div>
+
+          <div class="form-group">
+            <label for="googleAnalytics">Google Analytics</label>
+            <input type="text" id="googleAnalytics" name="googleAnalytics" value="<%= settings.googleAnalytics %>"
+                   placeholder="GA4-MEASUREMENT-ID ou G-XXXXXXXXXX">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="maintenanceMode" name="maintenanceMode" <%= settings.maintenanceMode ? 'checked' : '' %>>
+            Mode maintenance
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-theme-modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">
+          <img src="/icons/save.svg" alt="" class="icon"> Sauvegarder le thème
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,1 @@
+import { query } from './src/config/db.js'; const result = await query(\INSERT INTO sections (title, type, layout, is_visible, position) VALUES ('Section Cartes Test', 'card_grid', 'grid', true, 1) RETURNING id;\); console.log('Section créée:', result.rows[0].id);

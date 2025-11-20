@@ -21,6 +21,9 @@ export const getAllSections = async () => {
         show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
         show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
+        title_font_id, subtitle_font_id, text_font_id,
+        title_color, subtitle_color, text_color, accent_color,
+        border_radius, shadow,
         created_at, updated_at
       FROM sections
       WHERE is_visible = TRUE
@@ -110,6 +113,9 @@ export const getSectionById = async (sectionId) => {
         show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
         show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
+        title_font_id, subtitle_font_id, text_font_id,
+        title_color, subtitle_color, text_color, accent_color,
+        border_radius, shadow,
         created_at, updated_at
       FROM sections
       WHERE id = $1
@@ -228,7 +234,16 @@ export const updateSection = async (sectionId, sectionData) => {
       layout,
       padding_top,
       padding_bottom,
-      is_visible
+      is_visible,
+      title_font_id,
+      subtitle_font_id,
+      text_font_id,
+      title_color,
+      subtitle_color,
+      text_color,
+      accent_color,
+      border_radius,
+      shadow
     } = sectionData;
     
     // Construire dynamiquement la requête pour ne mettre à jour QUE les champs fournis
@@ -275,6 +290,42 @@ export const updateSection = async (sectionId, sectionData) => {
     if (is_visible !== undefined) {
       updates.push(`is_visible = $${paramIndex++}`);
       values.push(is_visible);
+    }
+    if (title_font_id !== undefined) {
+      updates.push(`title_font_id = $${paramIndex++}`);
+      values.push(title_font_id);
+    }
+    if (subtitle_font_id !== undefined) {
+      updates.push(`subtitle_font_id = $${paramIndex++}`);
+      values.push(subtitle_font_id);
+    }
+    if (text_font_id !== undefined) {
+      updates.push(`text_font_id = $${paramIndex++}`);
+      values.push(text_font_id);
+    }
+    if (title_color !== undefined) {
+      updates.push(`title_color = $${paramIndex++}`);
+      values.push(title_color);
+    }
+    if (subtitle_color !== undefined) {
+      updates.push(`subtitle_color = $${paramIndex++}`);
+      values.push(subtitle_color);
+    }
+    if (text_color !== undefined) {
+      updates.push(`text_color = $${paramIndex++}`);
+      values.push(text_color);
+    }
+    if (accent_color !== undefined) {
+      updates.push(`accent_color = $${paramIndex++}`);
+      values.push(accent_color);
+    }
+    if (border_radius !== undefined) {
+      updates.push(`border_radius = $${paramIndex++}`);
+      values.push(border_radius);
+    }
+    if (shadow !== undefined) {
+      updates.push(`shadow = $${paramIndex++}`);
+      values.push(shadow);
     }
     
     if (updates.length === 0) {
@@ -406,6 +457,95 @@ export const addSectionCard = async (sectionId, cardData) => {
 };
 
 /**
+ * Mettre à jour une card existante
+ */
+export const updateSectionCard = async (cardId, cardData) => {
+  try {
+    const {
+      title,
+      description,
+      media_url,
+      media_type,
+      link_url,
+      bg_color,
+      text_color,
+      event_date,
+      position
+    } = cardData;
+    
+    // Construire dynamiquement la requête pour ne mettre à jour QUE les champs fournis
+    const updates = [];
+    const values = [];
+    let paramIndex = 1;
+    
+    if (title !== undefined) {
+      updates.push(`title = $${paramIndex++}`);
+      values.push(title);
+    }
+    if (description !== undefined) {
+      updates.push(`description = $${paramIndex++}`);
+      values.push(description);
+    }
+    if (media_url !== undefined) {
+      updates.push(`media_url = $${paramIndex++}`);
+      values.push(media_url);
+    }
+    if (media_type !== undefined) {
+      updates.push(`media_type = $${paramIndex++}`);
+      values.push(media_type);
+    }
+    if (link_url !== undefined) {
+      updates.push(`link_url = $${paramIndex++}`);
+      values.push(link_url);
+    }
+    if (bg_color !== undefined) {
+      updates.push(`bg_color = $${paramIndex++}`);
+      values.push(bg_color);
+    }
+    if (text_color !== undefined) {
+      updates.push(`text_color = $${paramIndex++}`);
+      values.push(text_color);
+    }
+    if (event_date !== undefined) {
+      updates.push(`event_date = $${paramIndex++}`);
+      values.push(event_date);
+    }
+    if (position !== undefined) {
+      updates.push(`position = $${paramIndex++}`);
+      values.push(position);
+    }
+    
+    if (updates.length === 0) {
+      logger.info(`Card #${cardId} - aucune mise à jour`);
+      const { rows } = await query('SELECT * FROM cards_v2 WHERE id = $1', [cardId]);
+      return rows[0] || null;
+    }
+    
+    // Ajouter updated_at
+    updates.push(`updated_at = NOW()`);
+    
+    values.push(cardId);
+    
+    const { rows } = await query(`
+      UPDATE cards_v2 SET ${updates.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `, values);
+    
+    if (rows.length === 0) {
+      logger.info(`Card mise à jour: #${cardId} - non trouvée`);
+      return null;
+    }
+    
+    logger.info(`Card mise à jour: #${cardId}`);
+    return rows[0];
+  } catch (error) {
+    logger.error('Erreur updateSectionCard:', error);
+    throw error;
+  }
+};
+
+/**
  * Ajouter une décoration à une section
  */
 export const addSectionDecoration = async (sectionId, decorationData) => {
@@ -460,6 +600,25 @@ export const getAllDecorations = async () => {
     return rows;
   } catch (error) {
     logger.error('Erreur getAllDecorations:', error);
+    throw error;
+  }
+};
+
+/**
+ * Récupérer toutes les polices disponibles
+ */
+export const getAllFonts = async () => {
+  try {
+    const { rows } = await query(`
+      SELECT 
+        id, name, display_name, source, url, font_family, file_path
+      FROM fonts
+      ORDER BY source, name
+    `);
+    
+    return rows;
+  } catch (error) {
+    logger.error('Erreur getAllFonts:', error);
     throw error;
   }
 };

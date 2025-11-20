@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const sectionId = e.currentTarget.dataset.sectionId;
       console.log('Ajouter carte à la section:', sectionId);
-      // TODO: Ouvrir modale d'ajout de carte
-      alert(`Ajout de carte à la section ${sectionId} - Fonctionnalité à implémenter`);
+      // Rediriger vers la page de gestion des cartes avec paramètre pour ouvrir la modale
+      window.location.href = `/api/sections/${sectionId}/cards?action=new`;
     });
   });
 

@@ -1084,6 +1084,126 @@ function generatePositionGrid(elementName, currentH, currentV) {
   }).join('');
 }
 
+// ==========================================================================
+// Édition du titre de section (card_grid)
+// ==========================================================================
+
+document.addEventListener('click', async (e) => {
+  const editTitleBtn = e.target.closest('[data-action="edit-title"]');
+  if (!editTitleBtn) return;
+  
+  e.preventDefault();
+  const sectionId = editTitleBtn.dataset.sectionId;
+  
+  try {
+    const response = await fetch(`/api/sections/${sectionId}`);
+    const section = await response.json();
+    
+    const modal = createTitleModal(section);
+    document.body.appendChild(modal);
+    openModal('editTitleModal');
+    
+  } catch (error) {
+    alert('Erreur lors du chargement de la section');
+  }
+});
+
+function createTitleModal(section) {
+  const modal = document.createElement('div');
+  modal.id = 'editTitleModal';
+  modal.className = 'modal';
+  
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Modifier le titre de la section</h2>
+        <button class="modal-close" data-close-modal="editTitleModal">&times;</button>
+      </div>
+      <form id="editTitleForm">
+        <input type="hidden" name="sectionId" value="${section.id}">
+        
+        <div class="form-group">
+          <label for="sectionTitle">Titre de la section</label>
+          <input type="text" name="title" id="sectionTitle" value="${section.title || ''}" placeholder="Titre de la section">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="titleFont">Police du titre</label>
+            <select name="title_font_id" id="titleFont">
+              <option value="">Par défaut</option>
+              <!-- Les options seront chargées dynamiquement -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="titleColor">Couleur du titre</label>
+            <input type="color" name="title_color" id="titleColor" value="${section.title_color || '#000000'}">
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="editTitleModal">Annuler</button>
+          <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  // Charger les polices disponibles
+  fetch('/api/fonts')
+    .then(res => res.json())
+    .then(fonts => {
+      const select = modal.querySelector('#titleFont');
+      fonts.forEach(font => {
+        const option = document.createElement('option');
+        option.value = font.id;
+        option.textContent = font.name;
+        if (section.title_font_id == font.id) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+    })
+    .catch(err => console.warn('Erreur chargement polices:', err));
+  
+  // Handler close buttons
+  modal.querySelectorAll('[data-close-modal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeModal('editTitleModal');
+      removeModal('editTitleModal');
+    });
+  });
+  
+  // Handler submit
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const sectionId = formData.get('sectionId');
+    
+    const data = {
+      title: formData.get('title'),
+      title_font_id: formData.get('title_font_id') || null,
+      title_color: formData.get('title_color')
+    };
+    
+    try {
+      const response = await fetch(`/api/sections/${sectionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
+      
+      window.location.reload();
+    } catch (error) {
+      alert('Erreur: ' + error.message);
+    }
+  });
+  
+  return modal;
+}
+
 console.log('✅ Sections Edit JS initialisé');
 
 // ========================================================================== 

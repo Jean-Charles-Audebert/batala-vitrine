@@ -1,20 +1,90 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e1]:
-  - link "Aller au contenu principal" [ref=e2] [cursor=pointer]:
-    - /url: "#main-content"
-  - generic [ref=e3]:
-    - heading "Connexion" [level=1] [ref=e4]
-    - alert [ref=e5]: Identifiants invalides.
-    - generic [ref=e6]:
-      - generic [ref=e7]:
-        - generic [ref=e8]: Email
-        - textbox "Email" [active] [ref=e9]
-      - generic [ref=e10]:
-        - generic [ref=e11]: Mot de passe
-        - textbox "Mot de passe" [ref=e12]
-      - button "Se connecter" [ref=e13] [cursor=pointer]
-    - link "← Retour à l'accueil" [ref=e15] [cursor=pointer]:
-      - /url: /
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - img "Logo" [ref=e6]
+        - heading "Titre" [level=1] [ref=e8]
+        - generic [ref=e10]:
+          - link "facebook" [ref=e11] [cursor=pointer]:
+            - /url: https://facebook.com/example
+            - img "facebook" [ref=e12]
+          - link "instagram" [ref=e13] [cursor=pointer]:
+            - /url: https://instagram.com/example
+            - img "instagram" [ref=e14]
+          - link "youtube" [ref=e15] [cursor=pointer]:
+            - /url: https://youtube.com/example
+            - img "youtube" [ref=e16]
+      - generic [ref=e17]:
+        - button "Paramètres section" [ref=e18] [cursor=pointer]
+        - button "Éditer le contenu" [ref=e19] [cursor=pointer]
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - heading "Nos services" [level=2] [ref=e22]
+        - generic [ref=e23]:
+          - article [ref=e24]:
+            - generic [ref=e25]:
+              - heading "Service 1" [level=3] [ref=e26]
+              - paragraph [ref=e27]: Description du premier service
+            - generic [ref=e28]:
+              - button [ref=e29] [cursor=pointer]
+              - button [ref=e30] [cursor=pointer]
+          - article [ref=e31]:
+            - generic [ref=e32]:
+              - heading "Service 2" [level=3] [ref=e33]
+              - paragraph [ref=e34]: Description du deuxième service
+            - generic [ref=e35]:
+              - button [ref=e36] [cursor=pointer]
+              - button [ref=e37] [cursor=pointer]
+          - article [ref=e38]:
+            - generic [ref=e39]:
+              - heading "Service 3" [level=3] [ref=e40]
+              - paragraph [ref=e41]: Description du troisième service
+            - generic [ref=e42]:
+              - button [ref=e43] [cursor=pointer]
+              - button [ref=e44] [cursor=pointer]
+        - button "+ Ajouter une card" [ref=e45] [cursor=pointer]
+      - button "Paramètres section" [ref=e47] [cursor=pointer]
+    - generic [ref=e48]:
+      - generic [ref=e50]:
+        - img "Titre actu" [ref=e53]
+        - generic [ref=e54]:
+          - heading "Titre actu" [level=2] [ref=e55]
+          - paragraph [ref=e56]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
+      - generic [ref=e57]:
+        - button "Modifier les paramètres de la section" [ref=e58] [cursor=pointer]
+        - button "Modifier le contenu" [ref=e59] [cursor=pointer]
+    - generic [ref=e60]:
+      - generic [ref=e62]:
+        - img "Titre offre" [ref=e65]
+        - generic [ref=e66]:
+          - heading "Titre offre" [level=2] [ref=e67]
+          - paragraph [ref=e68]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
+      - generic [ref=e69]:
+        - button "Modifier les paramètres de la section" [ref=e70] [cursor=pointer]
+        - button "Modifier le contenu" [ref=e71] [cursor=pointer]
+  - contentinfo [ref=e72]:
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - group [ref=e76]:
+          - generic "À propos" [ref=e77]
+        - group [ref=e79]:
+          - generic "Contact" [ref=e80]
+        - group [ref=e82]:
+          - generic "Suivez-nous" [ref=e83]
+        - group [ref=e85]:
+          - generic "Liens utiles" [ref=e86]
+      - paragraph [ref=e88]:
+        - text: © 2025
+        - link "caixaDev" [ref=e89] [cursor=pointer]:
+          - /url: https://caixadev.dev
+        - text: . Tous droits réservés.
+    - button "Modifier le footer" [ref=e90] [cursor=pointer]
+  - navigation "Navigation administrateur":
+    - menu:
+      - menuitem "Gérer les blocs du site"
+      - menuitem "Se déconnecter de l'interface administrateur"
+  - button "Ajouter une section" [ref=e91] [cursor=pointer]: ➕
 ```

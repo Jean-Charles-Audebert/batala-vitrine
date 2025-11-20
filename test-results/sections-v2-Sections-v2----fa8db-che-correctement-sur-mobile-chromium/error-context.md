@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - img "Logo" [ref=e6]
+      - heading "Titre" [level=1] [ref=e8]
+      - generic [ref=e10]:
+        - link "facebook" [ref=e11] [cursor=pointer]:
+          - /url: https://facebook.com/example
+          - img "facebook" [ref=e12]
+        - link "instagram" [ref=e13] [cursor=pointer]:
+          - /url: https://instagram.com/example
+          - img "instagram" [ref=e14]
+        - link "youtube" [ref=e15] [cursor=pointer]:
+          - /url: https://youtube.com/example
+          - img "youtube" [ref=e16]
+    - generic [ref=e18]:
+      - heading "Nos services" [level=2] [ref=e19]
+      - generic [ref=e20]:
+        - article [ref=e21]:
+          - generic [ref=e22]:
+            - heading "Service 1" [level=3] [ref=e23]
+            - paragraph [ref=e24]: Description du premier service
+        - article [ref=e25]:
+          - generic [ref=e26]:
+            - heading "Service 2" [level=3] [ref=e27]
+            - paragraph [ref=e28]: Description du deuxième service
+        - article [ref=e29]:
+          - generic [ref=e30]:
+            - heading "Service 3" [level=3] [ref=e31]
+            - paragraph [ref=e32]: Description du troisième service
+    - generic [ref=e35]:
+      - img "Titre actu" [ref=e38]
+      - generic [ref=e39]:
+        - heading "Titre actu" [level=2] [ref=e40]
+        - paragraph [ref=e41]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
+    - generic [ref=e44]:
+      - img "Titre offre" [ref=e47]
+      - generic [ref=e48]:
+        - heading "Titre offre" [level=2] [ref=e49]
+        - paragraph [ref=e50]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
+  - contentinfo [ref=e51]:
+    - generic [ref=e52]:
+      - generic [ref=e53]:
+        - group [ref=e55]:
+          - generic "À propos" [ref=e56]
+        - group [ref=e58]:
+          - generic "Contact" [ref=e59]
+        - group [ref=e61]:
+          - generic "Suivez-nous" [ref=e62]
+        - group [ref=e64]:
+          - generic "Liens utiles" [ref=e65]
+      - paragraph [ref=e67]:
+        - text: © 2025
+        - link "caixaDev" [ref=e68] [cursor=pointer]:
+          - /url: https://caixadev.dev
+        - text: . Tous droits réservés.
+  - navigation "Navigation administrateur" [ref=e69]:
+    - button "Connexion à l'interface administrateur" [ref=e70] [cursor=pointer]
+```

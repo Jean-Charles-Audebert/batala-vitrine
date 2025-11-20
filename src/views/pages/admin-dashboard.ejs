@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <% if (typeof stylesheets !== 'undefined' && Array.isArray(stylesheets)) { %>
+    <% stylesheets.forEach(stylesheet => { %>
+  <link rel="stylesheet" href="<%= stylesheet %>">
+    <% }) %>
+  <% } %>
+</head>
+<body class="admin-page">
+  <div class="admin-layout">
+    <nav class="admin-nav">
+      <div class="nav-header">
+        <a href="/" class="nav-brand">
+          <img src="/icons/logo.svg" alt="Logo" class="nav-logo">
+          Batala Admin
+        </a>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="/" class="nav-link">
+            <img src="/icons/home.svg" alt="" class="nav-icon">
+            Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link nav-link-active" data-section="sections">
+            <img src="/icons/sections.svg" alt="" class="nav-icon">
+            Sections
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="admins">
+            <img src="/icons/user.svg" alt="" class="nav-icon">
+            Admins
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="fonts">
+            <img src="/icons/font.svg" alt="" class="nav-icon">
+            Polices
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" data-section="settings">
+            <img src="/icons/settings.svg" alt="" class="nav-icon">
+            Paramètres
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-footer">
+        <a href="/auth/logout" class="nav-link nav-link-logout">
+          <img src="/icons/logout.svg" alt="" class="nav-icon">
+          Déconnexion
+        </a>
+      </div>
+    </nav>
+
+    <main class="admin-main">
+      <div id="admin-content" class="admin-content">
+        <!-- Le contenu se charge ici dynamiquement -->
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Chargement...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <% if (typeof scripts !== 'undefined' && Array.isArray(scripts)) { %>
+    <% scripts.forEach(script => { %>
+  <script src="<%= script %>"></script>
+    <% }) %>
+  <% } %>
+</body>
+</html>

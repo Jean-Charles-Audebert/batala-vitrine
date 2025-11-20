@@ -40,7 +40,7 @@ describe("upload configuration", () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        message: "Fichier trop volumineux. Taille maximale : 5 MB.",
+        message: "Fichier trop volumineux. Taille maximale : 50 MB.",
       });
       expect(next).not.toHaveBeenCalled();
     });

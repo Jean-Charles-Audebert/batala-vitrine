@@ -8,7 +8,17 @@ function createRes() {
 }
 
 describe('homeController.showHome', () => {
-  it('doit rendre la vue pages/index avec les blocs de la DB', async () => {
+  const originalEnv = process.env.USE_SECTIONS_V2;
+
+  afterEach(() => {
+    // Restore original env
+    process.env.USE_SECTIONS_V2 = originalEnv;
+  });
+
+  it('doit rendre la vue pages/index avec les blocs de la DB quand USE_SECTIONS_V2=false', async () => {
+    // Force legacy mode
+    process.env.USE_SECTIONS_V2 = 'false';
+
     const req = {};
     const res = createRes();
     const mockQuery = jest.fn();

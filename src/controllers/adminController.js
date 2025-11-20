@@ -6,9 +6,10 @@ export const listAdmins = async (req, res) => {
   try {
     const { rows } = await query("SELECT id, email, is_active, created_at FROM admins");
     res.render("pages/admins", { 
-      title: "Liste des admins", 
+      title: "Liste des administrateurs", 
       admins: rows,
-      success: req.query.success || null
+      success: req.query.success || null,
+      currentPage: 'admins'
     });
   } catch (error) {
     logger.error("Erreur récupération admins", error);
@@ -20,7 +21,8 @@ export const showNewAdminForm = (req, res) => {
   res.render("pages/admin-form", { 
     title: "Créer un nouvel admin", 
     formAction: "/admins/new",
-    admin: null 
+    admin: null,
+    currentPage: 'admins'
   });
 };
 
@@ -31,7 +33,8 @@ export const createAdmin = async (req, res) => {
       title: "Créer un nouvel admin", 
       formAction: "/admins/new",
       admin: null,
-      error: "Email et mot de passe requis." 
+      error: "Email et mot de passe requis.",
+      currentPage: 'admins'
     });
   }
   try {
@@ -47,7 +50,8 @@ export const createAdmin = async (req, res) => {
       title: "Créer un nouvel admin", 
       formAction: "/admins/new",
       admin: { email },
-      error: "Erreur lors de la création (email déjà existant ?)" 
+      error: "Erreur lors de la création (email déjà existant ?)",
+      currentPage: 'admins'
     });
   }
 };
@@ -62,7 +66,8 @@ export const showEditAdminForm = async (req, res) => {
     res.render("pages/admin-form", { 
       title: "Modifier un admin", 
       formAction: `/admins/${id}/edit`,
-      admin: rows[0]
+      admin: rows[0],
+      currentPage: 'admins'
     });
   } catch (error) {
     logger.error("Erreur récupération admin", error);
