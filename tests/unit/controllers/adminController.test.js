@@ -5,7 +5,7 @@ import { jest } from '@jest/globals';
 function makeListAdmins(query) {
   return async (req, res) => {
     try {
-      const { rows } = await query('SELECT id, email, is_active, created_at FROM admins');
+      const { rows } = await query('SELECT id, email, is_active, created_at FROM admins WHERE is_super_admin = FALSE');
       res.render('pages/admins', { 
         title: 'Liste des admins', 
         admins: rows,
@@ -84,7 +84,7 @@ describe('adminController', () => {
       const req = { query: {} };
       const res = createRes();
       await listAdmins(req, res);
-      expect(query).toHaveBeenCalledWith('SELECT id, email, is_active, created_at FROM admins');
+      expect(query).toHaveBeenCalledWith('SELECT id, email, is_active, created_at FROM admins WHERE is_super_admin = FALSE');
       expect(res.render).toHaveBeenCalledWith('pages/admins', expect.objectContaining({
         title: expect.any(String),
         admins: expect.any(Array),

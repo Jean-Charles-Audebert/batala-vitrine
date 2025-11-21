@@ -1,18 +1,17 @@
 -- ======================================
 --  Schema: Batala Vitrine WMS (consolidé)
---  Inclut toutes les migrations fusionnées
+--  Date: 2025-11-21
 -- ======================================
 
 -- Drops (facultatifs en dev)
+DROP TABLE IF EXISTS hero_nav_links CASCADE;
+DROP TABLE IF EXISTS social_links CASCADE;
 DROP TABLE IF EXISTS section_decorations CASCADE;
 DROP TABLE IF EXISTS decorations CASCADE;
 DROP TABLE IF EXISTS cards_v2 CASCADE;
 DROP TABLE IF EXISTS section_content CASCADE;
 DROP TABLE IF EXISTS sections CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
-DROP TABLE IF EXISTS cards CASCADE;
-DROP TABLE IF EXISTS footer_elements CASCADE;
-DROP TABLE IF EXISTS blocks CASCADE;
 DROP TABLE IF EXISTS fonts CASCADE;
 DROP TABLE IF EXISTS page CASCADE;
 DROP TABLE IF EXISTS admins CASCADE;
@@ -25,6 +24,7 @@ CREATE TABLE admins (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
+    is_super_admin BOOLEAN DEFAULT FALSE,
     created_by INT REFERENCES admins(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
@@ -59,124 +59,37 @@ CREATE TABLE fonts (
 
 CREATE INDEX idx_fonts_source ON fonts(source);
 
--- Insérer les polices système par défaut
-INSERT INTO fonts (name, source, font_family) VALUES
-('Arial', 'system', 'Arial, sans-serif'),
-('Helvetica', 'system', '''Helvetica Neue'', Helvetica, sans-serif'),
-('Segoe UI', 'system', '''Segoe UI'', Tahoma, Geneva, Verdana, sans-serif'),
-('Georgia', 'system', 'Georgia, serif'),
-('Times New Roman', 'system', '''Times New Roman'', Times, serif'),
-('Verdana', 'system', 'Verdana, sans-serif');
-
 -- ===============================
 --  PAGE (singleton pour thème global)
 -- ===============================
 CREATE TABLE page (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) DEFAULT 'Mon Site',
-    
+
     -- HEADER THEME
     header_bg_image VARCHAR(512),
     header_bg_color VARCHAR(7) DEFAULT '#ffffff',
     header_title_color VARCHAR(7) DEFAULT '#ffffff',
-    
+
     -- MAIN CONTENT THEME (zone entre header et footer)
     main_bg_image VARCHAR(512),
     main_bg_color VARCHAR(7) DEFAULT '#f5f5f5',
     main_title_color VARCHAR(7) DEFAULT '#333333',
-    
+
     -- FOOTER THEME
     footer_bg_image VARCHAR(512),
     footer_bg_color VARCHAR(7) DEFAULT '#2c3e50',
     footer_text_color VARCHAR(7) DEFAULT '#ecf0f1',
-    
+
     -- POLICE GLOBALE (référence vers table fonts)
     title_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
-    
+
+    -- Support vidéo background
+    main_bg_video VARCHAR(512),
+    header_bg_video VARCHAR(512),
+
     updated_at TIMESTAMP DEFAULT NOW()
 );
-
--- Insérer la ligne unique par défaut (avec police Arial par défaut)
-INSERT INTO page (id, title, title_font_id) VALUES (1, 'Mon Site', 1);
-
--- Support vidéo background
-ALTER TABLE page ADD COLUMN IF NOT EXISTS main_bg_video VARCHAR(512);
-ALTER TABLE page ADD COLUMN IF NOT EXISTS header_bg_video VARCHAR(512);
-
--- ===============================
---  BLOCKS
--- ===============================
-CREATE TABLE blocks (
-    id SERIAL PRIMARY KEY,
-    type VARCHAR(50) NOT NULL,
-    title VARCHAR(255),
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    style JSONB DEFAULT '{}',
-    position INT NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_locked BOOLEAN DEFAULT FALSE,
-    is_collapsible BOOLEAN DEFAULT FALSE,
-    bg_image VARCHAR(512),
-    header_logo VARCHAR(512),
-    header_title VARCHAR(255),
-    is_fixed BOOLEAN DEFAULT FALSE,
-    
-    -- BLOCK THEME CUSTOMIZATION
-    is_transparent BOOLEAN DEFAULT FALSE,
-    bg_color VARCHAR(7),
-    title_font VARCHAR(255),
-    title_color VARCHAR(7),
-    
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_blocks_position ON blocks(position);
-CREATE INDEX idx_blocks_slug ON blocks(slug);
-
--- ===============================
---  CARDS (template réutilisable)
--- ===============================
-CREATE TABLE cards (
-    id SERIAL PRIMARY KEY,
-    block_id INT NOT NULL REFERENCES blocks(id) ON DELETE CASCADE,
-    position INT NOT NULL,
-    template VARCHAR(50) DEFAULT 'default', -- 'default', 'image_left', 'image_right', 'photo', 'video', 'text_only'
-    title VARCHAR(255), -- nullable pour galeries photos/vidéos
-    description TEXT,
-    media_path VARCHAR(512),
-    media_type VARCHAR(20) DEFAULT 'image', -- 'image', 'photo', 'youtube'
-    style JSONB DEFAULT '{}',
-    event_date DATE,
-    
-    -- CARD THEME CUSTOMIZATION
-    bg_color VARCHAR(7),
-    title_color VARCHAR(7),
-    description_color VARCHAR(7),
-    description_bg_color VARCHAR(7) DEFAULT '#ffffff',
-    
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_cards_block_id ON cards(block_id);
-CREATE INDEX idx_cards_position ON cards(position);
-
--- ===============================
---  FOOTER ELEMENTS
--- ===============================
-CREATE TABLE footer_elements (
-    id SERIAL PRIMARY KEY,
-    block_id INT NOT NULL REFERENCES blocks(id) ON DELETE CASCADE,
-    type VARCHAR(50) NOT NULL,
-    position INT NOT NULL,
-    content TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_footer_elements_block_id ON footer_elements(block_id);
-CREATE INDEX idx_footer_elements_position ON footer_elements(position);
 
 -- ===============================
 --  SECTIONS (système modulaire v2)
@@ -195,6 +108,24 @@ CREATE TABLE sections (
     layout VARCHAR(50),
     padding_top VARCHAR(20) DEFAULT 'medium' CHECK (padding_top IN ('none', 'small', 'medium', 'large')),
     padding_bottom VARCHAR(20) DEFAULT 'medium' CHECK (padding_bottom IN ('none', 'small', 'medium', 'large')),
+
+    -- Colonnes header ajoutées (migration 004)
+    logo_url VARCHAR(512),
+    logo_position_h VARCHAR(20) DEFAULT 'center' CHECK (logo_position_h IN ('left', 'center', 'right')),
+    logo_position_v VARCHAR(20) DEFAULT 'center' CHECK (logo_position_v IN ('top', 'center', 'bottom')),
+    logo_width INT DEFAULT 150, -- Largeur en pixels
+    show_social_links BOOLEAN DEFAULT FALSE,
+    social_position_h VARCHAR(20) DEFAULT 'right' CHECK (social_position_h IN ('left', 'center', 'right')),
+    social_position_v VARCHAR(20) DEFAULT 'top' CHECK (social_position_v IN ('top', 'center', 'bottom')),
+    social_icon_size INT DEFAULT 24, -- Taille icônes en pixels
+    social_icon_color VARCHAR(7) DEFAULT '#ffffff',
+    show_nav_links BOOLEAN DEFAULT FALSE,
+    nav_position_h VARCHAR(20) DEFAULT 'right' CHECK (nav_position_h IN ('left', 'center', 'right')),
+    nav_position_v VARCHAR(20) DEFAULT 'center' CHECK (nav_position_v IN ('top', 'center', 'bottom')),
+    nav_text_color VARCHAR(7) DEFAULT '#ffffff',
+    nav_bg_color VARCHAR(30) DEFAULT 'rgba(255,255,255,0.25)',
+    is_sticky BOOLEAN DEFAULT FALSE, -- Header fixe au scroll
+
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -216,11 +147,19 @@ CREATE TABLE section_content (
     media_url VARCHAR(512),
     media_type VARCHAR(20) CHECK (media_type IN ('image', 'video', 'youtube')),
     media_alt TEXT,
-    media_size VARCHAR(20) DEFAULT 'medium' CHECK (media_size IN ('small', 'medium', 'large')),
+    media_size VARCHAR(20) DEFAULT 'medium' CHECK (media_size IN ('small', 'medium', 'large', 'xl', 'xxl')),
+    media_position VARCHAR(20) DEFAULT 'left' CHECK (media_position IN ('left', 'center', 'right')),
     text_color VARCHAR(7),
     text_align VARCHAR(20) DEFAULT 'left' CHECK (text_align IN ('left', 'center', 'right')),
     bg_color VARCHAR(7),
     position INT DEFAULT 0,
+
+    -- Colonnes ajoutées (migration 004)
+    title_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
+    title_color VARCHAR(7) DEFAULT '#ffffff',
+    title_position_h VARCHAR(20) DEFAULT 'center' CHECK (title_position_h IN ('left', 'center', 'right')),
+    title_position_v VARCHAR(20) DEFAULT 'center' CHECK (title_position_v IN ('top', 'center', 'bottom')),
+
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -260,7 +199,7 @@ CREATE TABLE section_decorations (
     opacity DECIMAL(3,2) DEFAULT 0.8 CHECK (opacity >= 0 AND opacity <= 1),
     scale DECIMAL(3,2) DEFAULT 1.0 CHECK (scale > 0 AND scale <= 3.0),
     position VARCHAR(50) DEFAULT 'top-left' CHECK (position IN (
-        'top-left', 'top-right', 'bottom-left', 'bottom-right', 
+        'top-left', 'top-right', 'bottom-left', 'bottom-right',
         'center', 'top', 'bottom', 'left', 'right', 'full'
     )),
     z_index INT DEFAULT 1,
@@ -294,6 +233,42 @@ CREATE INDEX idx_cards_v2_position ON cards_v2(position);
 CREATE INDEX idx_cards_v2_event_date ON cards_v2(event_date);
 
 -- ===============================
+--  SOCIAL_LINKS (migration 003)
+-- ===============================
+CREATE TABLE social_links (
+    id SERIAL PRIMARY KEY,
+    platform VARCHAR(50) NOT NULL CHECK (platform IN ('facebook', 'instagram', 'twitter', 'youtube', 'tiktok', 'linkedin', 'github', 'website')),
+    url VARCHAR(512) NOT NULL,
+    label VARCHAR(100),
+    icon_svg TEXT, -- SVG personnalisé optionnel
+    position INT DEFAULT 0,
+    is_visible BOOLEAN DEFAULT TRUE,
+    location VARCHAR(20) DEFAULT 'footer' CHECK (location IN ('header', 'footer', 'both')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_social_links_location ON social_links(location);
+CREATE INDEX idx_social_links_position ON social_links(position);
+
+-- ===============================
+--  HERO_NAV_LINKS (migration 004)
+-- ===============================
+CREATE TABLE hero_nav_links (
+    id SERIAL PRIMARY KEY,
+    section_id INT NOT NULL REFERENCES sections(id) ON DELETE CASCADE, -- Section hero qui contient les liens
+    target_section_id INT REFERENCES sections(id) ON DELETE CASCADE, -- Section cible
+    label VARCHAR(100) NOT NULL, -- Texte du lien
+    position INT DEFAULT 0,
+    is_visible BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_hero_nav_links_section_id ON hero_nav_links(section_id);
+CREATE INDEX idx_hero_nav_links_position ON hero_nav_links(position);
+
+-- ===============================
 --  TRIGGERS: Updated_at
 -- ===============================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -311,4 +286,10 @@ CREATE TRIGGER update_section_content_updated_at BEFORE UPDATE ON section_conten
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_cards_v2_updated_at BEFORE UPDATE ON cards_v2
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_social_links_updated_at BEFORE UPDATE ON social_links
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_hero_nav_links_updated_at BEFORE UPDATE ON hero_nav_links
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

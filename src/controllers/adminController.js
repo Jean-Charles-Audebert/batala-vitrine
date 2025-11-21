@@ -4,7 +4,7 @@ import { logger } from "../utils/logger.js";
 
 export const listAdmins = async (req, res) => {
   try {
-    const { rows } = await query("SELECT id, email, is_active, created_at FROM admins");
+    const { rows } = await query("SELECT id, email, is_active, created_at FROM admins WHERE is_super_admin = FALSE");
     res.render("pages/admins", { 
       title: "Liste des administrateurs", 
       admins: rows,

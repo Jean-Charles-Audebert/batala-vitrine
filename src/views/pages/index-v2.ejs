@@ -38,6 +38,15 @@
       <% if (pageSettings.main_title_color) { %>
       --main-title-color: <%= pageSettings.main_title_color %>;
       <% } %>
+      
+      /* Variables pour les polices individuelles */
+      <% if (fonts && fonts.length > 0) { %>
+        <% fonts.forEach(font => { %>
+          <% if (font.font_family) { %>
+      --font-<%= font.id %>: <%= font.font_family.replace(/['"\\]/g, '') %>;
+          <% } %>
+        <% }); %>
+      <% } %>
     }
   </style>
 </head>
@@ -69,9 +78,6 @@
       <iframe class="section-bg-youtube global-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></iframe>
     <% } %>
   <% } %>
-  </style>
-</head>
-<body class="vitrine-page">
   
   <!-- SECTIONS V2 -->
   <div class="main-content-wrapper">

@@ -108,12 +108,13 @@ router.post('/sections/reorder', async (req, res) => {
 // POST /api/sections/:sectionId/content - Ajouter du contenu
 router.post('/sections/:sectionId/content', async (req, res) => {
   try {
-    const content = await addSectionContent({
-      section_id: parseInt(req.params.sectionId, 10),
-      ...req.body
-    });
+    const content = await addSectionContent(
+      parseInt(req.params.sectionId, 10),
+      req.body
+    );
     res.status(201).json(content);
   } catch (error) {
+    console.error('❌ Erreur dans la route:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -121,20 +122,22 @@ router.post('/sections/:sectionId/content', async (req, res) => {
 // PUT /api/sections/:sectionId/content/:contentId - Modifier du contenu
 router.put('/sections/:sectionId/content/:contentId', async (req, res) => {
   try {
-    const { query } = await import('../config/db.js');
-    const { title, subtitle, description, cta_label, cta_url, media_url, media_type, text_color, text_align } = req.body;
-    
-    await query(`
-      UPDATE section_content 
-      SET title = $1, subtitle = $2, description = $3, 
-          cta_label = $4, cta_url = $5, media_url = $6,
-          media_type = $7, text_color = $8, text_align = $9
-      WHERE id = $10 AND section_id = $11
-    `, [title, subtitle, description, cta_label, cta_url, media_url, media_type, text_color, text_align, 
-        parseInt(req.params.contentId, 10), parseInt(req.params.sectionId, 10)]);
-    
-    res.json({ success: true });
+    const { updateSectionContent } = await import('../controllers/sectionController.js');
+
+    if (!updateSectionContent) {
+      return res.status(500).json({ error: 'Fonction updateSectionContent non disponible' });
+    }
+
+    const content = await updateSectionContent(
+      parseInt(req.params.contentId, 10),
+      req.body
+    );
+    if (!content) {
+      return res.status(404).json({ error: 'Contenu non trouvé' });
+    }
+    res.json(content);
   } catch (error) {
+    console.error('Erreur dans route PUT content:', error);
     res.status(500).json({ error: error.message });
   }
 });

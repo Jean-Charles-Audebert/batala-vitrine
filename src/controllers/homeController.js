@@ -25,71 +25,50 @@ export const showHome = async (req, res, deps = {}) => {
     
     if (useSectionsV2) {
       logger.info('📦 Utilisation du système sections v2');
+      console.log('🔍 Récupération des sections...');
       const sections = await getAllSections();
+      console.log('✅ Sections récupérées:', sections.length);
+      logger.info(`📊 ${sections.length} sections récupérées`);
       
       // Charger les réseaux sociaux
       const { getAllSocialLinks } = await import('./socialLinksController.js');
       const socialLinks = await getAllSocialLinks();
       
+      // Charger les polices disponibles
+      const { rows: fonts } = await _query('SELECT id, name, font_family, url, file_path FROM fonts ORDER BY name');
+      
+      logger.info('🎨 Rendu de la vue index-v2...');
       return res.render("pages/index-v2", {
         title: "Accueil",
         sections,
         socialLinks,
         pageSettings,
+        fonts,
         user: req.user || null,
         getSocialIcon
       });
     }
-    
-    // LEGACY: Système blocks/cards
-    logger.info('📦 Utilisation du système legacy (blocks/cards)');
-    
-    // Récupérer tous les blocs dans l'ordre de position (avec nouveaux champs de thème)
-    const { rows: blocks } = await _query(
-      "SELECT id, type, title, slug, position, header_logo, header_title, bg_image, is_fixed, is_transparent, bg_color, title_font, title_color FROM blocks ORDER BY position ASC"
-    );
-    
-    logger.info(`Blocs récupérés: ${blocks.length} blocs trouvés`);
-    
-    // Pour chaque bloc, récupérer ses éléments selon le type
-    for (const block of blocks) {
-      if (block.type === 'footer') {
-        // Footer: éléments spécifiques dans la table footer_elements
-        const { rows: elements } = await _query(
-          "SELECT id, type, position, content FROM footer_elements WHERE block_id=$1 ORDER BY position ASC",
-          [block.id]
-        );
-        
-        // Parser le JSON content pour chaque élément
-        block.elements = elements.map(el => ({
-          ...el,
-          parsedContent: el.content ? JSON.parse(el.content) : null
-        }));
-      } else if (block.type !== 'header') {
-        // Autres blocs (actus, offres, photos, vidéos, ...): charger les cartes normalisées (avec nouveaux champs de thème)
-        const { rows: cards } = await _query(
-          "SELECT id, position, template, title, description, media_path, bg_color, title_color, description_color, description_bg_color, media_type FROM cards WHERE block_id=$1 ORDER BY position ASC",
-          [block.id]
-        );
-        block.cards = cards;
-      }
-      // Header: utilise désormais les champs du bloc (header_logo, header_title, bg_image)
+  } catch (error) {
+    logger.error("Erreur récupération sections", error);
+    // Charger les réseaux sociaux même en cas d'erreur
+    let socialLinks = [];
+    let fonts = [];
+    try {
+      const { getAllSocialLinks } = await import('./socialLinksController.js');
+      socialLinks = await getAllSocialLinks();
+      const fontsResult = await _query('SELECT id, name, font_family, url, file_path FROM fonts ORDER BY name');
+      fonts = fontsResult.rows;
+    } catch (socialError) {
+      logger.error("Erreur chargement social/fonts", socialError);
     }
     
-    res.render("pages/index", {
+    return res.render("pages/index-v2", {
       title: "Accueil",
-      blocks,
-      pageSettings,
-      user: req.user || null,
-      getSocialIcon
-    });
-  } catch (error) {
-    logger.error("Erreur récupération blocs", error);
-    res.render("pages/index", {
-      title: "Accueil",
-      blocks: [],
+      sections: [],
+      socialLinks,
       pageSettings: { theme: {} },
-      user: null,
+      fonts,
+      user: req.user || null,
       getSocialIcon
     });
   }

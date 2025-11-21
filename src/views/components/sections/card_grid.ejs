@@ -25,7 +25,7 @@
   const sectionClasses = [
     'section',
     'section-card-grid',
-    `section-card-grid--${layout}`,
+    `section-card-grid--${layout || 'grid_3'}`,
     `padding-top-${padding_top}`,
     `padding-bottom-${padding_bottom}`
   ];
@@ -82,14 +82,28 @@
     <% if (sectionTitle) { %>
       <div class="section-title-container">
         <h2 class="section-title" 
-            style="<%= section.title_font_id ? `font-family: var(--font-${section.title_font_id});` : '' %><%= section.title_color ? `color: ${section.title_color};` : '' %>"
+            <% 
+              let titleStyle = [];
+              if (section.title_font_id) titleStyle.push(`font-family: var(--font-${section.title_font_id})`);
+              
+              // Couleur par défaut blanche si vidéo de fond et pas de couleur définie
+              let titleColor = section.title_color;
+              if ((bg_video || bg_youtube) && !titleColor) {
+                titleColor = '#ffffff';
+              }
+              if (titleColor) titleStyle.push(`color: ${titleColor}`);
+              
+              if (titleStyle.length > 0) { 
+            %>
+            style="<%= titleStyle.join('; ') %>"
+            <% } %>
             data-section-id="<%= id %>">
           <%= sectionTitle %>
         </h2>
       </div>
     <% } %>
     
-    <div class="cards-grid cards-grid--<%= layout.replace('grid_', '') %>">
+    <div class="cards-grid cards-grid--<%= (layout || 'grid_3').replace('grid_', '') %>">
       <% if (cards && cards.length > 0) { %>
         <% cards.forEach(card => { %>
           <article class="card" data-card-id="<%= card.id %>">

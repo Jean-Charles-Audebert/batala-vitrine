@@ -8,6 +8,8 @@
     title: sectionTitle,
     bg_color,
     bg_image,
+    bg_video,
+    bg_youtube,
     is_transparent,
     padding_top = 'medium',
     padding_bottom = 'medium',
@@ -41,7 +43,27 @@
   
   <div class="container">
     <% if (sectionTitle) { %>
-      <h2 class="section-title"><%= sectionTitle %></h2>
+      <div class="section-title-container">
+        <h2 class="section-title" 
+            <% 
+              let titleStyle = [];
+              if (section.title_font_id) titleStyle.push(`font-family: var(--font-${section.title_font_id})`);
+              
+              // Couleur par défaut blanche si vidéo de fond et pas de couleur définie
+              let titleColor = section.title_color;
+              if ((bg_video || bg_youtube) && !titleColor) {
+                titleColor = '#ffffff';
+              }
+              if (titleColor) titleStyle.push(`color: ${titleColor}`);
+              
+              if (titleStyle.length > 0) { 
+            %>
+            style="<%= titleStyle.join('; ') %>"
+            <% } %>
+            data-section-id="<%= id %>">
+          <%= sectionTitle %>
+        </h2>
+      </div>
     <% } %>
     
     <div class="gallery-grid">
@@ -101,8 +123,72 @@
         data-action="edit-section"
         aria-label="Modifier la galerie"
       >
+        <img src="/icons/settings.svg" alt="" class="icon">
+      </button>
+      <button 
+        class="edit-btn" 
+        data-section-id="<%= id %>"
+        data-action="edit-title"
+        aria-label="Modifier le titre"
+        title="Modifier le titre"
+      >
         <img src="/icons/edit.svg" alt="" class="icon">
       </button>
     </div>
   <% } %>
 </section>
+
+<% if (typeof user !== 'undefined' && user) { %>
+<!-- Modale d'édition du titre de section -->
+<div id="titleModal-<%= id %>" class="modal title-modal" data-section-id="<%= id %>">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Modifier le titre de la section</h3>
+      <button class="modal-close" data-action="close-modal">&times;</button>
+    </div>
+    
+    <form id="titleForm-<%= id %>" class="title-form">
+      <input type="hidden" name="sectionId" value="<%= id %>">
+      
+      <div class="form-group">
+        <label for="sectionTitle-<%= id %>">Titre de la section</label>
+        <input type="text" id="sectionTitle-<%= id %>" name="title" value="<%= sectionTitle || '' %>" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="titleFont-<%= id %>">Police du titre</label>
+        <select id="titleFont-<%= id %>" name="title_font_id">
+          <option value="">— Police par défaut —</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="titleColor-<%= id %>">Couleur du titre</label>
+        <div class="color-picker-row">
+          <input type="color" id="titleColor-<%= id %>" name="title_color" value="<%= section.title_color || '#333333' %>" class="color-input">
+          <input type="text" class="color-hex-input" value="<%= section.title_color || '#333333' %>" readonly>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">Sauvegarder</button>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+
+<script>
+  // Synchroniser le color picker du titre avec le champ texte
+  (function() {
+    const colorInput = document.getElementById('titleColor-<%= id %>');
+    const textInput = colorInput?.parentNode?.querySelector('.color-hex-input');
+    
+    if (colorInput && textInput) {
+      colorInput.addEventListener('input', function() {
+        textInput.value = this.value;
+      });
+    }
+  })();
+</script>

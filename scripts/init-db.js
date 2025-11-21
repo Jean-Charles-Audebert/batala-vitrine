@@ -56,10 +56,10 @@ async function initDatabase() {
 
     // Vérifier si les tables existent
     const pageExists = await tableExists('page');
-    const blocksExists = await tableExists('blocks');
+    const sectionsExists = await tableExists('sections');
     const adminsExists = await tableExists('admins');
 
-    if (pageExists && blocksExists && adminsExists) {
+    if (pageExists && sectionsExists && adminsExists) {
       console.log('✅ Base de données déjà initialisée');
       return;
     }
@@ -73,13 +73,6 @@ async function initDatabase() {
     // Exécuter le seed
     const seedPath = join(__dirname, '..', 'db', '002_seed.sql');
     await runSqlFile(seedPath);
-
-    // Exécuter les migrations
-    const migration003Path = join(__dirname, '..', 'db', '003_add_description_bg_color.sql');
-    await runSqlFile(migration003Path);
-
-    const migration006Path = join(__dirname, '..', 'db', '006_simplify_fonts.sql');
-    await runSqlFile(migration006Path);
 
     console.log('✅ Base de données initialisée avec succès');
   } catch (error) {

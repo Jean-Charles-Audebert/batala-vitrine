@@ -16,7 +16,7 @@ import authRoutes from "./routes/authRoutes.js";
 import refreshRoutes from "./routes/refreshRoutes.js";
 // import blockRoutes from "./routes/blockRoutes.js"; // Supprimé - système legacy remplacé par sections v2
 // import cardRoutes from "./routes/cardRoutes.js"; // Supprimé - système legacy remplacé par sections v2
-import footerElementRoutes from "./routes/footerElementRoutes.js";
+// import footerElementRoutes from "./routes/footerElementRoutes.js";
 // import fontRoutes from "./routes/fontRoutes.js"; // Supprimé - remplacé par SPA
 import apiRoutes from "./routes/apiRoutes.js";
 import sectionsAdminRoutes from "./routes/sectionsAdminRoutes.js";
@@ -28,6 +28,122 @@ import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
+
+/**
+ * Initialise les sections par défaut si aucune n'existe
+ */
+async function initializeDefaultSections() {
+  try {
+    // Vérifier s'il y a déjà des sections
+    const { rows } = await query('SELECT COUNT(*) as count FROM sections');
+    if (rows[0].count > 0) {
+      logger.info(`✅ ${rows[0].count} sections déjà présentes`);
+      return;
+    }
+
+    logger.info('🚀 Initialisation des sections par défaut...');
+
+    // Créer les sections par défaut
+    const defaultSections = [
+      {
+        type: 'hero',
+        title: 'Bienvenue',
+        position: 1,
+        layout: null,
+        is_visible: true
+      },
+      {
+        type: 'content',
+        title: 'À propos',
+        position: 2,
+        layout: 'image_left',
+        is_visible: true
+      },
+      {
+        type: 'card_grid',
+        title: 'Nos prestations',
+        position: 3,
+        layout: 'grid_3',
+        is_visible: true
+      },
+      {
+        type: 'footer',
+        title: 'Contact',
+        position: 999,
+        layout: null,
+        is_visible: true
+      }
+    ];
+
+    for (const section of defaultSections) {
+      await query(`
+        INSERT INTO sections (type, title, position, layout, is_visible, padding_top, padding_bottom)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `, [
+        section.type,
+        section.title,
+        section.position,
+        section.layout,
+        section.is_visible,
+        'medium',
+        'medium'
+      ]);
+      logger.info(`📄 Section créée: ${section.type} - ${section.title}`);
+    }
+
+    // Créer du contenu par défaut pour la section hero
+    await query(`
+      INSERT INTO section_content (section_id, title, subtitle, description, cta_label, cta_url, position)
+      SELECT id, 'Site Vitrine', 'caixaDev', 'Créons ensemble votre présence en ligne', 'Nous contacter', '#contact', 0
+      FROM sections WHERE type = 'hero' LIMIT 1
+    `);
+
+    // Créer du contenu par défaut pour la section content
+    await query(`
+      INSERT INTO section_content (section_id, title, description, position)
+      SELECT id, 'À propos de nous', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin tortor purus platea sit eu id nisi litora libero.', 0
+      FROM sections WHERE type = 'content' LIMIT 1
+    `);
+
+    // Créer des cartes par défaut pour la section card_grid
+    const cardGridId = await query('SELECT id FROM sections WHERE type = $1', ['card_grid']);
+    if (cardGridId.rows.length > 0) {
+      const cards = [
+        {
+          title: 'Lorem ipsum',
+          description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          position: 0,
+        },
+        {
+          title: 'Lorem ipsum',
+          description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          position: 1,
+        },
+        {
+          title: 'Lorem ipsum',
+          description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          position: 2,
+        },
+      ];
+
+      for (const card of cards) {
+        await query(`
+          INSERT INTO cards_v2 (section_id, title, description, position)
+          VALUES ($1, $2, $3, $4)
+        `, [cardGridId.rows[0].id, card.title, card.description, card.position]);
+      }
+      logger.info('🃏 Cartes par défaut créées');
+    }
+
+    logger.success('✅ Sections par défaut initialisées avec succès');
+
+  } catch (error) {
+    logger.error('❌ Erreur lors de l\'initialisation des sections:', error);
+  }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -109,7 +225,7 @@ app.use("/sections", sectionsAdminRoutes);
 // Route de contact PUBLIQUE (AVANT footerElementRoutes pour éviter son middleware global)
 app.post("/contact", sendContactEmail);
 
-app.use("/", footerElementRoutes);
+// app.use("/", footerElementRoutes); // TODO: Supprimé - système legacy blocks
 
 app.use("/api", apiRoutes);
 app.use("/api", sectionsApiRoutes);
@@ -121,7 +237,7 @@ app.use("/admin", settingsRoutes);
 
 // --- Lancement du serveur ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.success(`Serveur en ligne sur http://localhost:${PORT}`);
 
   // Diagnostic base de données au démarrage en développement uniquement
@@ -143,4 +259,7 @@ app.listen(PORT, () => {
       }
     })();
   }
+
+  // Initialiser les sections par défaut
+  await initializeDefaultSections();
 });

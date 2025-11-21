@@ -123,7 +123,7 @@ body:has(.header-fixed) main#main-content {
 h1, h2, h3, h4, h5, h6,
 .header-block h1, .header-block h2, .header-block h3, .header-block h4, .header-block h5, .header-block h6,
 .main-content-wrapper h1, .main-content-wrapper h2, .main-content-wrapper h3, .main-content-wrapper h4, .main-content-wrapper h5, .main-content-wrapper h6 {
-  font-family: var(--font-family-title, Arial, sans-serif) !important;
+  font-family: var(--font-family-title, Arial, sans-serif);
 }
 
 .site-title {
@@ -1012,36 +1012,188 @@ footer .social-link:hover .social-icon,
 }
 
 /* ==========================================================================
-   Footer section edit buttons
+   Sections Content (texte + média)
    ========================================================================== */
-.footer-column {
+.section-content {
   position: relative;
 }
 
-.edit-footer-section-btn {
+.content-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.content-media {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.content-media--small {
+  max-width: 200px;
+}
+
+.content-media--medium {
+  max-width: 300px;
+}
+
+.content-media--large {
+  max-width: 400px;
+}
+
+.content-media--left {
+  order: -1;
+}
+
+.content-media--right {
+  order: 1;
+}
+
+.content-media--center {
+  order: 0;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.content-media--full {
+  width: 100%;
+  max-width: none;
+}
+
+.media-container {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.media-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform var(--transition-base);
+}
+
+.media-container:hover img {
+  transform: scale(1.02);
+}
+
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-wrapper iframe {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: rgba(255, 255, 255, 0.15);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.content-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.content-text h2 {
+  font-family: var(--font-family-title, Arial, sans-serif);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--main-title-color, var(--color-text-primary));
+}
+
+.content-text h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  margin: 1rem 0 0.5rem 0;
+  color: var(--main-title-color, var(--color-text-primary));
+}
+
+.content-text .content-description {
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  margin: 1rem 0;
+  color: var(--color-text-secondary);
+}
+
+.content-text .content-description p {
+  margin: 0 0 1rem 0;
+}
+
+.content-text .content-description p:last-child {
+  margin-bottom: 0;
+}
+
+.btn-cta {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all var(--transition-base);
+  margin-top: 1rem;
+}
+
+.btn-cta:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Bouton d'ajout de contenu */
+.btn-add-content {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: var(--color-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all var(--transition-base);
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(4px);
+  font-size: var(--font-size-md);
 }
 
-.edit-footer-section-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.1);
+.btn-add-content:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.edit-footer-section-btn:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+/* Responsive pour sections content */
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .content-media {
+    order: 0 !important;
+    width: 100%;
+    max-width: none;
+  }
+  
+  .content-media--small,
+  .content-media--medium,
+  .content-media--large {
+    max-width: 100%;
+  }
+  
+  .content-text {
+    min-width: auto;
+  }
+  
+  .content-text h2 {
+    font-size: var(--font-size-lg);
+  }
 }
 

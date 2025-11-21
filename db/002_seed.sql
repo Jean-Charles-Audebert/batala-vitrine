@@ -1,66 +1,96 @@
--- Seed consolidé: Batala Vitrine WMS
+-- Seed consolidé: Batala Vitrine WMS (sections v2)
 
--- Blocs de base
--- Note: is_transparent, bg_color, title_font, title_color added for theme customization
--- Footer has explicit bg_color (#424242) to never be transparent
-INSERT INTO blocks (type, title, slug, position, is_active, is_locked, is_collapsible, is_transparent, bg_color, title_font, title_color)
+-- Sections de base (remplacement du système blocks legacy)
+INSERT INTO sections (type, title, position, is_visible, layout, padding_top, padding_bottom)
 VALUES
-  ('header', 'En-tête du site', 'header', 1, TRUE, TRUE, FALSE, FALSE, NULL, NULL, NULL),
-  ('events', 'Événements à venir', 'evenements', 2, TRUE, FALSE, FALSE, TRUE, NULL, NULL, NULL),
-  ('offers', 'Nos offres', 'offres', 3, TRUE, FALSE, FALSE, TRUE, NULL, NULL, NULL),
-  ('footer', 'Pied de page', 'footer', 999, TRUE, TRUE, FALSE, FALSE, '#424242', NULL, '#e0e0e0');
+  ('hero', 'Bienvenue', 1, TRUE, NULL, 'medium', 'medium'),
+  ('content', 'À propos', 2, TRUE, 'image_left', 'medium', 'medium'),
+  ('card_grid', 'Événements à venir', 3, TRUE, 'grid_3', 'medium', 'medium'),
+  ('card_grid', 'Nos prestations', 4, TRUE, 'grid_3', 'medium', 'medium'),
+  ('footer', 'Contact', 999, TRUE, NULL, 'medium', 'medium');
 
--- Header: logo, background, titre
-UPDATE blocks
-SET header_logo = '/assets/logo-default.svg',
-    bg_image = '/assets/header-bg-default.svg',
-    header_title = 'Titre de la page'
-WHERE slug = 'header';
+-- Contenu pour la section hero
+INSERT INTO section_content (section_id, title, subtitle, description, cta_label, cta_url, position)
+SELECT id, 'Titre de la page', NULL, NULL, NULL, NULL, 0
+FROM sections WHERE type = 'hero' LIMIT 1;
 
--- Cartes: Événements (avec dates)
--- Note: bg_color, title_color, description_color added for card theme customization (NULL = inherit from parent)
-INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
-SELECT b.id, 1, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-1.svg', '2025-06-15', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'evenements';
+-- Contenu pour la section "À propos"
+INSERT INTO section_content (section_id, title, description, position)
+SELECT id, 'À propos de nous', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', 0
+FROM sections WHERE type = 'content' AND title = 'À propos' LIMIT 1;
 
-INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
-SELECT b.id, 2, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-2.svg', '2025-05-20', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'evenements';
+-- Cartes pour la section "Événements à venir"
+INSERT INTO cards_v2 (section_id, title, description, media_url, event_date, position)
+SELECT s.id, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-1.svg', '2025-06-15', 0
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Événements à venir' LIMIT 1;
 
-INSERT INTO cards (block_id, position, title, description, media_path, event_date, bg_color, title_color, description_color)
-SELECT b.id, 3, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-3.svg', '2025-07-10', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'evenements';
+INSERT INTO cards_v2 (section_id, title, description, media_url, event_date, position)
+SELECT s.id, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-2.svg', '2025-05-20', 1
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Événements à venir' LIMIT 1;
 
--- Cartes: Offres (sans dates)
-INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
-SELECT b.id, 1, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-drums.svg', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'offres';
+INSERT INTO cards_v2 (section_id, title, description, media_url, event_date, position)
+SELECT s.id, 'Titre actu', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.', '/assets/placeholder-3.svg', '2025-07-10', 2
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Événements à venir' LIMIT 1;
 
-INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
-SELECT b.id, 2, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-event.svg', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'offres';
+-- Cartes pour la section "Nos prestations"
+INSERT INTO cards_v2 (section_id, title, description, media_url, position)
+SELECT s.id, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-drums.svg', 0
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Nos prestations' LIMIT 1;
 
-INSERT INTO cards (block_id, position, title, description, media_path, bg_color, title_color, description_color)
-SELECT b.id, 3, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-training.svg', NULL, NULL, NULL
-FROM blocks b WHERE b.slug = 'offres';
+INSERT INTO cards_v2 (section_id, title, description, media_url, position)
+SELECT s.id, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-event.svg', 1
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Nos prestations' LIMIT 1;
 
--- Footer
-INSERT INTO footer_elements (block_id, type, position, content) 
-SELECT b.id, 'text', 1, '{"about_title": "À propos de nous", "about_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante."}'
-FROM blocks b WHERE b.slug = 'footer';
+INSERT INTO cards_v2 (section_id, title, description, media_url, position)
+SELECT s.id, 'Titre offre', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', '/assets/icon-training.svg', 2
+FROM sections s WHERE s.type = 'card_grid' AND s.title = 'Nos prestations' LIMIT 1;
 
-INSERT INTO footer_elements (block_id, type, position, content)
-SELECT b.id, 'contact', 2, '{"email": "contact@email.fr", "phone": "+33 6 12 34 56 78"}'
-FROM blocks b WHERE b.slug = 'footer';
+-- Contenu pour la section footer
+INSERT INTO section_content (section_id, title, description, position)
+SELECT id, 'À propos de nous', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.', 0
+FROM sections WHERE type = 'footer' LIMIT 1;
 
-INSERT INTO footer_elements (block_id, type, position, content)
-SELECT b.id, 'social', 3, '{"links": [{"network": "facebook", "url": "https://facebook.com/lien"}, {"network": "instagram", "url": "https://instagram.com/lien"}, {"network": "youtube", "url": "https://youtube.com/lien"}, {"network": "tiktok", "url": "https://tiktok.com/lien"}]}'
-FROM blocks b WHERE b.slug = 'footer';
+INSERT INTO section_content (section_id, title, subtitle, description, position)
+SELECT id, 'Contactez-nous', 'Informations de contact', 'Email: contact@email.fr\nTéléphone: +33 6 12 34 56 78', 1
+FROM sections WHERE type = 'footer' LIMIT 1;
+
+-- Super-admin (non listé dans l'interface admin)
+INSERT INTO admins (email, password_hash, is_active, is_super_admin)
+VALUES ('jc1932@gmail.com', '$argon2id$v=19$m=65536,t=3,p=4$efoy+RWRgHbSvICiimBkPg$T0uTT9oGJLClU2hkoAqoI/jD/tZnEjLgWSjxdwup0kU', TRUE, TRUE)
+ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = TRUE, is_super_admin = TRUE;
 
 -- Admin de test pour E2E (password: SecureP@ss123)
 INSERT INTO admins (email, password_hash, is_active)
 VALUES ('admin@batala.fr', '$argon2id$v=19$m=65536,t=3,p=4$T+ptavBGgyk2ox+u+ZF46g$u9zuOPKAXB2uRRu3pM30Vk/2KpAcQx+4cQiVbOI0mCU', TRUE)
 ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = TRUE;
+
+-- ===============================  
+--  FONTS (bibliothèque de polices)
+-- ===============================
+INSERT INTO fonts (name, source, url, font_family) VALUES
+('roboto', 'google', 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap', 'Roboto'),
+('opensans', 'google', 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap', 'Open Sans'),
+('lato', 'google', 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap', 'Lato'),
+('montserrat', 'google', 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap', 'Montserrat'),
+('raleway', 'google', 'https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap', 'Raleway'),
+('playfair', 'google', 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap', 'Playfair Display'),
+('merriweather', 'google', 'https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap', 'Merriweather'),
+('nunito', 'google', 'https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap', 'Nunito'),
+('poppins', 'google', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap', 'Poppins'),
+('sourcesans', 'google', 'https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap', 'Source Sans Pro');
+
+-- ===============================  
+--  PAGE SETTINGS (singleton)
+-- ===============================
+INSERT INTO page (id, title, main_bg_color, main_title_color, footer_bg_color, footer_text_color, title_font_id)
+VALUES (1, 'Batala Vitrine', '#f5f5f5', '#333333', '#2c3e50', '#ecf0f1', 4) -- Montserrat par défaut
+ON CONFLICT (id) DO UPDATE SET 
+  title = EXCLUDED.title,
+  main_bg_color = EXCLUDED.main_bg_color,
+  main_title_color = EXCLUDED.main_title_color,
+  footer_bg_color = EXCLUDED.footer_bg_color,
+  footer_text_color = EXCLUDED.footer_text_color,
+  title_font_id = EXCLUDED.title_font_id;
 
 -- ===============================
 --  DÉCORATIONS (v2 sections)

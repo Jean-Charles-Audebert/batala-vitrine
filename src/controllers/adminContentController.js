@@ -39,7 +39,7 @@ export const getSectionsContent = async (req, res) => {
  */
 export const getAdminsContent = async (req, res) => {
   try {
-    const { rows: admins } = await query("SELECT id, email, is_active, created_at FROM admins");
+    const { rows: admins } = await query("SELECT id, email, is_active, created_at FROM admins WHERE is_super_admin = FALSE");
     const success = req.query.success || null;
 
     res.render('admin-content/admins', {

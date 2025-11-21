@@ -21,9 +21,6 @@ export const getAllSections = async () => {
         show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
         show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
-        title_font_id, subtitle_font_id, text_font_id,
-        title_color, subtitle_color, text_color, accent_color,
-        border_radius, shadow,
         created_at, updated_at
       FROM sections
       WHERE is_visible = TRUE
@@ -113,9 +110,6 @@ export const getSectionById = async (sectionId) => {
         show_social_links, social_position_h, social_position_v, social_icon_size, social_icon_color,
         show_nav_links, nav_position_h, nav_position_v, nav_text_color, nav_bg_color,
         is_sticky,
-        title_font_id, subtitle_font_id, text_font_id,
-        title_color, subtitle_color, text_color, accent_color,
-        border_radius, shadow,
         created_at, updated_at
       FROM sections
       WHERE id = $1
@@ -198,6 +192,36 @@ export const createSection = async (sectionData) => {
       padding_bottom = 'medium'
     } = sectionData;
     
+    // Définir le layout par défaut selon le type de section
+    let defaultLayout;
+    switch (type) {
+      case 'card_grid':
+        defaultLayout = 'grid_3';
+        break;
+      case 'content':
+        defaultLayout = 'image_left';
+        break;
+      case 'gallery':
+        defaultLayout = null; // Gallery n'utilise pas de layout
+        break;
+      default:
+        defaultLayout = null;
+    }
+    
+    const finalLayout = layout || defaultLayout;
+    
+    // Si position n'est pas fournie, calculer automatiquement
+    let finalPosition = position;
+    if (finalPosition === null || finalPosition === undefined) {
+      // Trouver la position maximale actuelle (mais inférieure à 999)
+      const { rows: maxPosRows } = await query(`
+        SELECT COALESCE(MAX(position), 0) as max_pos 
+        FROM sections 
+        WHERE position < 999
+      `);
+      finalPosition = maxPosRows[0].max_pos + 1;
+    }
+    
     const { rows } = await query(`
       INSERT INTO sections (
         type, title, position,
@@ -206,12 +230,12 @@ export const createSection = async (sectionData) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `, [
-      type, title, position,
+      type, title, finalPosition,
       bg_color, bg_image, bg_video, is_transparent,
-      layout, padding_top, padding_bottom
+      finalLayout, padding_top, padding_bottom
     ]);
     
-    logger.info(`Section créée: #${rows[0].id} (${type})`);
+    logger.info(`Section créée: #${rows[0].id} (${type}) à la position ${finalPosition}`);
     return rows[0];
   } catch (error) {
     logger.error('Erreur createSection:', error);
@@ -234,16 +258,7 @@ export const updateSection = async (sectionId, sectionData) => {
       layout,
       padding_top,
       padding_bottom,
-      is_visible,
-      title_font_id,
-      subtitle_font_id,
-      text_font_id,
-      title_color,
-      subtitle_color,
-      text_color,
-      accent_color,
-      border_radius,
-      shadow
+      is_visible
     } = sectionData;
     
     // Construire dynamiquement la requête pour ne mettre à jour QUE les champs fournis
@@ -290,42 +305,6 @@ export const updateSection = async (sectionId, sectionData) => {
     if (is_visible !== undefined) {
       updates.push(`is_visible = $${paramIndex++}`);
       values.push(is_visible);
-    }
-    if (title_font_id !== undefined) {
-      updates.push(`title_font_id = $${paramIndex++}`);
-      values.push(title_font_id);
-    }
-    if (subtitle_font_id !== undefined) {
-      updates.push(`subtitle_font_id = $${paramIndex++}`);
-      values.push(subtitle_font_id);
-    }
-    if (text_font_id !== undefined) {
-      updates.push(`text_font_id = $${paramIndex++}`);
-      values.push(text_font_id);
-    }
-    if (title_color !== undefined) {
-      updates.push(`title_color = $${paramIndex++}`);
-      values.push(title_color);
-    }
-    if (subtitle_color !== undefined) {
-      updates.push(`subtitle_color = $${paramIndex++}`);
-      values.push(subtitle_color);
-    }
-    if (text_color !== undefined) {
-      updates.push(`text_color = $${paramIndex++}`);
-      values.push(text_color);
-    }
-    if (accent_color !== undefined) {
-      updates.push(`accent_color = $${paramIndex++}`);
-      values.push(accent_color);
-    }
-    if (border_radius !== undefined) {
-      updates.push(`border_radius = $${paramIndex++}`);
-      values.push(border_radius);
-    }
-    if (shadow !== undefined) {
-      updates.push(`shadow = $${paramIndex++}`);
-      values.push(shadow);
     }
     
     if (updates.length === 0) {
@@ -375,39 +354,52 @@ export const deleteSection = async (sectionId) => {
  */
 export const addSectionContent = async (sectionId, contentData) => {
   try {
+    console.log('🔧 addSectionContent appelé avec:');
+    console.log('  sectionId:', sectionId);
+    console.log('  contentData:', JSON.stringify(contentData, null, 2));
+
     const {
       title,
-      subtitle,
       description,
-      cta_label,
-      cta_url,
       media_url,
       media_type,
-      media_alt,
-      media_size = 'medium',
+      media_size = 'large',
+      media_position = 'left',
       text_color,
       text_align = 'left',
+      title_font_id,
+      title_color,
       bg_color,
       position = 0
     } = contentData;
-    
+
+    console.log('📋 Valeurs extraites:');
+    console.log('  title:', title);
+    console.log('  media_size:', media_size);
+    console.log('  media_position:', media_position);
+    console.log('  bg_color:', bg_color);
+
     const { rows } = await query(`
       INSERT INTO section_content (
-        section_id, title, subtitle, description,
-        cta_label, cta_url,
-        media_url, media_type, media_alt, media_size,
-        text_color, text_align, bg_color,
+        section_id, title, description,
+        media_url, media_type, media_size,
+        media_position,
+        text_color, text_align,
+        title_font_id, title_color,
+        bg_color,
         position
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `, [
-      sectionId, title, subtitle, description,
-      cta_label, cta_url,
-      media_url, media_type, media_alt, media_size,
-      text_color, text_align, bg_color,
+      sectionId, title, description,
+      media_url, media_type, media_size,
+      media_position,
+      text_color, text_align,
+      title_font_id, title_color,
+      bg_color,
       position
     ]);
-    
+
     logger.info(`Contenu ajouté à section #${sectionId}`);
     return rows[0];
   } catch (error) {
@@ -415,6 +407,59 @@ export const addSectionContent = async (sectionId, contentData) => {
     throw error;
   }
 };
+
+/**
+ * Mettre à jour du contenu existant
+ */
+export async function updateSectionContent(contentId, updates) {
+  try {
+    // Vérifier que contentId est valide
+    if (!contentId || isNaN(contentId)) {
+      throw new Error('ID de contenu invalide');
+    }
+
+    // Construire la requête de mise à jour dynamique
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+
+    // Parcourir les champs à mettre à jour
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined && value !== null) {
+        fields.push(`${key} = $${paramIndex}`);
+        values.push(value);
+        paramIndex++;
+      }
+    }
+
+    if (fields.length === 0) {
+      throw new Error('Aucun champ à mettre à jour');
+    }
+
+    // Ajouter updated_at
+    fields.push(`updated_at = NOW()`);
+
+    // Construire la requête
+    const queryText = `
+      UPDATE section_content
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `;
+    values.push(contentId);
+
+    const { rows } = await query(queryText, values);
+
+    if (rows.length === 0) {
+      return null;
+    }
+
+    return rows[0];
+  } catch (error) {
+    console.error('Erreur dans updateSectionContent:', error);
+    throw error;
+  }
+}
 
 /**
  * Ajouter une card à une section

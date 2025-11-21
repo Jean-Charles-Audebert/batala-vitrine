@@ -3,60 +3,102 @@
 ```yaml
 - generic [active] [ref=e1]:
   - generic [ref=e2]:
-    - generic [ref=e4]:
-      - img "Logo" [ref=e6]
-      - heading "Titre" [level=1] [ref=e8]
-      - generic [ref=e10]:
-        - link "facebook" [ref=e11] [cursor=pointer]:
-          - /url: https://facebook.com/example
-          - img "facebook" [ref=e12]
-        - link "instagram" [ref=e13] [cursor=pointer]:
-          - /url: https://instagram.com/example
-          - img "instagram" [ref=e14]
-        - link "youtube" [ref=e15] [cursor=pointer]:
-          - /url: https://youtube.com/example
-          - img "youtube" [ref=e16]
-    - generic [ref=e18]:
-      - heading "Nos services" [level=2] [ref=e19]
-      - generic [ref=e20]:
-        - article [ref=e21]:
+    - generic [ref=e6]:
+      - link "facebook" [ref=e7] [cursor=pointer]:
+        - /url: https://facebook.com/example
+        - img "facebook" [ref=e8]
+      - link "instagram" [ref=e9] [cursor=pointer]:
+        - /url: https://instagram.com/example
+        - img "instagram" [ref=e10]
+      - link "youtube" [ref=e11] [cursor=pointer]:
+        - /url: https://youtube.com/example
+        - img "youtube" [ref=e12]
+    - generic [ref=e15]:
+      - heading "Nos services" [level=2] [ref=e17]
+      - generic [ref=e18]:
+        - article [ref=e19]:
+          - img "Service 1" [ref=e21]
           - generic [ref=e22]:
             - heading "Service 1" [level=3] [ref=e23]
-            - paragraph [ref=e24]: Description du premier service
+            - paragraph [ref=e24]: Description du premier service esa
         - article [ref=e25]:
-          - generic [ref=e26]:
-            - heading "Service 2" [level=3] [ref=e27]
-            - paragraph [ref=e28]: Description du deuxième service
-        - article [ref=e29]:
-          - generic [ref=e30]:
-            - heading "Service 3" [level=3] [ref=e31]
-            - paragraph [ref=e32]: Description du troisième service
-    - generic [ref=e35]:
-      - img "Titre actu" [ref=e38]
-      - generic [ref=e39]:
-        - heading "Titre actu" [level=2] [ref=e40]
-        - paragraph [ref=e41]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
-    - generic [ref=e44]:
-      - img "Titre offre" [ref=e47]
-      - generic [ref=e48]:
-        - heading "Titre offre" [level=2] [ref=e49]
-        - paragraph [ref=e50]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
-  - contentinfo [ref=e51]:
-    - generic [ref=e52]:
-      - generic [ref=e53]:
-        - group [ref=e55]:
-          - generic "À propos" [ref=e56]
-        - group [ref=e58]:
-          - generic "Contact" [ref=e59]
-        - group [ref=e61]:
-          - generic "Suivez-nous" [ref=e62]
-        - group [ref=e64]:
-          - generic "Liens utiles" [ref=e65]
-      - paragraph [ref=e67]:
+          - img "Service 1" [ref=e27]
+          - generic [ref=e28]:
+            - heading "Service 1" [level=3] [ref=e29]
+            - paragraph [ref=e30]: la la la
+    - generic [ref=e32]:
+      - heading "Événements à venir" [level=2] [ref=e34]
+      - generic [ref=e35]:
+        - article [ref=e36]:
+          - img "Titre actu" [ref=e38]
+          - generic [ref=e39]:
+            - heading "Titre actu" [level=3] [ref=e40]
+            - paragraph [ref=e41]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
+        - article [ref=e42]:
+          - img "Titre actu" [ref=e44]
+          - generic [ref=e45]:
+            - heading "Titre actu" [level=3] [ref=e46]
+            - paragraph [ref=e47]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
+        - article [ref=e48]:
+          - img "Titre actu" [ref=e50]
+          - generic [ref=e51]:
+            - heading "Titre actu" [level=3] [ref=e52]
+            - paragraph [ref=e53]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
+    - generic [ref=e55]:
+      - heading "Nos offres" [level=2] [ref=e57]
+      - generic [ref=e58]:
+        - article [ref=e59]:
+          - img "gnbxgn" [ref=e61]
+          - generic [ref=e62]:
+            - heading "gnbxgn" [level=3] [ref=e63]
+            - paragraph [ref=e64]: cvnbvncvnbcv
+        - article [ref=e65]:
+          - img "Titre offre" [ref=e67]
+          - generic [ref=e68]:
+            - heading "Titre offre" [level=3] [ref=e69]
+            - paragraph [ref=e70]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
+        - article [ref=e71]:
+          - img "Titre offre" [ref=e73]
+          - generic [ref=e74]:
+            - heading "Titre offre" [level=3] [ref=e75]
+            - paragraph [ref=e76]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
+    - generic [ref=e78]:
+      - heading "Media" [level=2] [ref=e80]
+      - paragraph [ref=e82]: Aucun média à afficher
+    - generic [ref=e85]:
+      - img "BATALA LA ROCHELLE" [ref=e88]
+      - generic [ref=e89]:
+        - heading "BATALA LA ROCHELLE" [level=2] [ref=e90]
+        - generic [ref=e91]: "Nous appartenons à Batala, groupe international composé de plus de 3000 percussionnistes répartis sur 4 continents ! En 2000, Giba Gonçalves, d’origine bahianaise (NE Brésil), créa notre groupe rochelais avec une quinzaine de membres, qui travaillèrent intensément pour effectuer les premières sorties en public. Peu à peu, notre association s’est agrandie, attirant des personnes conquises par cette musique. Aujourd’hui, une cinquantaine de musiciens, de tous âges et de différents horizons, participe à la vie de notre association et assure la promotion de la culture brésilienne. Ouverts à tous, nous invitons régulièrement d’autres batucadas et groupes Batala. Nous participons régulièrement à des rencontres inter-batucadas (ex : Nuits Frappées de Bruniquel) pour partager un stage, un week-end convivial, une prestation, un concert … Nous sillonnons la France et l’Europe, participe avec énergie et bonne humeur aux animations culturelles de plein air (fêtes de quartiers, carnavals de rue, festivals, évènements sportifs, fêtes communales), mais aussi sur scène ou lors de soirées privées."
+    - generic [ref=e93]:
+      - heading "cards essai" [level=2] [ref=e95]
+      - generic [ref=e96]:
+        - article [ref=e97]:
+          - img "essai" [ref=e99]
+          - generic [ref=e100]:
+            - heading "essai" [level=3] [ref=e101]
+            - paragraph [ref=e102]: essai
+        - article [ref=e103]:
+          - img "essai 2" [ref=e105]
+          - generic [ref=e106]:
+            - heading "essai 2" [level=3] [ref=e107]
+            - paragraph [ref=e108]: qqsdfqdf
+  - contentinfo [ref=e109]:
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - group [ref=e113]:
+          - generic "À propos" [ref=e114]
+        - group [ref=e116]:
+          - generic "Contact" [ref=e117]
+        - group [ref=e119]:
+          - generic "Suivez-nous" [ref=e120]
+        - group [ref=e122]:
+          - generic "Liens utiles" [ref=e123]
+      - paragraph [ref=e125]:
         - text: © 2025
-        - link "caixaDev" [ref=e68] [cursor=pointer]:
+        - link "caixaDev" [ref=e126] [cursor=pointer]:
           - /url: https://caixadev.dev
         - text: . Tous droits réservés.
-  - navigation "Navigation administrateur" [ref=e69]:
-    - button "Connexion à l'interface administrateur" [ref=e70] [cursor=pointer]
+  - navigation "Navigation administrateur" [ref=e127]:
+    - button "Connexion à l'interface administrateur" [ref=e128] [cursor=pointer]
 ```

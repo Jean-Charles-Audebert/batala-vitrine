@@ -1462,8 +1462,15 @@ tr[draggable="true"]:hover {
 }
 
 /* ==========================================================================
-   Loading States
+   Content Modal - Éditeur de contenu
    ========================================================================== */
+
+body .modal .modal-content {
+  background: white !important;
+  opacity: 1 !important;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
 .loading-state {
   display: flex;
   flex-direction: column;

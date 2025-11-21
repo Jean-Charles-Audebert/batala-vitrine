@@ -516,6 +516,11 @@ body.vitrine-page {
   max-height: 600px;
 }
 
+.section-content .container {
+  position: relative;
+  z-index: 1;
+}
+
 .section-content .content-wrapper {
   display: flex;
   gap: var(--grid-gap);
@@ -581,6 +586,11 @@ body.vitrine-page {
   background-position: center center;
   background-repeat: no-repeat;
   min-height: 400px;
+}
+
+.section-card-grid .container {
+  position: relative;
+  z-index: 1;
 }
 
 .section-title {

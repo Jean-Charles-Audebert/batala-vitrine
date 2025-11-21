@@ -1,10 +1,11 @@
 <%
   /**
    * Composant: Section Content
-   * Texte avec image (layout flexible: image_left, image_right, centered)
+   * Contenu simple avec texte et image
    */
   const {
     id,
+    title: sectionTitle,
     layout = 'image_left',
     bg_color,
     bg_image,
@@ -17,18 +18,6 @@
     decorations = []
   } = section;
   
-  const sectionContent = content[0] || {};
-  const {
-    title: contentTitle,
-    description,
-    media_url,
-    media_type = 'image',
-    media_size = 'medium',
-    media_alt,
-    cta_label,
-    cta_url
-  } = sectionContent;
-  
   const bgStyle = [];
   if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
   if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
@@ -36,7 +25,7 @@
   const sectionClasses = [
     'section',
     'section-content',
-    `section-content--${layout}`,
+    `section-content--${layout || 'image_left'}`,
     `padding-top-${padding_top}`,
     `padding-bottom-${padding_bottom}`
   ];
@@ -90,9 +79,102 @@
   <% } %>
   
   <div class="container">
+    <% if (sectionTitle) { %>
+      <div class="section-title-container">
+        <h2 class="section-title" 
+            <% 
+              let titleStyle = [];
+              if (section.title_font_id) titleStyle.push(`font-family: var(--font-${section.title_font_id})`);
+              
+              // Couleur par défaut blanche si vidéo de fond et pas de couleur définie
+              let titleColor = section.title_color;
+              if ((bg_video || bg_youtube) && !titleColor) {
+                titleColor = '#ffffff';
+              }
+              if (titleColor) titleStyle.push(`color: ${titleColor}`);
+              
+              if (titleStyle.length > 0) { 
+            %>
+            style="<%= titleStyle.join('; ') %>"
+            <% } %>
+            data-section-id="<%= id %>">
+          <%= sectionTitle %>
+        </h2>
+      </div>
+    <% } %>
+    
     <div class="content-wrapper">
-      <% if (media_url) { %>
-        <div class="content-media content-media--<%= media_size %>">
+      <% const sectionContent = content[0] || {};
+         const {
+           title: contentTitle,
+           subtitle,
+           description,
+           media_url,
+           media_type = 'image',
+           media_size = 'medium',
+           media_width_percent = 50,
+           media_position = 'left',
+           media_margin_top = 0,
+           media_margin_right = 20,
+           media_margin_bottom = 0,
+           media_margin_left = 0,
+           media_alt,
+           cta_label,
+           cta_url,
+           text_color,
+           text_align = 'left',
+           bg_color: text_bg_color,
+           text_bg_color: text_bg_color2,
+           text_bg_opacity = 0,
+           text_font_id,
+           text_font_size = 'medium',
+           title_font_id: content_title_font_id,
+           title_color: content_title_color,
+           title_position_h: content_title_position_h,
+           title_position_v: content_title_position_v
+         } = sectionContent;
+         
+         // Styles pour le texte
+         const textStyles = [];
+         if (text_color) textStyles.push(`color: ${text_color}`);
+         if (text_align) textStyles.push(`text-align: ${text_align}`);
+         if (text_font_id) textStyles.push(`font-family: var(--font-${text_font_id})`);
+         
+         // Taille de police
+         const fontSizeMap = { small: '0.9rem', medium: '1rem', large: '1.2rem', xl: '1.5rem' };
+         if (text_font_size && fontSizeMap[text_font_size]) {
+           textStyles.push(`font-size: ${fontSizeMap[text_font_size]}`);
+         }
+         
+         // Arrière-plan du texte
+         const textBgColor = text_bg_color || text_bg_color2;
+         if (textBgColor) {
+           const opacity = text_bg_opacity || 1;
+           if (opacity < 1) {
+             textStyles.push(`background-color: ${textBgColor}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`);
+           } else {
+             textStyles.push(`background-color: ${textBgColor}`);
+           }
+           textStyles.push('padding: 1rem; border-radius: 8px;');
+         }
+         
+         // Styles pour le média
+         const mediaStyles = [];
+         if (media_width_percent && media_width_percent > 0) {
+           mediaStyles.push(`width: ${media_width_percent}%`);
+         }
+         if (media_margin_top) mediaStyles.push(`margin-top: ${media_margin_top}px`);
+         if (media_margin_right) mediaStyles.push(`margin-right: ${media_margin_right}px`);
+         if (media_margin_bottom) mediaStyles.push(`margin-bottom: ${media_margin_bottom}px`);
+         if (media_margin_left) mediaStyles.push(`margin-left: ${media_margin_left}px`);
+         
+         // Classes pour la position du média
+         const mediaClasses = ['content-media', `content-media--${media_position}`];
+         if (media_size) mediaClasses.push(`content-media--${media_size}`);
+      %>
+      
+      <% if (media_url && media_position !== 'center') { %>
+        <div class="<%= mediaClasses.join(' ') %>" <% if (mediaStyles.length > 0) { %>style="<%= mediaStyles.join('; ') %>"<% } %>>
           <div class="media-container">
             <% if (media_type === 'youtube') { %>
               <div class="video-wrapper">
@@ -110,18 +192,51 @@
         </div>
       <% } %>
       
-      <div class="content-text">
+      <div class="content-text" <% if (textStyles.length > 0) { %>style="<%= textStyles.join('; ') %>"<% } %>>
         <% if (contentTitle) { %>
-          <h2><%= contentTitle %></h2>
+          <h2 <% 
+            const titleStyles = [];
+            if (content_title_font_id) titleStyles.push(`font-family: var(--font-${content_title_font_id})`);
+            if (content_title_color) titleStyles.push(`color: ${content_title_color}`);
+            if (titleStyles.length > 0) { 
+          %>style="<%= titleStyles.join('; ') %>"<% } %>><%= contentTitle %></h2>
+        <% } %>
+        <% if (subtitle) { %>
+          <h3><%= subtitle %></h3>
         <% } %>
         <% if (description) { %>
-          <p><%= description %></p>
+          <div class="content-description"><%= description %></div>
         <% } %>
         <% if (cta_label && cta_url) { %>
           <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
         <% } %>
       </div>
+      
+      <% if (media_url && media_position === 'center') { %>
+        <div class="<%= mediaClasses.join(' ') %>" <% if (mediaStyles.length > 0) { %>style="<%= mediaStyles.join('; ') %>"<% } %>>
+          <div class="media-container">
+            <% if (media_type === 'youtube') { %>
+              <div class="video-wrapper">
+                <iframe 
+                  src="<%= media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>" 
+                  frameborder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen
+                ></iframe>
+              </div>
+            <% } else { %>
+              <img src="<%= media_url %>" alt="<%= media_alt || contentTitle || '' %>">
+            <% } %>
+          </div>
+        </div>
+      <% } %>
     </div>
+    
+    <% if (typeof user !== 'undefined' && user && content.length === 0) { %>
+      <button class="btn-add-content" data-section-id="<%= id %>" data-action="add-content">
+        + Ajouter du contenu
+      </button>
+    <% } %>
   </div>
   
   <% if (typeof user !== 'undefined' && user) { %>
@@ -129,24 +244,303 @@
       <button 
         class="edit-btn" 
         data-section-id="<%= id %>"
-        data-action="edit-section"
-        aria-label="Modifier les paramètres de la section"
-        title="Paramètres (fond, layout)"
+        data-action="edit-section-settings"
+        aria-label="Paramètres de la section"
+        title="Section (titre, fond)"
       >
         <img src="/icons/settings.svg" alt="" class="icon">
       </button>
-      <% if (sectionContent.id) { %>
-        <button 
-          class="edit-btn" 
-          data-section-id="<%= id %>"
-          data-content-id="<%= sectionContent.id %>"
-          data-action="edit-content"
-          aria-label="Modifier le contenu"
-          title="Éditer le texte"
-        >
-          <img src="/icons/edit.svg" alt="" class="icon">
-        </button>
-      <% } %>
+      <button 
+        class="edit-btn" 
+        data-section-id="<%= id %>"
+        data-action="edit-content"
+        aria-label="Modifier le contenu"
+        title="Contenu (texte, média)"
+      >
+        <img src="/icons/edit.svg" alt="" class="icon">
+      </button>
     </div>
   <% } %>
 </section>
+
+<% if (typeof user !== 'undefined' && user) { %>
+<!-- Modale des paramètres de section -->
+<div id="sectionSettingsModal-<%= id %>" class="modal" data-section-id="<%= id %>">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Paramètres de la section</h3>
+      <button class="modal-close" data-action="close-modal">&times;</button>
+    </div>
+    
+    <form id="sectionSettingsForm-<%= id %>" class="section-settings-form">
+      <input type="hidden" name="sectionId" value="<%= id %>">
+      
+      <div class="form-group">
+        <label for="sectionTitle-<%= id %>">Titre de la section</label>
+        <input type="text" id="sectionTitle-<%= id %>" name="title" value="<%= sectionTitle || '' %>">
+        <small class="form-hint">Laissez vide pour masquer le titre</small>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="titleFont-<%= id %>">Police du titre</label>
+          <select id="titleFont-<%= id %>" name="title_font_id">
+            <option value="">— Police par défaut —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="titleColor-<%= id %>">Couleur du titre</label>
+          <input type="color" id="titleColor-<%= id %>" name="title_color" value="<%= section.title_color || '#333333' %>">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="sectionBgColor-<%= id %>">Couleur de fond</label>
+        <div class="color-picker-row">
+          <input type="color" id="sectionBgColor-<%= id %>" name="bg_color" value="<%= section.bg_color || '#ffffff' %>" class="color-input">
+          <input type="text" class="color-hex-input" value="<%= section.bg_color || '#ffffff' %>" readonly>
+          <span class="color-preview"></span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_transparent" <%= section.is_transparent ? 'checked' : '' %>>
+          Fond transparent
+        </label>
+        <small class="form-hint">Le fond hérite de la couleur de la page</small>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+        <button type="submit" class="btn btn-primary">Sauvegarder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale d'édition du contenu avec preview -->
+<div id="contentModal-<%= id %>" class="modal modal-large content-modal" data-section-id="<%= id %>">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Modifier le contenu</h3>
+      <button class="modal-close" data-action="close-modal">&times;</button>
+    </div>
+    
+    <div class="content-editor-layout">
+      <!-- Panneau de contrôle -->
+      <div class="editor-controls">
+        <form id="contentForm-<%= id %>" class="content-form">
+          <input type="hidden" name="sectionId" value="<%= id %>">
+          <input type="hidden" name="contentId" value="<%= content.length > 0 ? content[0].id : '' %>">
+          
+          <!-- Onglets -->
+          <div class="editor-tabs">
+            <button type="button" class="tab-btn active" data-tab="content">Contenu</button>
+            <button type="button" class="tab-btn" data-tab="style">Style</button>
+            <button type="button" class="tab-btn" data-tab="layout">Mise en page</button>
+          </div>
+          
+          <!-- TAB: Contenu -->
+          <div class="tab-content active" data-tab-content="content">
+            <div class="form-group">
+              <label for="contentTitle-<%= id %>">Titre du contenu</label>
+              <input type="text" id="contentTitle-<%= id %>" name="title" value="<%= content.length > 0 ? content[0].title || '' : '' %>">
+              <small class="form-hint">Optionnel - laissez vide si non souhaité</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="contentText-<%= id %>">Texte</label>
+              <textarea id="contentText-<%= id %>" name="description" rows="8" placeholder="Votre texte ici..."><%= content.length > 0 ? content[0].description || '' : '' %></textarea>
+            </div>
+          </div>
+          
+          <!-- TAB: Style -->
+          <div class="tab-content" data-tab-content="style">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contentTitleFont-<%= id %>">Police du titre</label>
+                <select id="contentTitleFont-<%= id %>" name="title_font_id">
+                  <option value="">— Police par défaut —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="contentTitleColor-<%= id %>">Couleur du titre</label>
+                <input type="color" id="contentTitleColor-<%= id %>" name="title_color" value="<%= content.length > 0 ? content[0].title_color || '#333333' : '#333333' %>">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contentTextFont-<%= id %>">Police du texte</label>
+                <select id="contentTextFont-<%= id %>" name="text_font_id">
+                  <option value="">— Police par défaut —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="contentTextSize-<%= id %>">Taille du texte</label>
+                <select id="contentTextSize-<%= id %>" name="text_font_size">
+                  <option value="small" <%= (content.length > 0 && content[0].text_font_size === 'small') ? 'selected' : '' %>>Petit</option>
+                  <option value="medium" <%= (content.length > 0 && content[0].text_font_size === 'medium') || !content.length || !content[0].text_font_size ? 'selected' : '' %>>Normal</option>
+                  <option value="large" <%= (content.length > 0 && content[0].text_font_size === 'large') ? 'selected' : '' %>>Grand</option>
+                  <option value="xl" <%= (content.length > 0 && content[0].text_font_size === 'xl') ? 'selected' : '' %>>Très grand</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contentTextColor-<%= id %>">Couleur du texte</label>
+                <input type="color" id="contentTextColor-<%= id %>" name="text_color" value="<%= content.length > 0 ? content[0].text_color || '#666666' : '#666666' %>">
+              </div>
+              <div class="form-group">
+                <label for="contentTextAlign-<%= id %>">Alignement</label>
+                <select id="contentTextAlign-<%= id %>" name="text_align">
+                  <option value="left" <%= (content.length > 0 && content[0].text_align === 'left') || !content.length || !content[0].text_align ? 'selected' : '' %>>Gauche</option>
+                  <option value="center" <%= (content.length > 0 && content[0].text_align === 'center') ? 'selected' : '' %>>Centre</option>
+                  <option value="right" <%= (content.length > 0 && content[0].text_align === 'right') ? 'selected' : '' %>>Droite</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- TAB: Mise en page -->
+          <div class="tab-content" data-tab-content="layout">
+            <div class="form-group">
+              <label for="contentMedia-<%= id %>">Média</label>
+              <div class="image-upload-field">
+                <input type="text" id="contentMedia-<%= id %>" name="media_url" value="<%= content.length > 0 ? content[0].media_url || '' : '' %>" placeholder="/uploads/..." readonly>
+                <button type="button" class="btn btn-sm btn-secondary select-media" data-target="contentMedia-<%= id %>">
+                  <img src="/icons/image.svg" alt="" class="icon"> Choisir
+                </button>
+                <% if (content.length > 0 && content[0].media_url) { %>
+                  <button type="button" class="btn btn-sm btn-danger clear-media" data-target="contentMedia-<%= id %>">
+                    <img src="/icons/trash.svg" alt="" class="icon">
+                  </button>
+                <% } %>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contentMediaType-<%= id %>">Type de média</label>
+                <select id="contentMediaType-<%= id %>" name="media_type">
+                  <option value="image" <%= (content.length > 0 && content[0].media_type === 'image') || !content.length ? 'selected' : '' %>>Image</option>
+                  <option value="youtube" <%= (content.length > 0 && content[0].media_type === 'youtube') ? 'selected' : '' %>>YouTube</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="contentMediaSize-<%= id %>">Taille de base</label>
+                <select id="contentMediaSize-<%= id %>" name="media_size">
+                  <option value="small" <%= (content.length > 0 && content[0].media_size === 'small') ? 'selected' : '' %>>Petit</option>
+                  <option value="medium" <%= (content.length > 0 && content[0].media_size === 'medium') || !content.length ? 'selected' : '' %>>Moyen</option>
+                  <option value="large" <%= (content.length > 0 && content[0].media_size === 'large') ? 'selected' : '' %>>Grand</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Contrôles visuels de positionnement -->
+            <div class="layout-controls">
+              <div class="form-group">
+                <label>Positionnement visuel</label>
+                <div class="position-preview">
+                  <div class="preview-container">
+                    <div class="preview-text">Texte d'exemple pour voir le rendu</div>
+                    <div class="preview-media" style="background: #e9ecef; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                      Média
+                    </div>
+                  </div>
+                  
+                  <div class="position-controls">
+                    <div class="control-group">
+                      <label for="mediaWidth-<%= id %>">Largeur (%)</label>
+                      <input type="range" id="mediaWidth-<%= id %>" name="media_width_percent" value="<%= content.length > 0 ? content[0].media_width_percent || 50 : 50 %>" min="10" max="100" step="5">
+                      <div class="range-value"><span id="mediaWidthValue-<%= id %>"><%= content.length > 0 ? content[0].media_width_percent || 50 : 50 %></span>%</div>
+                    </div>
+                    
+                    <div class="control-group">
+                      <label for="mediaPosition-<%= id %>">Position</label>
+                      <select id="mediaPosition-<%= id %>" name="media_position">
+                        <option value="left" <%= (content.length > 0 && content[0].media_position === 'left') || !content.length ? 'selected' : '' %>>À gauche</option>
+                        <option value="right" <%= (content.length > 0 && content[0].media_position === 'right') ? 'selected' : '' %>>À droite</option>
+                        <option value="center" <%= (content.length > 0 && content[0].media_position === 'center') ? 'selected' : '' %>>Centré</option>
+                        <option value="full" <%= (content.length > 0 && content[0].media_position === 'full') ? 'selected' : '' %>>Pleine largeur</option>
+                      </select>
+                    </div>
+                    
+                    <div class="control-group">
+                      <label>Écart du texte</label>
+                      <div class="spacing-controls">
+                        <button type="button" class="spacing-btn" data-direction="top" data-target="mediaMarginTop-<%= id %>">-</button>
+                        <input type="number" id="mediaMarginTop-<%= id %>" name="media_margin_top" value="<%= content.length > 0 ? content[0].media_margin_top || 0 : 0 %>" min="0" max="100" readonly>
+                        <button type="button" class="spacing-btn" data-direction="top" data-target="mediaMarginTop-<%= id %>">+</button>
+                      </div>
+                      <div class="spacing-controls">
+                        <button type="button" class="spacing-btn" data-direction="right" data-target="mediaMarginRight-<%= id %>">-</button>
+                        <input type="number" id="mediaMarginRight-<%= id %>" name="media_margin_right" value="<%= content.length > 0 ? content[0].media_margin_right || 20 : 20 %>" min="0" max="100" readonly>
+                        <button type="button" class="spacing-btn" data-direction="right" data-target="mediaMarginRight-<%= id %>">+</button>
+                      </div>
+                      <div class="spacing-controls">
+                        <button type="button" class="spacing-btn" data-direction="bottom" data-target="mediaMarginBottom-<%= id %>">-</button>
+                        <input type="number" id="mediaMarginBottom-<%= id %>" name="media_margin_bottom" value="<%= content.length > 0 ? content[0].media_margin_bottom || 0 : 0 %>" min="0" max="100" readonly>
+                        <button type="button" class="spacing-btn" data-direction="bottom" data-target="mediaMarginBottom-<%= id %>">+</button>
+                      </div>
+                      <div class="spacing-controls">
+                        <button type="button" class="spacing-btn" data-direction="left" data-target="mediaMarginLeft-<%= id %>">-</button>
+                        <input type="number" id="mediaMarginLeft-<%= id %>" name="media_margin_left" value="<%= content.length > 0 ? content[0].media_margin_left || 0 : 0 %>" min="0" max="100" readonly>
+                        <button type="button" class="spacing-btn" data-direction="left" data-target="mediaMarginLeft-<%= id %>">+</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-action="close-modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Preview en temps réel -->
+      <div class="editor-preview">
+        <div class="preview-header">
+          <h4>Aperçu</h4>
+          <small class="preview-hint">Modifiez les paramètres pour voir les changements</small>
+        </div>
+        <div class="preview-content" id="contentPreview-<%= id %>">
+          <div class="preview-section">
+            <div class="preview-title">
+              <%= content.length > 0 && content[0].title ? content[0].title : 'Titre du contenu' %>
+            </div>
+            <div class="preview-text">
+              <%= content.length > 0 && content[0].description ? content[0].description : 'Votre texte apparaîtra ici. Modifiez le contenu dans l\'onglet à gauche pour voir les changements en temps réel.' %>
+            </div>
+            <% if (content.length > 0 && content[0].media_url) { %>
+              <div class="preview-media">
+                <img src="<%= content[0].media_url %>" alt="Preview">
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<script>
+  // Synchroniser le color picker du titre avec le champ texte
+  (function() {
+    const colorInput = document.getElementById('titleColor-<%= id %>');
+    const textInput = colorInput?.parentNode?.querySelector('.color-hex-input');
+    
+    if (colorInput && textInput) {
+      colorInput.addEventListener('input', function() {
+        textInput.value = this.value;
+      });
+    }
+  })();
+</script>

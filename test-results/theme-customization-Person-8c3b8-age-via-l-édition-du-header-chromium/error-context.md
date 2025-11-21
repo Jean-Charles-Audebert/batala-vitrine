@@ -1,90 +1,239 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
-  - generic [ref=e2]:
-    - generic [ref=e3]:
-      - generic [ref=e4]:
-        - img "Logo" [ref=e6]
-        - heading "Titre" [level=1] [ref=e8]
-        - generic [ref=e10]:
-          - link "facebook" [ref=e11] [cursor=pointer]:
-            - /url: https://facebook.com/example
-            - img "facebook" [ref=e12]
-          - link "instagram" [ref=e13] [cursor=pointer]:
-            - /url: https://instagram.com/example
-            - img "instagram" [ref=e14]
-          - link "youtube" [ref=e15] [cursor=pointer]:
-            - /url: https://youtube.com/example
-            - img "youtube" [ref=e16]
-      - generic [ref=e17]:
-        - button "Paramètres section" [ref=e18] [cursor=pointer]
-        - button "Éditer le contenu" [ref=e19] [cursor=pointer]
-    - generic [ref=e20]:
-      - generic [ref=e21]:
-        - heading "Nos services" [level=2] [ref=e22]
-        - generic [ref=e23]:
-          - article [ref=e24]:
-            - generic [ref=e25]:
-              - heading "Service 1" [level=3] [ref=e26]
-              - paragraph [ref=e27]: Description du premier service
-            - generic [ref=e28]:
-              - button [ref=e29] [cursor=pointer]
-              - button [ref=e30] [cursor=pointer]
-          - article [ref=e31]:
-            - generic [ref=e32]:
-              - heading "Service 2" [level=3] [ref=e33]
-              - paragraph [ref=e34]: Description du deuxième service
-            - generic [ref=e35]:
-              - button [ref=e36] [cursor=pointer]
-              - button [ref=e37] [cursor=pointer]
-          - article [ref=e38]:
-            - generic [ref=e39]:
-              - heading "Service 3" [level=3] [ref=e40]
-              - paragraph [ref=e41]: Description du troisième service
-            - generic [ref=e42]:
-              - button [ref=e43] [cursor=pointer]
-              - button [ref=e44] [cursor=pointer]
-        - button "+ Ajouter une card" [ref=e45] [cursor=pointer]
-      - button "Paramètres section" [ref=e47] [cursor=pointer]
-    - generic [ref=e48]:
-      - generic [ref=e50]:
-        - img "Titre actu" [ref=e53]
-        - generic [ref=e54]:
-          - heading "Titre actu" [level=2] [ref=e55]
-          - paragraph [ref=e56]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante. Ut quis dignissim metus. Phasellus velit elit, tempor eget augue varius, sagittis placerat sem.
-      - generic [ref=e57]:
-        - button "Modifier les paramètres de la section" [ref=e58] [cursor=pointer]
-        - button "Modifier le contenu" [ref=e59] [cursor=pointer]
-    - generic [ref=e60]:
-      - generic [ref=e62]:
-        - img "Titre offre" [ref=e65]
-        - generic [ref=e66]:
-          - heading "Titre offre" [level=2] [ref=e67]
-          - paragraph [ref=e68]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras luctus nunc nec erat placerat ornare. Mauris nibh nunc, tempus ut quam at, varius rutrum ante.
-      - generic [ref=e69]:
-        - button "Modifier les paramètres de la section" [ref=e70] [cursor=pointer]
-        - button "Modifier le contenu" [ref=e71] [cursor=pointer]
-  - contentinfo [ref=e72]:
-    - generic [ref=e73]:
-      - generic [ref=e74]:
-        - group [ref=e76]:
-          - generic "À propos" [ref=e77]
-        - group [ref=e79]:
-          - generic "Contact" [ref=e80]
-        - group [ref=e82]:
-          - generic "Suivez-nous" [ref=e83]
-        - group [ref=e85]:
-          - generic "Liens utiles" [ref=e86]
-      - paragraph [ref=e88]:
-        - text: © 2025
-        - link "caixaDev" [ref=e89] [cursor=pointer]:
-          - /url: https://caixadev.dev
-        - text: . Tous droits réservés.
-    - button "Modifier le footer" [ref=e90] [cursor=pointer]
-  - navigation "Navigation administrateur":
-    - menu:
-      - menuitem "Gérer les blocs du site"
-      - menuitem "Se déconnecter de l'interface administrateur"
-  - button "Ajouter une section" [ref=e91] [cursor=pointer]: ➕
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "Logo Batala Admin" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "Logo" [ref=e6]
+      - text: Batala Admin
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "Accueil" [ref=e9] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=e10]:
+        - link "Sections" [ref=e11] [cursor=pointer]:
+          - /url: "#"
+      - listitem [ref=e12]:
+        - link "Admins" [ref=e13] [cursor=pointer]:
+          - /url: "#"
+      - listitem [ref=e14]:
+        - link "Polices" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+      - listitem [ref=e16]:
+        - link "Paramètres" [ref=e17] [cursor=pointer]:
+          - /url: "#"
+    - link "Déconnexion" [ref=e19] [cursor=pointer]:
+      - /url: /auth/logout
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - heading "Gestion des sections" [level=1] [ref=e23]
+        - generic [ref=e24]:
+          - button "Nouvelle section" [ref=e25] [cursor=pointer]
+          - link "Voir le site" [ref=e26] [cursor=pointer]:
+            - /url: /
+      - table [ref=e28]:
+        - rowgroup [ref=e29]:
+          - row "Position Type Titre Visibilité Layout Actions" [ref=e30]:
+            - cell "Position" [ref=e31]
+            - cell "Type" [ref=e32]
+            - cell "Titre" [ref=e33]
+            - cell "Visibilité" [ref=e34]
+            - cell "Layout" [ref=e35]
+            - cell "Actions" [ref=e36]
+        - rowgroup [ref=e37]:
+          - row "1 ⋮⋮ hero En-tête du site ✓ Visible centered" [ref=e38]:
+            - cell "1 ⋮⋮" [ref=e39]:
+              - generic [ref=e40]: "1"
+              - generic [ref=e41]: ⋮⋮
+            - cell "hero" [ref=e42]:
+              - generic [ref=e43]: hero
+            - cell "En-tête du site" [ref=e44]
+            - cell "✓ Visible" [ref=e45]:
+              - generic [ref=e46]: ✓ Visible
+            - cell "centered" [ref=e47]
+            - cell [ref=e48]:
+              - generic [ref=e49]:
+                - button "Modifier la section" [ref=e50] [cursor=pointer]
+                - button "Supprimer la section" [ref=e51] [cursor=pointer]
+          - row "2 ⋮⋮ card grid Événements à venir ✓ Visible grid_2" [ref=e52]:
+            - cell "2 ⋮⋮" [ref=e53]:
+              - generic [ref=e54]: "2"
+              - generic [ref=e55]: ⋮⋮
+            - cell "card grid" [ref=e56]:
+              - generic [ref=e57]: card grid
+            - cell "Événements à venir" [ref=e58]
+            - cell "✓ Visible" [ref=e59]:
+              - generic [ref=e60]: ✓ Visible
+            - cell "grid_2" [ref=e61]
+            - cell [ref=e62]:
+              - generic [ref=e63]:
+                - button "Modifier la section" [ref=e64] [cursor=pointer]
+                - button "Gérer les cartes" [ref=e65] [cursor=pointer]
+                - button "Supprimer la section" [ref=e66] [cursor=pointer]
+          - row "2 ⋮⋮ card grid Nos services ✓ Visible grid_3" [ref=e67]:
+            - cell "2 ⋮⋮" [ref=e68]:
+              - generic [ref=e69]: "2"
+              - generic [ref=e70]: ⋮⋮
+            - cell "card grid" [ref=e71]:
+              - generic [ref=e72]: card grid
+            - cell "Nos services" [ref=e73]
+            - cell "✓ Visible" [ref=e74]:
+              - generic [ref=e75]: ✓ Visible
+            - cell "grid_3" [ref=e76]
+            - cell [ref=e77]:
+              - generic [ref=e78]:
+                - button "Modifier la section" [ref=e79] [cursor=pointer]
+                - button "Gérer les cartes" [ref=e80] [cursor=pointer]
+                - button "Supprimer la section" [ref=e81] [cursor=pointer]
+          - row "3 ⋮⋮ card grid Nos offres ✓ Visible grid_3" [ref=e82]:
+            - cell "3 ⋮⋮" [ref=e83]:
+              - generic [ref=e84]: "3"
+              - generic [ref=e85]: ⋮⋮
+            - cell "card grid" [ref=e86]:
+              - generic [ref=e87]: card grid
+            - cell "Nos offres" [ref=e88]
+            - cell "✓ Visible" [ref=e89]:
+              - generic [ref=e90]: ✓ Visible
+            - cell "grid_3" [ref=e91]
+            - cell [ref=e92]:
+              - generic [ref=e93]:
+                - button "Modifier la section" [ref=e94] [cursor=pointer]
+                - button "Gérer les cartes" [ref=e95] [cursor=pointer]
+                - button "Supprimer la section" [ref=e96] [cursor=pointer]
+          - row "4 ⋮⋮ gallery Media ✓ Visible —" [ref=e97]:
+            - cell "4 ⋮⋮" [ref=e98]:
+              - generic [ref=e99]: "4"
+              - generic [ref=e100]: ⋮⋮
+            - cell "gallery" [ref=e101]:
+              - generic [ref=e102]: gallery
+            - cell "Media" [ref=e103]
+            - cell "✓ Visible" [ref=e104]:
+              - generic [ref=e105]: ✓ Visible
+            - cell "—" [ref=e106]
+            - cell [ref=e107]:
+              - generic [ref=e108]:
+                - button "Modifier la section" [ref=e109] [cursor=pointer]
+                - button "Supprimer la section" [ref=e110] [cursor=pointer]
+          - row "5 ⋮⋮ content Sans titre ✓ Visible image_left" [ref=e111]:
+            - cell "5 ⋮⋮" [ref=e112]:
+              - generic [ref=e113]: "5"
+              - generic [ref=e114]: ⋮⋮
+            - cell "content" [ref=e115]:
+              - generic [ref=e116]: content
+            - cell "Sans titre" [ref=e117]
+            - cell "✓ Visible" [ref=e118]:
+              - generic [ref=e119]: ✓ Visible
+            - cell "image_left" [ref=e120]
+            - cell [ref=e121]:
+              - generic [ref=e122]:
+                - button "Modifier la section" [ref=e123] [cursor=pointer]
+                - button "Supprimer la section" [ref=e124] [cursor=pointer]
+          - row "6 ⋮⋮ card grid cards essai ✓ Visible —" [ref=e125]:
+            - cell "6 ⋮⋮" [ref=e126]:
+              - generic [ref=e127]: "6"
+              - generic [ref=e128]: ⋮⋮
+            - cell "card grid" [ref=e129]:
+              - generic [ref=e130]: card grid
+            - cell "cards essai" [ref=e131]
+            - cell "✓ Visible" [ref=e132]:
+              - generic [ref=e133]: ✓ Visible
+            - cell "—" [ref=e134]
+            - cell [ref=e135]:
+              - generic [ref=e136]:
+                - button "Modifier la section" [ref=e137] [cursor=pointer]
+                - button "Gérer les cartes" [ref=e138] [cursor=pointer]
+                - button "Supprimer la section" [ref=e139] [cursor=pointer]
+          - row "999 ⋮⋮ footer Pied de page ✓ Visible —" [ref=e140]:
+            - cell "999 ⋮⋮" [ref=e141]:
+              - generic [ref=e142]: "999"
+              - generic [ref=e143]: ⋮⋮
+            - cell "footer" [ref=e144]:
+              - generic [ref=e145]: footer
+            - cell "Pied de page" [ref=e146]
+            - cell "✓ Visible" [ref=e147]:
+              - generic [ref=e148]: ✓ Visible
+            - cell "—" [ref=e149]
+            - cell [ref=e150]:
+              - generic [ref=e151]:
+                - button "Modifier la section" [ref=e152] [cursor=pointer]
+                - button "Supprimer la section" [ref=e153] [cursor=pointer]
+      - generic [ref=e155]:
+        - generic [ref=e156]:
+          - heading [level=2] [ref=e157]: Sélectionner une vidéo
+          - button [ref=e158]: ×
+        - generic [ref=e159]:
+          - button [ref=e160] [cursor=pointer]: Annuler
+          - button [ref=e161] [cursor=pointer]: Uploader une nouvelle vidéo
+      - generic [ref=e163]:
+        - generic [ref=e164]:
+          - heading [level=2] [ref=e165]: Nouvelle section
+          - button [ref=e166]: ×
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - heading [level=3] [ref=e169]: Informations de base
+            - generic [ref=e170]:
+              - generic [ref=e171]:
+                - generic [ref=e172]: Type de section *
+                - combobox [ref=e173]
+              - generic [ref=e174]:
+                - generic [ref=e175]: Position
+                - spinbutton [ref=e176]
+                - generic [ref=e177]: Laissez vide pour ajouter à la fin
+            - generic [ref=e178]:
+              - generic [ref=e179]: Titre (admin uniquement)
+              - textbox [ref=e180]:
+                - /placeholder: Label pour identifier la section
+              - generic [ref=e181]: Ce titre n'est affiché que dans l'admin. Le contenu visible vient des éléments de contenu.
+            - generic [ref=e182]:
+              - generic [ref=e183]:
+                - generic [ref=e184]: Layout
+                - combobox [ref=e185]
+              - generic [ref=e187]:
+                - checkbox [checked] [ref=e188]
+                - text: Visible sur le site
+          - generic [ref=e189]:
+            - heading [level=3] [ref=e190]: Apparence
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - generic [ref=e193]: Couleur de fond
+                - generic [ref=e194]:
+                  - textbox [ref=e195] [cursor=pointer]: "#ffffff"
+                  - textbox [ref=e196]: "#FFFFFF"
+              - generic [ref=e197]:
+                - generic [ref=e198]: Marge haute
+                - combobox [ref=e199]
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: Marge basse
+                - combobox [ref=e203]
+              - generic [ref=e205]:
+                - checkbox [ref=e206]
+                - text: Fond transparent
+            - generic [ref=e207]:
+              - generic [ref=e208]: Image de fond
+              - generic [ref=e209]:
+                - textbox [ref=e210]:
+                  - /placeholder: /uploads/...
+                - button [ref=e211] [cursor=pointer]: Choisir
+              - generic [ref=e212]:
+                - text: 💡
+                - strong [ref=e213]: "Tailles recommandées pour hero :"
+                - text: "• Bannière large : 2700×600px (ratio 4.5:1) - affichage optimal • Standard : 1920×427px (ratio 4.5:1) • Minimum : 1350×300px (ratio 4.5:1) ⚠️ Les images carrées ou verticales seront recadrées (haut/bas perdus)"
+            - generic [ref=e214]:
+              - generic [ref=e215]: Vidéo de fond (MP4)
+              - generic [ref=e216]:
+                - textbox [ref=e217]:
+                  - /placeholder: /uploads/...
+                - button [ref=e218] [cursor=pointer]: Choisir
+              - generic [ref=e219]: Fichier MP4 local uniquement (max 50 MB)
+            - generic [ref=e220]:
+              - generic [ref=e221]: Vidéo YouTube
+              - textbox [ref=e222]:
+                - /placeholder: https://youtu.be/... ou https://youtube.com/watch?v=...
+              - generic [ref=e223]: URL YouTube complète (prioritaire sur MP4 local)
+          - generic [ref=e224]:
+            - button [ref=e225] [cursor=pointer]: Annuler
+            - button [ref=e226] [cursor=pointer]: Enregistrer
 ```
