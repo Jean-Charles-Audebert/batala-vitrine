@@ -14,9 +14,9 @@ export const showEditor = async (req, res) => {
     logger.info(`📊 Éditeur chargé avec ${editorData.sections.length} sections`);
 
     // Rendre la vue éditeur
-    return res.render('editor/index', {
+    return res.render('pages/editor', {
       title: 'Éditeur',
-      ...editorData,
+      pageData: editorData,
       user: req.user
     });
 
@@ -24,11 +24,13 @@ export const showEditor = async (req, res) => {
     logger.error('Erreur construction éditeur:', error);
 
     // En cas d'erreur, rendre avec des données minimales
-    return res.render('editor/index', {
+    return res.render('pages/editor', {
       title: 'Éditeur',
-      page: {},
-      sections: [],
-      fonts: [],
+      pageData: {
+        page: {},
+        sections: [],
+        fonts: []
+      },
       user: req.user
     });
   }

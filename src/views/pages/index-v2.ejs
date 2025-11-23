@@ -8,14 +8,28 @@
   
   <!-- Fonts -->
   <% if (page.title_font_id && fonts) { %>
-    <% const font = fonts.find(f => f.id == page.title_font_id); %>
-    <% if (font && font.url) { %>
-      <link rel="stylesheet" href="<%= font.url %>">
-    <% } else if (font && font.file_path) { %>
+    <% const titleFont = fonts.find(f => f.id == page.title_font_id); %>
+    <% if (titleFont && titleFont.font_url) { %>
+      <link rel="stylesheet" href="<%= titleFont.font_url %>">
+    <% } else if (titleFont && titleFont.file_path) { %>
       <style>
         @font-face {
-          font-family: '<%= font.name %>';
-          src: url('<%= font.file_path %>');
+          font-family: '<%= titleFont.name %>';
+          src: url('<%= titleFont.file_path %>');
+        }
+      </style>
+    <% } %>
+  <% } %>
+
+  <% if (page.text_font_id && fonts) { %>
+    <% const textFont = fonts.find(f => f.id == page.text_font_id); %>
+    <% if (textFont && textFont.font_url) { %>
+      <link rel="stylesheet" href="<%= textFont.font_url %>">
+    <% } else if (textFont && textFont.file_path) { %>
+      <style>
+        @font-face {
+          font-family: '<%= textFont.name %>';
+          src: url('<%= textFont.file_path %>');
         }
       </style>
     <% } %>
@@ -29,31 +43,54 @@
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="/css/design-system.css">
   
-  <!-- CSS Variables pour thème -->
-  <%
-    let cssVars = ':root {';
-    if (page.title_font_id && fonts) {
-      const font = fonts.find(f => f.id == page.title_font_id);
-      if (font && font.font_family) {
-        cssVars += `--font-family-title: ${font.font_family.replace(/['"\\]/g, '')};`;
-      }
+  <!-- CSS Variables pour thème global -->
+  <style>
+    :root {
+      <% if (page.title_font_id && fonts) { %>
+        <% const titleFont = fonts.find(f => f.id == page.title_font_id); %>
+        <% if (titleFont && titleFont.font_family) { %>
+      --font-family-title: <%= titleFont.font_family.replace(/['"\\]/g, '') %>;
+        <% } %>
+      <% } %>
+
+      <% if (page.text_font_id && fonts) { %>
+        <% const textFont = fonts.find(f => f.id == page.text_font_id); %>
+        <% if (textFont && textFont.font_family) { %>
+      --font-family-text: <%= textFont.font_family.replace(/['"\\]/g, '') %>;
+        <% } %>
+      <% } %>
+
+      <% if (page.main_bg_color) { %>
+      --main-bg-color: <%= page.main_bg_color %>;
+      <% } %>
+
+      <% if (page.main_title_color) { %>
+      --main-title-color: <%= page.main_title_color %>;
+      <% } %>
+
+      /* Variables pour les polices individuelles */
+      <% if (fonts && fonts.length > 0) { %>
+        <% fonts.forEach(font => { %>
+          <% if (font.font_family) { %>
+      --font-<%= font.id %>: <%= font.font_family.replace(/['"\\]/g, '') %>;
+          <% } %>
+        <% }); %>
+      <% } %>
     }
-    if (page.main_bg_color) {
-      cssVars += `--main-bg-color: ${page.main_bg_color};`;
+  </style>
+
+  <!-- Styles pour les polices individuelles -->
+  <style>
+    <% if (fonts && fonts.length > 0) { %>
+      <% fonts.forEach(font => { %>
+        <% if (font.font_family) { %>
+    .font-<%= font.id %> {
+      font-family: var(--font-<%= font.id %>, inherit) !important;
     }
-    if (page.main_title_color) {
-      cssVars += `--main-title-color: ${page.main_title_color};`;
-    }
-    if (fonts && fonts.length > 0) {
-      fonts.forEach(font => {
-        if (font.font_family) {
-          cssVars += `--font-${font.id}: ${font.font_family.replace(/['"\\]/g, '')};`;
-        }
-      });
-    }
-    cssVars += '}';
-  %>
-  <style><%= cssVars %></style>
+        <% } %>
+      <% }); %>
+    <% } %>
+  </style>
 </head>
 <body class="vitrine-page">
   <%
@@ -93,15 +130,27 @@
   <!-- SECTIONS V2 -->
   <div class="main-content-wrapper">
     <% sections.forEach(section => { %>
-      <% if (section.type === 'footer') { return; } %>
-      <% if (section.type === 'hero') { %>
-        <%- include('../components/sections/hero', { section, user, getSocialIcon }) %>
-      <% } else if (section.type === 'content') { %>
-        <%- include('../components/sections/content', { section, user }) %>
-      <% } else if (section.type === 'card_grid') { %>
-        <%- include('../components/sections/card_grid', { section, user }) %>
-      <% } else if (section.type === 'gallery') { %>
-        <%- include('../components/sections/gallery', { section, user }) %>
+      <% 
+        const sectionType = section.layout?.type || section.type || 'content';
+        const sectionLayout = section.layout || {};
+      %>
+      <% if (sectionType === 'footer') { return; } %>
+      <% if (sectionType === 'hero') { %>
+        <%- include('../components/sections/hero', { section }) %>
+      <% } else if (sectionType === 'content' || sectionType === 'image_left' || sectionType === 'text-media') { %>
+        <%- include('../components/sections/text-media', { section }) %>
+      <% } else if (sectionType === 'card_grid' || sectionType === 'grid_3' || sectionType === 'grid_2') { %>
+        <%- include('../components/sections/card_grid', { section }) %>
+      <% } else if (sectionType === 'gallery') { %>
+        <%- include('../components/sections/gallery', { section }) %>
+      <% } else { %>
+        <!-- Section non supportée: <%= sectionType %> -->
+        <section class="block-section" data-type="<%= sectionType %>">
+          <div class="container">
+            <h2><%= section.title || 'Section' %></h2>
+            <p>Type de section non supporté: <%= sectionType %></p>
+          </div>
+        </section>
       <% } %>
     <% }) %>
   </div>

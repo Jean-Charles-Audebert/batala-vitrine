@@ -3,6 +3,7 @@
  */
 import sharp from "sharp";
 import path from "path";
+import fs from "fs/promises";
 import { logger } from "./logger.js";
 import { IMAGE_PRESETS } from "../constants.js";
 
@@ -132,4 +133,42 @@ export function getOriginalPath(optimizedPath) {
   const baseName = path.basename(optimizedPath, ext);
   const dir = path.dirname(optimizedPath);
   return path.join(dir, `${baseName}-original${ext}`).replace(/\\/g, '/');
+}
+
+/**
+ * Supprime un fichier et son original s'il existe
+ * @param {string} filePath - Chemin du fichier à supprimer (optimisé ou original)
+ * @returns {Promise<boolean>} - true si au moins un fichier a été supprimé
+ */
+export async function deleteFileAndOriginal(filePath) {
+  if (!filePath) return false;
+
+  let deletedCount = 0;
+
+  try {
+    // Supprimer le fichier principal
+    await fs.unlink(filePath);
+    logger.info(`[FileManager] Fichier supprimé: ${filePath}`);
+    deletedCount++;
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      logger.warn(`[FileManager] Erreur suppression fichier ${filePath}:`, error.message);
+    }
+  }
+
+  try {
+    // Supprimer le fichier original si c'est un fichier optimisé
+    const originalPath = getOriginalPath(filePath);
+    if (originalPath !== filePath) {
+      await fs.unlink(originalPath);
+      logger.info(`[FileManager] Fichier original supprimé: ${originalPath}`);
+      deletedCount++;
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      logger.warn(`[FileManager] Erreur suppression fichier original ${getOriginalPath(filePath)}:`, error.message);
+    }
+  }
+
+  return deletedCount > 0;
 }

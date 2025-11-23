@@ -61,7 +61,12 @@ CREATE TABLE page (
     title VARCHAR(255) DEFAULT 'Mon Site',
     title_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
     text_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
-    contact_email VARCHAR(255)
+    contact_email VARCHAR(255),
+    main_bg_color VARCHAR(20) DEFAULT '#ffffff',
+    main_bg_media_url VARCHAR(255) DEFAULT NULL,
+    main_bg_youtube_url VARCHAR(255) DEFAULT NULL,
+    main_bg_opacity NUMERIC(3,2) DEFAULT 1.0,
+    main_bg_position VARCHAR(50) DEFAULT 'center',
     updated_at TIMESTAMP DEFAULT NOW()
 );
 

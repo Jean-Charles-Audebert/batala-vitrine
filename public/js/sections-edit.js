@@ -1389,6 +1389,7 @@ function createThemeModal(fonts, page) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="editThemeModal">Annuler</button>
+          <button type="button" class="btn btn-info" id="previewThemeBtn"><img src="/icons/eye.svg" alt="" class="icon"> Aperçu</button>
           <button type="submit" class="btn btn-primary"><img src="/icons/save.svg" alt="" class="icon"> Enregistrer</button>
         </div>
       </form>
@@ -1476,7 +1477,7 @@ function createThemeModal(fonts, page) {
       main_bg_youtube: formData.get('main_bg_youtube')
     };
     try {
-      const response = await fetch('/api/page/theme', {
+      const response = await fetch('/api/page', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // Inclure les cookies dans la requête
@@ -1487,6 +1488,26 @@ function createThemeModal(fonts, page) {
       setTimeout(() => window.location.reload(), 900);
     } catch (error) {
       showToast('Erreur : ' + error.message, 'error');
+    }
+  });
+
+  // Handler preview
+  modal.querySelector('#previewThemeBtn').addEventListener('click', () => {
+    const formData = new FormData(modal.querySelector('form'));
+    const previewData = {
+      main_bg_color: formData.get('main_bg_color'),
+      main_bg_image: formData.get('main_bg_image'),
+      main_bg_image_repeat: formData.get('main_bg_image_repeat'),
+      main_bg_image_size: formData.get('main_bg_image_size'),
+      main_bg_video: formData.get('main_bg_video'),
+      main_bg_youtube: formData.get('main_bg_youtube')
+    };
+
+    // Utiliser la fonction openPreview exposée globalement
+    if (window.openPreview) {
+      window.openPreview(previewData);
+    } else {
+      console.error('Fonction openPreview non disponible');
     }
   });
 

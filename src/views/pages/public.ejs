@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Site vitrine moderne et responsive">
+  <title><%= title %></title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/design-system.css">
+</head>
+<body>
+  <!-- Page publique - rendu des sections visibles uniquement -->
+  <main class="site-main">
+    <% pageData.sections.forEach(section => { %>
+      <% if (section.is_visible) { %>
+        <section class="section-block" id="section-<%= section.id %>" data-section-id="<%= section.id %>" data-section-type="<%= section.type %>">
+          <div class="section-container">
+            <!-- Titre de section (optionnel) -->
+            <% if (section.show_title && section.title) { %>
+              <h2 class="section-title"><%= section.title %></h2>
+            <% } %>
+
+            <!-- Contenu de la section -->
+            <div class="section-content">
+              <% section.elements.forEach(element => { %>
+                <div class="element-block" data-element-id="<%= element.id %>" data-element-type="<%= element.type %>">
+                  <% if (element.type === 'text') { %>
+                    <div class="text-element">
+                      <% if (element.title) { %>
+                        <h3 class="element-title"><%= element.title %></h3>
+                      <% } %>
+                      <div class="text-content"><%- element.settings.content || '' %></div>
+                    </div>
+                  <% } else if (element.type === 'media') { %>
+                    <div class="media-element">
+                      <% if (element.settings.media_url) { %>
+                        <% if (element.settings.media_url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) { %>
+                          <img class="media-image" src="<%= element.settings.media_url %>" alt="<%= element.settings.media_alt || element.title || '' %>">
+                        <% } else if (element.settings.media_url.match(/\.(mp4|webm|ogg)$/i)) { %>
+                          <video controls>
+                            <source src="<%= element.settings.media_url %>" type="video/<%= element.settings.media_url.split('.').pop() %>">
+                          </video>
+                        <% } %>
+                      <% } %>
+                    </div>
+                  <% } else if (element.type === 'card') { %>
+                    <div class="card-element">
+                      <% if (element.settings.media_url) { %>
+                        <div class="card-image">
+                          <img src="<%= element.settings.media_url %>" alt="<%= element.settings.media_alt || '' %>">
+                        </div>
+                      <% } %>
+                      <div class="card-content">
+                        <% if (element.title) { %>
+                          <h4 class="card-title"><%= element.title %></h4>
+                        <% } %>
+                        <div class="card-text"><%- element.settings.content || '' %></div>
+                        <% if (element.settings.link_url) { %>
+                          <a href="<%= element.settings.link_url %>" class="card-link">En savoir plus</a>
+                        <% } %>
+                      </div>
+                    </div>
+                  <% } else if (element.type === 'photo') { %>
+                    <div class="photo-element">
+                      <% if (element.settings.media_url) { %>
+                        <img class="photo-image" src="<%= element.settings.media_url %>" alt="<%= element.settings.media_alt || element.title || '' %>">
+                      <% } %>
+                    </div>
+                  <% } else if (element.type === 'video') { %>
+                    <div class="video-element">
+                      <% if (element.settings.media_url) { %>
+                        <video class="video-player" controls>
+                          <source src="<%= element.settings.media_url %>" type="video/<%= element.settings.media_url.split('.').pop() %>">
+                        </video>
+                      <% } %>
+                    </div>
+                  <% } %>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </section>
+      <% } %>
+    <% }); %>
+  </main>
+
+  <!-- Styles CSS pour la page publique -->
+  <style>
+    .site-main {
+      min-height: 100vh;
+    }
+
+    .section-block {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .section-content {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .element-block {
+      grid-column: span 12;
+    }
+
+    /* Styles spécifiques selon les paramètres */
+    .text-element {
+      padding: 2rem 0;
+    }
+
+    .media-element {
+      text-align: center;
+    }
+
+    .media-image, .photo-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .card-element {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card-element:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      margin: 0 0 1rem 0;
+      font-size: 1.25rem;
+    }
+
+    .card-text {
+      margin-bottom: 1rem;
+      color: #666;
+    }
+
+    .card-link {
+      display: inline-block;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    .video-element video {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+  </style>
+
+  <script>
+    // JavaScript pour la page publique
+    console.log('Page publique chargée avec <%= pageData.sections.length %> sections');
+  </script>
+</body>
+</html>

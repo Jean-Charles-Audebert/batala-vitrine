@@ -10,12 +10,19 @@ export const showHome = async (req, res) => {
     // Construire les données complètes de la page
     const pageData = await buildPageData();
 
-    // Charger les liens sociaux
-    const { rows: socialLinks } = await query(`
-      SELECT * FROM social_links
-      WHERE is_visible = true
-      ORDER BY position ASC
-    `);
+    // Charger les liens sociaux (si la table existe)
+    let socialLinks = [];
+    try {
+      const result = await query(`
+        SELECT * FROM social_links
+        WHERE is_visible = true
+        ORDER BY position ASC
+      `);
+      socialLinks = result.rows;
+    } catch (socialError) {
+      // La table social_links n'existe pas encore, c'est OK
+      logger.info('ℹ️ Table social_links non trouvée, utilisation d\'une liste vide');
+    }
 
     logger.info(`📊 Page construite avec ${pageData.sections.length} sections`);
 

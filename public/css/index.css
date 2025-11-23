@@ -50,6 +50,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Par défaut, les sections sont transparentes pour laisser voir le background de page */
+.main-content-wrapper .section:not([data-transparent="false"]) {
+  background-color: transparent !important;
+}
+
 /* ==========================================================================
    Header
    ========================================================================== */
@@ -1194,6 +1199,74 @@ footer .social-link:hover .social-icon,
   
   .content-text h2 {
     font-size: var(--font-size-lg);
+  }
+}
+
+/* ==========================================================================
+   Section Text + Media
+   ========================================================================== */
+.section-text-media {
+  position: relative;
+}
+
+.text-media-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.text-media-media {
+  flex-shrink: 0;
+}
+
+.text-media-media--left {
+  order: -1;
+}
+
+.text-media-media .media-container {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.text-media-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.text-media-text {
+  flex: 1;
+}
+
+.text-media-text h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: 1rem;
+  font-family: var(--font-family-title, inherit);
+}
+
+.text-media-description {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-family: var(--font-family-text, inherit);
+}
+
+.text-media-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .text-media-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .text-media-media--left {
+    order: 0;
   }
 }
 

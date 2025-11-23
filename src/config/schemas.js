@@ -6,6 +6,7 @@ export const textElementSchema = z.object({
   alignment: z.enum(['left', 'center', 'right']).optional(),
   subtitle: z.string().optional(),
   content: z.string().optional(),
+  font_id: z.number().positive().optional(), // Police personnalisée pour cet élément
 });
 
 export const mediaElementSchema = z.object({
@@ -14,6 +15,7 @@ export const mediaElementSchema = z.object({
   height: z.number().min(50).max(800).optional(),
   alignment: z.enum(['left', 'center', 'right']).optional(),
   alt: z.string().optional(),
+  font_id: z.number().positive().optional(), // Police personnalisée pour cet élément
 });
 
 export const cardElementSchema = z.object({
@@ -22,6 +24,7 @@ export const cardElementSchema = z.object({
   event_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   link_url: z.string().url().optional(),
   link_text: z.string().optional(),
+  font_id: z.number().positive().optional(), // Police personnalisée pour cet élément
 });
 
 export const photoElementSchema = z.object({
@@ -29,6 +32,7 @@ export const photoElementSchema = z.object({
   caption: z.string().optional(),
   width: z.number().min(100).max(800).optional(),
   height: z.number().min(100).max(600).optional(),
+  font_id: z.number().positive().optional(), // Police personnalisée pour cet élément
 });
 
 export const videoElementSchema = z.object({
@@ -36,6 +40,7 @@ export const videoElementSchema = z.object({
   thumbnail_url: z.string().url().optional(),
   autoplay: z.boolean().optional(),
   controls: z.boolean().optional().default(true),
+  font_id: z.number().positive().optional(), // Police personnalisée pour cet élément
 });
 
 // Union des schémas d'éléments par type

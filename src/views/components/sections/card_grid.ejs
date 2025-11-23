@@ -3,17 +3,23 @@
    * Composant: Section Card Grid
    * Grille de cards (événements, services, etc.) - utilisant le système modulaire elements
    */
+
+  // Configuration de la section depuis settings JSONB
+  const sectionSettings = section.settings || {};
   const {
-    id,
-    title: sectionTitle,
-    layout = 'grid_3',
     bg_color,
     bg_image,
     bg_video,
     bg_youtube,
     is_transparent,
     padding_top = 'medium',
-    padding_bottom = 'medium',
+    padding_bottom = 'medium'
+  } = sectionSettings;
+
+  const {
+    id,
+    title: sectionTitle,
+    layout = {},
     elements = [],
     decorations = []
   } = section;
@@ -28,7 +34,7 @@
   const sectionClasses = [
     'section',
     'section-card-grid',
-    `section-card-grid--${layout || 'grid_3'}`,
+    `section-card-grid--${layout.type || 'grid_3'}`,
     `padding-top-${padding_top}`,
     `padding-bottom-${padding_bottom}`
   ];
@@ -106,7 +112,7 @@
       </div>
     <% } %>
 
-    <div class="cards-grid cards-grid--<%= (layout || 'grid_3').replace('grid_', '') %>">
+    <div class="cards-grid cards-grid--<%= (layout.type || 'grid_3').replace('grid_', '') %>">
       <% if (cards && cards.length > 0) { %>
         <% cards.forEach(card => { %>
           <% const settings = card.settings || {}; %>
@@ -129,18 +135,19 @@
 
             <div class="card-content">
               <% if (settings.title) { %>
-                <h3><%= settings.title %></h3>
+                <h3<% if (settings.font_id) { %> class="font-<%= settings.font_id %>"<% } %>><%= settings.title %></h3>
               <% } %>
               <% if (settings.description) { %>
-                <p><%= settings.description %></p>
+                <p<% if (settings.font_id) { %> class="font-<%= settings.font_id %>"<% } %>><%= settings.description %></p>
               <% } %>
               <% if (settings.event_date) { %>
-                <time datetime="<%= new Date(settings.event_date).toISOString() %>">
+                <time datetime="<%= new Date(settings.event_date).toISOString() %>"
+                      <% if (settings.font_id) { %> class="font-<%= settings.font_id %>"<% } %>>
                   <%= new Date(settings.event_date).toLocaleDateString('fr-FR') %>
                 </time>
               <% } %>
               <% if (settings.link_url) { %>
-                <a href="<%= settings.link_url %>" class="card-link">En savoir plus</a>
+                <a href="<%= settings.link_url %>" class="card-link"<% if (settings.font_id) { %> class="font-<%= settings.font_id %>"<% } %>>En savoir plus</a>
               <% } %>
             </div>
           </article>

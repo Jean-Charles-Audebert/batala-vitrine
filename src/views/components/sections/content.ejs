@@ -166,16 +166,17 @@
            data-text-color="<%= text_color %>">
         <% if (contentTitle) { %>
           <h2 data-title-color="<%= content_title_color %>"
-              data-title-font="<%= content_title_font_id %>"><%= contentTitle %></h2>
+              data-title-font="<%= content_title_font_id %>"
+              <% if (textSettings.font_id) { %> class="font-<%= textSettings.font_id %>"<% } %>><%= contentTitle %></h2>
         <% } %>
         <% if (subtitle) { %>
-          <h3><%= subtitle %></h3>
+          <h3<% if (textSettings.font_id) { %> class="font-<%= textSettings.font_id %>"<% } %>><%= subtitle %></h3>
         <% } %>
         <% if (description) { %>
-          <div class="content-description"><%= description %></div>
+          <div class="content-description<% if (textSettings.font_id) { %> font-<%= textSettings.font_id %><% } %>"><%= description %></div>
         <% } %>
         <% if (cta_label && cta_url) { %>
-          <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
+          <a href="<%= cta_url %>" class="btn-cta<% if (textSettings.font_id) { %> font-<%= textSettings.font_id %><% } %>"><%= cta_label %></a>
         <% } %>
       </div>
 

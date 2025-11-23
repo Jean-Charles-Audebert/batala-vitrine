@@ -36,14 +36,21 @@ const fileFilter = (req, file, cb) => {
     "video/mp4",
     "video/webm",
     "video/ogg",
-    "video/quicktime" // .mov
+    "video/quicktime", // .mov
+    // Polices
+    "font/woff",
+    "font/woff2",
+    "font/ttf",
+    "application/font-ttf",
+    "font/otf",
+    "application/font-otf"
   ];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        `Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP, GIF, SVG, MP4, WebM, OGG, MOV`
+        `Type de fichier non autorisé. Formats acceptés : JPEG, PNG, WebP, GIF, SVG, MP4, WebM, OGG, MOV, WOFF, WOFF2, TTF, OTF`
       ),
       false
     );

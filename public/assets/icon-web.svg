@@ -1,0 +1,8 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#28a745" stroke="#1e7e34" stroke-width="2"/>
+  <rect x="18" y="22" width="28" height="20" fill="white" rx="2"/>
+  <rect x="22" y="26" width="20" height="2" fill="#28a745"/>
+  <rect x="22" y="30" width="16" height="2" fill="#28a745"/>
+  <rect x="22" y="34" width="12" height="2" fill="#28a745"/>
+  <text x="32" y="55" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif" font-size="8">Web Dev</text>
+</svg>

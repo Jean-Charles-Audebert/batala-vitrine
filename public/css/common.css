@@ -496,3 +496,31 @@ table tbody tr:last-child td {
 .grid-gap-1 {
   gap: var(--spacing-md);
 }
+
+/**
+ * Polices globales par défaut
+ * Applique les polices définies dans les paramètres globaux
+ */
+.vitrine-page {
+  /* Police par défaut pour tout le texte */
+  font-family: var(--font-family-text, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+}
+
+.vitrine-page h1,
+.vitrine-page h2,
+.vitrine-page h3,
+.vitrine-page h4,
+.vitrine-page h5,
+.vitrine-page h6 {
+  /* Police spécifique pour les titres */
+  font-family: var(--font-family-title, var(--font-family-text, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif));
+}
+
+/* Classes utilitaires pour forcer les polices */
+.font-title {
+  font-family: var(--font-family-title, inherit) !important;
+}
+
+.font-text {
+  font-family: var(--font-family-text, inherit) !important;
+}

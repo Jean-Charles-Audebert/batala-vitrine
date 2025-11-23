@@ -30,6 +30,7 @@ import sectionsRoutes from "./routes/sections.js";
 import elementsRoutes from "./routes/elements.js";
 import pageRoutes from "./routes/page.js";
 import editorRoutes from "./routes/editor.js";
+import fontRoutes from "./routes/fontRoutes.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -340,6 +341,7 @@ app.use("/api/admin", adminContentRoutes);
 // app.use("/admin", adminDashboardRoutes); // Supprimé - remplacé par /editor
 app.use("/admin", settingsRoutes);
 app.use("/editor", editorRoutes);
+app.use("/admin/fonts", fontRoutes);
 // app.use("/api/sections", sectionsRoutes);
 // app.use("/api/elements", elementsRoutes);
 

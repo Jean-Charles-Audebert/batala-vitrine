@@ -10,8 +10,8 @@
       include('../partials/admin-toolbar', {
         title,
         toolbarButtons: [
-          { href: '/admin?section=sections', class: 'btn-secondary', icon: 'arrow_back', label: 'Retour' },
-          { href: '/fonts/google/new', class: 'btn-primary', icon: 'add', label: 'Google Fonts' }
+          { href: '/editor', class: 'btn-secondary', icon: 'arrow_back', label: 'Retour à l\'éditeur' },
+          { href: '/admin/fonts/new', class: 'btn-primary', icon: 'add', label: 'Google Fonts' }
         ]
       })
     %>
@@ -20,8 +20,9 @@
 
     <!-- Formulaire d'upload rapide -->
     <div class="alert-box alert-info mb-3">
-      <h3 class="mt-0 mb-2">📁 Uploader une police depuis votre PC</h3>
-      <form method="POST" action="/fonts/upload" enctype="multipart/form-data" class="flex-row flex-wrap gap-md">
+      <h3 class="mt-0 mb-2">📁 Alternative : Uploader une police depuis votre PC</h3>
+      <p class="mb-3 text-small text-muted">Si vous préférez utiliser vos propres fichiers de polices plutôt que Google Fonts.</p>
+      <form method="POST" action="/admin/fonts/upload" enctype="multipart/form-data" class="flex-row flex-wrap gap-md">
         <div class="form-group flex-1" style="margin: 0; min-width: 200px;">
           <label for="font_name">Nom de la police *</label>
           <input type="text" id="font_name" name="name" required placeholder="Roboto Bold">
@@ -74,7 +75,7 @@
               <% } %>
             </div>
             <% if (font.source !== 'system') { %>
-              <form method="POST" action="/fonts/<%= font.id %>/delete" class="d-inline" onsubmit="return confirm('Supprimer cette police ?');">
+              <form method="POST" action="/admin/fonts/<%= font.id %>/delete" class="d-inline" onsubmit="return confirm('Supprimer cette police ?');">
                 <button type="submit" class="btn-delete-card">
                   <img src="/icons/trash.svg" alt="Supprimer" class="icon">
                 </button>

@@ -10,6 +10,8 @@ import { query } from "../config/db.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs/promises";
+import { buildPageData } from "../services/pageBuilder.js";
+import { getSocialIcon } from "../utils/socialIcons.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +19,55 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 
 // Note: La route /api/contact est définie directement dans server.js pour éviter les conflits d'authentification
+
+// Route pour l'aperçu de la page publique (sans authentification pour éviter les conflits d'iframe)
+router.get("/preview", async (req, res) => {
+  try {
+    logger.info('🖼️ Génération aperçu page publique...');
+
+    // Construire les données complètes de la page
+    const pageData = await buildPageData();
+
+    // Charger les liens sociaux (si la table existe)
+    let socialLinks = [];
+    try {
+      const result = await query(`
+        SELECT * FROM social_links
+        WHERE is_visible = true
+        ORDER BY position ASC
+      `);
+      socialLinks = result.rows;
+    } catch (socialError) {
+      // La table social_links n'existe pas encore, c'est OK
+      logger.info('ℹ️ Table social_links non trouvée, utilisation d\'une liste vide');
+    }
+
+    logger.info(`📊 Aperçu généré avec ${pageData.sections.length} sections`);
+
+    // Rendre la vue avec les données unifiées
+    return res.render('pages/index-v2', {
+      title: 'Aperçu',
+      ...pageData,
+      socialLinks,
+      user: null, // Pas d'utilisateur pour l'aperçu
+      getSocialIcon
+    });
+
+  } catch (error) {
+    logger.error('Erreur génération aperçu:', error);
+
+    // En cas d'erreur, rendre avec des données minimales
+    return res.render('pages/index-v2', {
+      title: 'Aperçu',
+      page: {},
+      sections: [],
+      fonts: [],
+      socialLinks: [],
+      user: null,
+      getSocialIcon
+    });
+  }
+});
 
 // Routes pour l'éditeur JSON
 router.get("/site-config", requireAuth, async (req, res) => {
@@ -82,6 +133,56 @@ router.put("/page/theme", requireAuth, async (req, res) => {
   } catch (error) {
     logger.error("Erreur mise à jour thème global:", error);
     res.status(500).json({ success: false, message: "Erreur lors de la mise à jour du thème global" });
+  }
+});
+
+// Route PUT pour mettre à jour une page complète
+router.put("/pages/:id", requireAuth, async (req, res) => {
+  try {
+    const pageId = parseInt(req.params.id);
+    const { 
+      title, 
+      contact_email, 
+      main_bg_color, 
+      main_bg_media_url, 
+      main_bg_youtube_url, 
+      main_bg_opacity, 
+      main_bg_position,
+      title_font_id,
+      text_font_id
+    } = req.body;
+
+    await query(
+      `UPDATE page SET 
+        title = $1, 
+        contact_email = $2, 
+        main_bg_color = $3, 
+        main_bg_media_url = $4, 
+        main_bg_youtube_url = $5, 
+        main_bg_opacity = $6, 
+        main_bg_position = $7,
+        title_font_id = $8,
+        text_font_id = $9,
+        updated_at = NOW() 
+       WHERE id = $10`,
+      [
+        title || null, 
+        contact_email || null, 
+        main_bg_color || '#ffffff', 
+        main_bg_media_url || null, 
+        main_bg_youtube_url || null, 
+        main_bg_opacity || 1.0, 
+        main_bg_position || 'center',
+        title_font_id || null,
+        text_font_id || null,
+        pageId
+      ]
+    );
+
+    res.json({ success: true, message: "Page mise à jour avec succès" });
+  } catch (error) {
+    logger.error("Erreur mise à jour page:", error);
+    res.status(500).json({ success: false, message: "Erreur lors de la mise à jour de la page" });
   }
 });
 

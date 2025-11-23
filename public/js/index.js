@@ -1,13 +1,154 @@
 /**
  * Scripts page d'accueil
  * Fichier: public/js/index.js
- * 
+ *
  * @fileoverview Scripts pour l'édition en ligne de la page d'accueil
  */
 
-/* global document, confirm, window, fetch */
+/* global document, confirm, window, fetch, sessionStorage */
 
 // ==========================================================================
+// Gestion de l'aperçu depuis l'éditeur
+// ==========================================================================
+
+/**
+ * Applique les paramètres d'aperçu depuis l'URL ou sessionStorage
+ */
+function applyPreviewSettings() {
+  // Vérifier si on est en mode aperçu
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.has('preview')) return;
+
+  try {
+    // Essayer d'abord depuis l'URL (paramètres encodés)
+    let previewData = null;
+
+    if (urlParams.has('data')) {
+      // Données encodées dans l'URL
+      const encodedData = urlParams.get('data');
+      previewData = JSON.parse(decodeURIComponent(encodedData));
+    } else {
+      // Fallback vers sessionStorage (ancienne méthode)
+      previewData = JSON.parse(sessionStorage.getItem('editor_preview'));
+    }
+
+    if (!previewData) return;
+
+    console.log('Application des paramètres d\'aperçu:', previewData);
+
+    // Appliquer la couleur de fond
+    if (previewData.main_bg_color) {
+      document.documentElement.style.setProperty('--main-bg-color', previewData.main_bg_color);
+    }
+
+    // Appliquer l'image de fond
+    if (previewData.main_bg_image) {
+      // Supprimer l'ancien fond s'il existe
+      const existingBg = document.querySelector('.global-bg-image');
+      if (existingBg) existingBg.remove();
+
+      // Créer le nouveau fond
+      const bgDiv = document.createElement('div');
+      bgDiv.className = 'global-bg-image preview-bg';
+      bgDiv.style.cssText = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${previewData.main_bg_image}');background-repeat:${previewData.main_bg_image_repeat || 'no-repeat'};background-size:${previewData.main_bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
+      document.body.insertBefore(bgDiv, document.body.firstChild);
+    }
+
+    // Appliquer la vidéo de fond
+    if (previewData.main_bg_video) {
+      // Supprimer l'ancienne vidéo s'il existe
+      const existingVideo = document.querySelector('.global-bg-video');
+      if (existingVideo) existingVideo.remove();
+
+      // Créer la nouvelle vidéo
+      const video = document.createElement('video');
+      video.className = 'global-bg-video preview-bg';
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;';
+      video.innerHTML = `<source src="${previewData.main_bg_video}" type="video/mp4">`;
+      document.body.insertBefore(video, document.body.firstChild);
+    }
+
+    // Appliquer la vidéo YouTube
+    if (previewData.main_bg_youtube) {
+      // Supprimer l'ancienne iframe YouTube s'il existe
+      const existingYoutube = document.querySelector('.global-bg-youtube');
+      if (existingYoutube) existingYoutube.remove();
+
+      // Extraire l'ID de la vidéo YouTube
+      let videoId = '';
+      try {
+        if (previewData.main_bg_youtube.includes('youtu.be/')) {
+          videoId = previewData.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (previewData.main_bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(previewData.main_bg_youtube);
+          videoId = url.searchParams.get('v');
+        }
+      } catch (e) {}
+
+      if (videoId) {
+        const iframe = document.createElement('iframe');
+        iframe.className = 'global-bg-youtube preview-bg';
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&playsinline=1`;
+        iframe.frameBorder = '0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allowFullscreen = true;
+        iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;';
+        document.body.insertBefore(iframe, document.body.firstChild);
+      }
+    }
+
+    // Ajouter un indicateur visuel qu'on est en mode aperçu
+    const previewIndicator = document.createElement('div');
+    previewIndicator.id = 'preview-indicator';
+    previewIndicator.textContent = 'APERÇU - Modifications non sauvegardées';
+    previewIndicator.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 9999;
+      pointer-events: none;
+    `;
+    document.body.appendChild(previewIndicator);
+
+  } catch (error) {
+    console.error('Erreur lors de l\'application des paramètres d\'aperçu:', error);
+  }
+}
+
+// Appliquer les paramètres d'aperçu au chargement de la page
+document.addEventListener('DOMContentLoaded', applyPreviewSettings);
+
+/**
+ * Ouvre un aperçu avec les paramètres donnés
+ * @param {Object} previewData - Données de prévisualisation
+ */
+function openPreview(previewData) {
+  try {
+    // Encoder les données dans l'URL
+    const encodedData = encodeURIComponent(JSON.stringify(previewData));
+    const previewUrl = `${window.location.origin}${window.location.pathname}?preview=1&data=${encodedData}`;
+
+    // Ouvrir dans une nouvelle fenêtre/onglet
+    window.open(previewUrl, '_blank');
+  } catch (error) {
+    console.error('Erreur lors de l\'ouverture de l\'aperçu:', error);
+    alert('Erreur lors de l\'ouverture de l\'aperçu');
+  }
+}
+
+// Exposer la fonction globalement pour que l'éditeur puisse l'utiliser
+window.openPreview = openPreview;// ==========================================================================
 // Gestion des modales
 // ==========================================================================
 

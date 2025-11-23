@@ -8,14 +8,28 @@
 
   <!-- Fonts -->
   <% if (config.global.title_font_id && fonts) { %>
-    <% const font = fonts.find(f => f.id == config.global.title_font_id); %>
-    <% if (font && font.font_url) { %>
-      <link rel="stylesheet" href="<%= font.font_url %>">
-    <% } else if (font && font.file_path) { %>
+    <% const titleFont = fonts.find(f => f.id == config.global.title_font_id); %>
+    <% if (titleFont && titleFont.font_url) { %>
+      <link rel="stylesheet" href="<%= titleFont.font_url %>">
+    <% } else if (titleFont && titleFont.file_path) { %>
       <style>
         @font-face {
-          font-family: '<%= font.name %>';
-          src: url('<%= font.file_path %>');
+          font-family: '<%= titleFont.name %>';
+          src: url('<%= titleFont.file_path %>');
+        }
+      </style>
+    <% } %>
+  <% } %>
+
+  <% if (config.global.text_font_id && fonts) { %>
+    <% const textFont = fonts.find(f => f.id == config.global.text_font_id); %>
+    <% if (textFont && textFont.font_url) { %>
+      <link rel="stylesheet" href="<%= textFont.font_url %>">
+    <% } else if (textFont && textFont.file_path) { %>
+      <style>
+        @font-face {
+          font-family: '<%= textFont.name %>';
+          src: url('<%= textFont.file_path %>');
         }
       </style>
     <% } %>
@@ -32,11 +46,19 @@
   <style>
     :root {
       <% if (config.global.title_font_id && fonts) { %>
-        <% const font = fonts.find(f => f.id == config.global.title_font_id); %>
-        <% if (font && font.font_family) { %>
-      --font-family-title: <%= font.font_family.replace(/['"\\]/g, '') %>;
+        <% const titleFont = fonts.find(f => f.id == config.global.title_font_id); %>
+        <% if (titleFont && titleFont.font_family) { %>
+      --font-family-title: <%= titleFont.font_family.replace(/['"\\]/g, '') %>;
         <% } %>
       <% } %>
+
+      <% if (config.global.text_font_id && fonts) { %>
+        <% const textFont = fonts.find(f => f.id == config.global.text_font_id); %>
+        <% if (textFont && textFont.font_family) { %>
+      --font-family-text: <%= textFont.font_family.replace(/['"\\]/g, '') %>;
+        <% } %>
+      <% } %>
+
       <% if (config.global.main_bg_color) { %>
       --main-bg-color: <%= config.global.main_bg_color %>;
       <% } %>
