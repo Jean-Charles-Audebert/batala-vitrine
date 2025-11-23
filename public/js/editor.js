@@ -3,6 +3,9 @@
  * Interface WYSIWYG pour l'édition des sections et éléments
  */
 
+// Déclaration globale pour SortableJS
+/* global Sortable */
+
 class Editor {
   constructor() {
     this.sections = window.pageData.sections || [];
@@ -20,73 +23,78 @@ class Editor {
 
   bindEvents() {
     // Boutons principaux
-    $('#save-btn').on('click', () => this.saveAll());
-    $('#preview-btn').on('click', () => this.preview());
-    $('#add-section-btn').on('click', () => this.showAddSectionModal());
+    document.getElementById('save-btn').addEventListener('click', () => this.saveAll());
+    document.getElementById('preview-btn').addEventListener('click', () => this.preview());
+    document.getElementById('add-section-btn').addEventListener('click', () => this.showAddSectionModal());
 
     // Boutons sections
-    $(document).on('click', '.section-settings-btn', (e) => {
-      const sectionId = $(e.currentTarget).data('section-id');
-      this.showSectionSettingsModal(sectionId);
-    });
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.section-settings-btn')) {
+        const sectionId = parseInt(e.target.closest('.section-settings-btn').dataset.sectionId);
+        this.showSectionSettingsModal(sectionId);
+      }
 
-    $(document).on('click', '.section-toggle-btn', (e) => {
-      const sectionId = $(e.currentTarget).data('section-id');
-      this.toggleSectionVisibility(sectionId);
-    });
+      if (e.target.closest('.section-toggle-btn')) {
+        const sectionId = parseInt(e.target.closest('.section-toggle-btn').dataset.sectionId);
+        this.toggleSectionVisibility(sectionId);
+      }
 
-    $(document).on('click', '.section-delete-btn', (e) => {
-      const sectionId = $(e.currentTarget).data('section-id');
-      this.deleteSection(sectionId);
-    });
+      if (e.target.closest('.section-delete-btn')) {
+        const sectionId = parseInt(e.target.closest('.section-delete-btn').dataset.sectionId);
+        this.deleteSection(sectionId);
+      }
 
-    // Boutons éléments
-    $(document).on('click', '.add-element-btn', (e) => {
-      const sectionId = $(e.currentTarget).data('section-id');
-      this.showAddElementModal(sectionId);
-    });
+      // Boutons éléments
+      if (e.target.closest('.add-element-btn')) {
+        const sectionId = parseInt(e.target.closest('.add-element-btn').dataset.sectionId);
+        this.showAddElementModal(sectionId);
+      }
 
-    $(document).on('click', '.element-edit-btn', (e) => {
-      const elementId = $(e.currentTarget).data('element-id');
-      this.showElementEditModal(elementId);
-    });
+      if (e.target.closest('.element-edit-btn')) {
+        const elementId = parseInt(e.target.closest('.element-edit-btn').dataset.elementId);
+        this.showElementEditModal(elementId);
+      }
 
-    $(document).on('click', '.element-delete-btn', (e) => {
-      const elementId = $(e.currentTarget).data('element-id');
-      this.deleteElement(elementId);
-    });
+      if (e.target.closest('.element-delete-btn')) {
+        const elementId = parseInt(e.target.closest('.element-delete-btn').dataset.elementId);
+        this.deleteElement(elementId);
+      }
 
-    // Modals
-    $(document).on('click', '.modal-close', () => this.closeModals());
-    $(document).on('click', '.modal', (e) => {
-      if (e.target === e.currentTarget) this.closeModals();
-    });
+      // Modals
+      if (e.target.closest('.modal-close') || (e.target.classList.contains('modal') && e.target === e.currentTarget)) {
+        this.closeModals();
+      }
 
-    // Types d'éléments
-    $(document).on('click', '.element-type-btn', (e) => {
-      const type = $(e.currentTarget).data('type');
-      const sectionId = $('#add-element-modal').data('section-id');
-      this.addElement(sectionId, type);
+      // Types d'éléments
+      if (e.target.closest('.element-type-btn')) {
+        const type = e.target.closest('.element-type-btn').dataset.type;
+        const modal = document.getElementById('add-element-modal');
+        const sectionId = parseInt(modal.dataset.sectionId);
+        this.addElement(sectionId, type);
+      }
     });
   }
 
   initSortable() {
     // Sections
-    new Sortable(document.getElementById('sections-container'), {
-      handle: '.section-header',
-      animation: 150,
-      onEnd: (evt) => {
-        this.updateSectionPositions();
-      }
-    });
+    const sectionsContainer = document.getElementById('sections-container');
+    if (sectionsContainer) {
+      new Sortable(sectionsContainer, {
+        handle: '.section-header',
+        animation: 150,
+        onEnd: () => {
+          this.updateSectionPositions();
+        }
+      });
+    }
 
     // Éléments dans chaque section
     document.querySelectorAll('.elements-container').forEach(container => {
       new Sortable(container, {
         handle: '.element-drag-handle',
         animation: 150,
-        onEnd: (evt) => {
-          const sectionId = $(container).data('section-id');
+        onEnd: () => {
+          const sectionId = parseInt(container.dataset.sectionId);
           this.updateElementPositions(sectionId);
         }
       });
@@ -95,7 +103,10 @@ class Editor {
 
   updateUI() {
     const visibleCount = this.sections.filter(s => s.is_visible).length;
-    $('#visible-count').text(visibleCount);
+    const visibleCountElement = document.getElementById('visible-count');
+    if (visibleCountElement) {
+      visibleCountElement.textContent = visibleCount;
+    }
   }
 
   // API Calls
@@ -144,7 +155,10 @@ class Editor {
     try {
       await this.apiCall(`/sections/${sectionId}`, 'DELETE');
       this.sections = this.sections.filter(s => s.id !== sectionId);
-      $(`.section-wrapper[data-section-id="${sectionId}"]`).remove();
+      const sectionElement = document.querySelector(`.section-wrapper[data-section-id="${sectionId}"]`);
+      if (sectionElement) {
+        sectionElement.remove();
+      }
       this.updateUI();
     } catch (error) {
       console.error('Erreur delete section:', error);
@@ -190,7 +204,10 @@ class Editor {
         section.elements = section.elements.filter(e => e.id !== elementId);
       });
 
-      $(`.element-wrapper[data-element-id="${elementId}"]`).remove();
+      const elementElement = document.querySelector(`.element-wrapper[data-element-id="${elementId}"]`);
+      if (elementElement) {
+        elementElement.remove();
+      }
     } catch (error) {
       console.error('Erreur delete element:', error);
       alert('Erreur lors de la suppression de l\'élément');
@@ -200,8 +217,9 @@ class Editor {
   // Position Updates
   async updateSectionPositions() {
     const positions = [];
-    $('#sections-container .section-wrapper').each((index, element) => {
-      const sectionId = $(element).data('section-id');
+    const sectionElements = document.querySelectorAll('#sections-container .section-wrapper');
+    sectionElements.forEach((element, index) => {
+      const sectionId = parseInt(element.dataset.sectionId);
       positions.push({ id: sectionId, position: index + 1 });
     });
 
@@ -220,8 +238,9 @@ class Editor {
 
   async updateElementPositions(sectionId) {
     const positions = [];
-    $(`.elements-container[data-section-id="${sectionId}"] .element-wrapper`).each((index, element) => {
-      const elementId = $(element).data('element-id');
+    const elementElements = document.querySelectorAll(`.elements-container[data-section-id="${sectionId}"] .element-wrapper`);
+    elementElements.forEach((element, index) => {
+      const elementId = parseInt(element.dataset.elementId);
       positions.push({ id: elementId, position: index + 1 });
     });
 
@@ -256,7 +275,11 @@ class Editor {
   }
 
   showAddElementModal(sectionId) {
-    $('#add-element-modal').data('section-id', sectionId).addClass('show');
+    const modal = document.getElementById('add-element-modal');
+    if (modal) {
+      modal.dataset.sectionId = sectionId;
+      modal.classList.add('show');
+    }
   }
 
   showElementEditModal(elementId) {
@@ -268,7 +291,9 @@ class Editor {
   }
 
   closeModals() {
-    $('.modal').removeClass('show');
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.classList.remove('show');
+    });
   }
 
   // Utility Methods
@@ -325,16 +350,22 @@ class Editor {
     const section = this.sections.find(s => s.id === sectionId);
     if (!section) return;
 
-    const $section = $(`.section-wrapper[data-section-id="${sectionId}"]`);
-    const $visibility = $section.find('.section-visibility');
-    const $toggleBtn = $section.find('.section-toggle-btn i');
+    const sectionElement = document.querySelector(`.section-wrapper[data-section-id="${sectionId}"]`);
+    if (!sectionElement) return;
+
+    const visibilityElement = sectionElement.querySelector('.section-visibility');
+    const toggleBtn = sectionElement.querySelector('.section-toggle-btn i');
 
     if (section.is_visible) {
-      $visibility.removeClass('hidden').addClass('visible');
-      $toggleBtn.removeClass('fa-eye').addClass('fa-eye-slash');
+      visibilityElement?.classList.remove('hidden');
+      visibilityElement?.classList.add('visible');
+      toggleBtn?.classList.remove('fa-eye');
+      toggleBtn?.classList.add('fa-eye-slash');
     } else {
-      $visibility.removeClass('visible').addClass('hidden');
-      $toggleBtn.removeClass('fa-eye-slash').addClass('fa-eye');
+      visibilityElement?.classList.remove('visible');
+      visibilityElement?.classList.add('hidden');
+      toggleBtn?.classList.remove('fa-eye-slash');
+      toggleBtn?.classList.add('fa-eye');
     }
   }
 
@@ -343,19 +374,21 @@ class Editor {
     if (!section) return;
 
     // Re-render la section des éléments
-    const $container = $(`.elements-container[data-section-id="${sectionId}"]`);
-    $container.empty();
+    const container = document.querySelector(`.elements-container[data-section-id="${sectionId}"]`);
+    if (!container) return;
+
+    container.innerHTML = '';
 
     section.elements.forEach(element => {
       const elementHtml = this.renderElement(element);
-      $container.append(elementHtml);
+      container.insertAdjacentHTML('beforeend', elementHtml);
     });
 
     // Réinitialiser le sortable pour cette section
-    new Sortable($container[0], {
+    new Sortable(container, {
       handle: '.element-drag-handle',
       animation: 150,
-      onEnd: (evt) => {
+      onEnd: () => {
         this.updateElementPositions(sectionId);
       }
     });
@@ -439,6 +472,6 @@ class Editor {
 }
 
 // Initialiser l'éditeur quand le DOM est prêt
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
   window.editor = new Editor();
 });
