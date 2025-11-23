@@ -26,6 +26,10 @@ import adminContentRoutes from "./routes/adminContentRoutes.js";
 import settingsRoutes from "./routes/settings.js";
 // import adminDashboardRoutes from "./routes/adminDashboardRoutes.js"; // Supprimé - remplacé par /editor
 import pagesRoutes from "./routes/pages.js";
+import sectionsRoutes from "./routes/sections.js";
+import elementsRoutes from "./routes/elements.js";
+import pageRoutes from "./routes/page.js";
+import editorRoutes from "./routes/editor.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -92,51 +96,149 @@ async function initializeDefaultSections() {
       logger.info(`📄 Section créée: ${section.type} - ${section.title}`);
     }
 
-    // Créer du contenu par défaut pour la section hero
-    await query(`
-      INSERT INTO section_content (section_id, title, subtitle, description, cta_label, cta_url, position)
-      SELECT id, 'Site Vitrine', 'caixaDev', 'Créons ensemble votre présence en ligne', 'Nous contacter', '#contact', 0
-      FROM sections WHERE type = 'hero' LIMIT 1
-    `);
+    // Créer des éléments par défaut pour la section hero
+    const heroId = await query('SELECT id FROM sections WHERE type = $1', ['hero']);
+    if (heroId.rows.length > 0) {
+      const heroElements = [
+        {
+          type: 'text',
+          title: 'Titre principal',
+          position: 0,
+          settings: {
+            content: 'Site Vitrine'
+          }
+        },
+        {
+          type: 'text',
+          title: 'Sous-titre',
+          position: 1,
+          settings: {
+            content: 'caixaDev'
+          }
+        },
+        {
+          type: 'text',
+          title: 'Description',
+          position: 2,
+          settings: {
+            content: 'Créons ensemble votre présence en ligne'
+          }
+        },
+        {
+          type: 'link-navigation',
+          title: 'CTA principal',
+          position: 3,
+          settings: {
+            label: 'Nous contacter',
+            url: '#contact'
+          }
+        }
+      ];
 
-    // Créer du contenu par défaut pour la section content
-    await query(`
-      INSERT INTO section_content (section_id, title, description, position)
-      SELECT id, 'À propos de nous', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin tortor purus platea sit eu id nisi litora libero.', 0
-      FROM sections WHERE type = 'content' LIMIT 1
-    `);
+      for (const element of heroElements) {
+        await query(`
+          INSERT INTO elements (section_id, type, title, position, settings)
+          VALUES ($1, $2, $3, $4, $5)
+        `, [
+          heroId.rows[0].id,
+          element.type,
+          element.title,
+          element.position,
+          JSON.stringify(element.settings)
+        ]);
+      }
+      logger.info('🎯 Éléments hero par défaut créés');
+    }
 
-    // Créer des cartes par défaut pour la section card_grid
+    // Créer des éléments par défaut pour la section content
+    const contentId = await query('SELECT id FROM sections WHERE type = $1', ['content']);
+    if (contentId.rows.length > 0) {
+      const contentElements = [
+        {
+          type: 'text',
+          title: 'Titre',
+          position: 0,
+          settings: {
+            content: 'À propos de nous'
+          }
+        },
+        {
+          type: 'text',
+          title: 'Description',
+          position: 1,
+          settings: {
+            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Proin tortor purus platea sit eu id nisi litora libero.'
+          }
+        }
+      ];
+
+      for (const element of contentElements) {
+        await query(`
+          INSERT INTO elements (section_id, type, title, position, settings)
+          VALUES ($1, $2, $3, $4, $5)
+        `, [
+          contentId.rows[0].id,
+          element.type,
+          element.title,
+          element.position,
+          JSON.stringify(element.settings)
+        ]);
+      }
+      logger.info('📝 Éléments content par défaut créés');
+    }
+
+    // Créer des éléments par défaut pour la section card_grid
     const cardGridId = await query('SELECT id FROM sections WHERE type = $1', ['card_grid']);
     if (cardGridId.rows.length > 0) {
-      const cards = [
+      const cardElements = [
         {
-          title: 'Lorem ipsum',
-          description:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          type: 'card',
+          title: 'Carte 1',
           position: 0,
+          settings: {
+            title: 'Lorem ipsum',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+            background_color: '#ffffff',
+            text_color: '#000000'
+          }
         },
         {
-          title: 'Lorem ipsum',
-          description:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          type: 'card',
+          title: 'Carte 2',
           position: 1,
+          settings: {
+            title: 'Lorem ipsum',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+            background_color: '#ffffff',
+            text_color: '#000000'
+          }
         },
         {
-          title: 'Lorem ipsum',
-          description:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          type: 'card',
+          title: 'Carte 3',
           position: 2,
+          settings: {
+            title: 'Lorem ipsum',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+            background_color: '#ffffff',
+            text_color: '#000000'
+          }
         },
       ];
 
-      for (const card of cards) {
+      for (const element of cardElements) {
         await query(`
-          INSERT INTO cards_v2 (section_id, title, description, position)
-          VALUES ($1, $2, $3, $4)
-        `, [cardGridId.rows[0].id, card.title, card.description, card.position]);
+          INSERT INTO elements (section_id, type, title, position, settings)
+          VALUES ($1, $2, $3, $4, $5)
+        `, [
+          cardGridId.rows[0].id,
+          element.type,
+          element.title,
+          element.position,
+          JSON.stringify(element.settings)
+        ]);
       }
-      logger.info('🃏 Cartes par défaut créées');
+      logger.info('🃏 Éléments carte par défaut créés');
     }
 
     logger.success('✅ Sections par défaut initialisées avec succès');
@@ -229,6 +331,7 @@ app.post("/contact", sendContactEmail);
 
 // app.use("/", footerElementRoutes); // TODO: Supprimé - système legacy blocks
 
+app.use("/api/page", pageRoutes);
 app.use("/api", apiRoutes);
 app.use("/api", sectionsApiRoutes);
 app.use("/api", socialLinksRoutes);
@@ -236,6 +339,9 @@ app.use("/api", socialLinksRoutes);
 app.use("/api/admin", adminContentRoutes);
 // app.use("/admin", adminDashboardRoutes); // Supprimé - remplacé par /editor
 app.use("/admin", settingsRoutes);
+app.use("/editor", editorRoutes);
+// app.use("/api/sections", sectionsRoutes);
+// app.use("/api/elements", elementsRoutes);
 
 // --- Lancement du serveur ---
 const PORT = process.env.PORT || 3000;

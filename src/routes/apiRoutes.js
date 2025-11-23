@@ -359,47 +359,78 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
       ]
     );
 
-    // 2. Upsert section_content (titre, police, couleur, position)
-    const existingContent = await query(
-      `SELECT id FROM section_content WHERE section_id = $1 LIMIT 1`,
-      [sectionId]
-    );
+    // 2. Mettre à jour les éléments de contenu (titre, description, CTA)
+    // Supprimer les anciens éléments de contenu
+    await query('DELETE FROM elements WHERE section_id = $1 AND type IN ($2, $3, $4)', 
+      [sectionId, 'text', 'link-navigation', 'link-social']);
 
-    if (existingContent.rows.length > 0) {
-      // Update existing
-      await query(
-        `UPDATE section_content SET 
-          title = $1, 
-          title_font_id = $2, 
-          title_color = $3,
-          title_position_h = $4, 
-          title_position_v = $5,
-          updated_at = NOW()
-         WHERE section_id = $6`,
-        [
-          content.title || null,
-          content.title_font_id || null,
-          content.title_color || '#ffffff',
-          content.title_position_h || 'center',
-          content.title_position_v || 'center',
-          sectionId
-        ]
-      );
-    } else {
-      // Insert new
-      await query(
-        `INSERT INTO section_content 
-          (section_id, title, title_font_id, title_color, title_position_h, title_position_v, position)
-         VALUES ($1, $2, $3, $4, $5, $6, 0)`,
-        [
-          sectionId,
-          content.title || null,
-          content.title_font_id || null,
-          content.title_color || '#ffffff',
-          content.title_position_h || 'center',
-          content.title_position_v || 'center'
-        ]
-      );
+    // Créer les nouveaux éléments basés sur le contenu fourni
+    const elements = [];
+    let position = 0;
+
+    if (content.title) {
+      elements.push({
+        type: 'text',
+        title: 'Titre principal',
+        position: position++,
+        settings: {
+          content: content.title,
+          font_id: content.title_font_id,
+          color: content.title_color || '#ffffff'
+        }
+      });
+    }
+
+    if (content.subtitle) {
+      elements.push({
+        type: 'text',
+        title: 'Sous-titre',
+        position: position++,
+        settings: {
+          content: content.subtitle,
+          font_id: content.subtitle_font_id,
+          color: content.subtitle_color || '#ffffff'
+        }
+      });
+    }
+
+    if (content.description) {
+      elements.push({
+        type: 'text',
+        title: 'Description',
+        position: position++,
+        settings: {
+          content: content.description,
+          font_id: content.description_font_id,
+          color: content.description_color || '#ffffff'
+        }
+      });
+    }
+
+    if (content.cta_label && content.cta_url) {
+      elements.push({
+        type: 'link-navigation',
+        title: 'CTA principal',
+        position: position++,
+        settings: {
+          label: content.cta_label,
+          url: content.cta_url
+        }
+      });
+    }
+
+    // Insérer les nouveaux éléments
+    for (const element of elements) {
+      await query(`
+        INSERT INTO elements (section_id, type, title, position, settings)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [
+        sectionId,
+        element.type,
+        element.title,
+        element.position,
+        JSON.stringify(element.settings)
+      ]);
     }
 
     // 3. Gérer les liens de navigation (hero_nav_links)

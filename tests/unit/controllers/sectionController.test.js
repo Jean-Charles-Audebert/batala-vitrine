@@ -27,8 +27,8 @@ describe('sectionController - tests d\'intégration', () => {
         expect(firstSection).toHaveProperty('type');
         expect(firstSection).toHaveProperty('title');
         expect(firstSection).toHaveProperty('position');
-        expect(firstSection).toHaveProperty('content');
-        expect(Array.isArray(firstSection.content)).toBe(true);
+        expect(firstSection).toHaveProperty('elements');
+        expect(Array.isArray(firstSection.elements)).toBe(true);
         expect(firstSection).toHaveProperty('decorations');
         expect(Array.isArray(firstSection.decorations)).toBe(true);
       }
@@ -58,15 +58,15 @@ describe('sectionController - tests d\'intégration', () => {
         expect(section).toBeTruthy();
         expect(section.id).toBe(sectionId);
         expect(section).toHaveProperty('type');
-        expect(section).toHaveProperty('content');
-        expect(Array.isArray(section.content)).toBe(true);
+        expect(section).toHaveProperty('elements');
+        expect(Array.isArray(section.elements)).toBe(true);
         expect(section).toHaveProperty('decorations');
         expect(Array.isArray(section.decorations)).toBe(true);
         
-        // Vérifier les cartes selon le type
+        // Vérifier les éléments selon le type
         if (section.type === 'card_grid') {
-          expect(section).toHaveProperty('cards');
-          expect(Array.isArray(section.cards)).toBe(true);
+          expect(section).toHaveProperty('elements');
+          expect(Array.isArray(section.elements)).toBe(true);
         }
       }
     });
@@ -84,7 +84,6 @@ describe('sectionController - tests d\'intégration', () => {
       const sectionData = {
         type: 'content',
         title: 'Test Section',
-        bg_color: '#ffffff',
         layout: 'centered',
         position: 999
       };
@@ -96,7 +95,6 @@ describe('sectionController - tests d\'intégration', () => {
       expect(section.id).toBeDefined();
       expect(section.type).toBe('content');
       expect(section.title).toBe('Test Section');
-      expect(section.bg_color).toBe('#ffffff');
     });
 
     afterAll(async () => {

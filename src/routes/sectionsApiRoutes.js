@@ -9,8 +9,6 @@ import {
   createSection,
   updateSection,
   deleteSection,
-  addSectionContent,
-  addSectionCard,
   addSectionDecoration,
   getAllDecorations,
   getAllFonts
@@ -98,103 +96,6 @@ router.post('/sections/reorder', async (req, res) => {
       await query('UPDATE sections SET position = $1 WHERE id = $2', [i + 1, sectionIds[i]]);
     }
     
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ========== SECTION CONTENT ==========
-// POST /api/sections/:sectionId/content - Ajouter du contenu
-router.post('/sections/:sectionId/content', async (req, res) => {
-  try {
-    const content = await addSectionContent(
-      parseInt(req.params.sectionId, 10),
-      req.body
-    );
-    res.status(201).json(content);
-  } catch (error) {
-    console.error('❌ Erreur dans la route:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// PUT /api/sections/:sectionId/content/:contentId - Modifier du contenu
-router.put('/sections/:sectionId/content/:contentId', async (req, res) => {
-  try {
-    const { updateSectionContent } = await import('../controllers/sectionController.js');
-
-    if (!updateSectionContent) {
-      return res.status(500).json({ error: 'Fonction updateSectionContent non disponible' });
-    }
-
-    const content = await updateSectionContent(
-      parseInt(req.params.contentId, 10),
-      req.body
-    );
-    if (!content) {
-      return res.status(404).json({ error: 'Contenu non trouvé' });
-    }
-    res.json(content);
-  } catch (error) {
-    console.error('Erreur dans route PUT content:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// DELETE /api/sections/:sectionId/content/:contentId - Supprimer du contenu
-router.delete('/sections/:sectionId/content/:contentId', async (req, res) => {
-  try {
-    const { query } = await import('../config/db.js');
-    await query('DELETE FROM section_content WHERE id = $1 AND section_id = $2', [
-      parseInt(req.params.contentId, 10),
-      parseInt(req.params.sectionId, 10)
-    ]);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ========== SECTION CARDS ==========
-// POST /api/sections/:id/cards - Ajouter une carte à une section
-router.post('/sections/:sectionId/cards', async (req, res) => {
-  try {
-    const card = await addSectionCard(
-      parseInt(req.params.sectionId, 10),
-      req.body
-    );
-    res.status(201).json(card);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// PUT /api/sections/:sectionId/cards/:cardId - Mettre à jour une carte
-router.put('/sections/:sectionId/cards/:cardId', async (req, res) => {
-  try {
-    const { updateSectionCard } = await import('../controllers/sectionController.js');
-    const card = await updateSectionCard(
-      parseInt(req.params.cardId, 10),
-      req.body
-    );
-    if (!card) {
-      return res.status(404).json({ error: 'Carte non trouvée' });
-    }
-    res.json(card);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// DELETE /api/sections/:sectionId/cards/:cardId - Supprimer une carte
-router.delete('/sections/:sectionId/cards/:cardId', async (req, res) => {
-  try {
-    const { query } = await import('../config/db.js');
-    await query('DELETE FROM cards_v2 WHERE id = $1 AND section_id = $2', [
-      parseInt(req.params.cardId, 10),
-      parseInt(req.params.sectionId, 10)
-    ]);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });

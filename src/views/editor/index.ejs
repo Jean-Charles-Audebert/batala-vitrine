@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+
+  <!-- Fonts -->
+  <% fonts.forEach(font => { %>
+    <% if (font.source === 'google') { %>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="<%= font.url %>" rel="stylesheet">
+    <% } %>
+  <% }); %>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/editor.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+  <div id="editor-app">
+    <!-- Header -->
+    <header class="editor-header">
+      <div class="header-left">
+        <h1><i class="fas fa-edit"></i> Éditeur</h1>
+      </div>
+      <div class="header-right">
+        <button id="save-btn" class="btn btn-primary">
+          <i class="fas fa-save"></i> Sauvegarder
+        </button>
+        <button id="preview-btn" class="btn btn-secondary">
+          <i class="fas fa-eye"></i> Aperçu
+        </button>
+        <a href="/" class="btn btn-outline">
+          <i class="fas fa-home"></i> Retour au site
+        </a>
+      </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="editor-toolbar">
+      <div class="toolbar-section">
+        <button id="add-section-btn" class="btn btn-success">
+          <i class="fas fa-plus"></i> Ajouter une section
+        </button>
+      </div>
+      <div class="toolbar-section">
+        <span class="toolbar-label">Sections visibles:</span>
+        <span id="visible-count" class="count-badge">0</span>
+      </div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <main class="editor-main">
+      <div id="sections-container" class="sections-container">
+        <% sections.forEach(section => { %>
+          <div class="section-wrapper" data-section-id="<%= section.id %>">
+            <div class="section-header">
+              <div class="section-info">
+                <h3 class="section-title"><%= section.title %></h3>
+                <span class="section-type badge badge-<%= section.type %>"><%= section.type %></span>
+                <span class="section-visibility <%= section.is_visible ? 'visible' : 'hidden' %>">
+                  <i class="fas fa-<%= section.is_visible ? 'eye' : 'eye-slash' %>"></i>
+                </span>
+              </div>
+              <div class="section-controls">
+                <button class="btn btn-sm btn-outline section-settings-btn" data-section-id="<%= section.id %>">
+                  <i class="fas fa-cog"></i>
+                </button>
+                <button class="btn btn-sm btn-outline section-toggle-btn" data-section-id="<%= section.id %>">
+                  <i class="fas fa-<%= section.is_visible ? 'eye-slash' : 'eye' %>"></i>
+                </button>
+                <button class="btn btn-sm btn-danger section-delete-btn" data-section-id="<%= section.id %>">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="section-content">
+              <div class="elements-container" data-section-id="<%= section.id %>">
+                <% section.elements.forEach(element => { %>
+                  <div class="element-wrapper" data-element-id="<%= element.id %>">
+                    <div class="element-header">
+                      <div class="element-info">
+                        <span class="element-title"><%= element.title || `Élément ${element.type}` %></span>
+                        <span class="element-type badge badge-sm badge-<%= element.type %>"><%= element.type %></span>
+                      </div>
+                      <div class="element-controls">
+                        <button class="btn btn-xs btn-outline element-edit-btn" data-element-id="<%= element.id %>">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-xs btn-danger element-delete-btn" data-element-id="<%= element.id %>">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        <div class="element-drag-handle">
+                          <i class="fas fa-grip-vertical"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="element-preview">
+                      <%- renderElementPreview(element) %>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+
+              <div class="add-element-section">
+                <button class="btn btn-sm btn-success add-element-btn" data-section-id="<%= section.id %>">
+                  <i class="fas fa-plus"></i> Ajouter un élément
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="section-settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Paramètres de la section</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="section-settings-form">
+          <!-- Section settings form will be populated dynamically -->
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="element-edit-modal" class="modal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h3>Modifier l'élément</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="element-edit-form">
+          <!-- Element edit form will be populated dynamically -->
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-element-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Ajouter un élément</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="element-types-grid">
+          <button class="element-type-btn" data-type="text">
+            <i class="fas fa-font"></i>
+            <span>Texte</span>
+          </button>
+          <button class="element-type-btn" data-type="media">
+            <i class="fas fa-image"></i>
+            <span>Média</span>
+          </button>
+          <button class="element-type-btn" data-type="card">
+            <i class="fas fa-square"></i>
+            <span>Carte</span>
+          </button>
+          <button class="element-type-btn" data-type="photo">
+            <i class="fas fa-camera"></i>
+            <span>Photo</span>
+          </button>
+          <button class="element-type-btn" data-type="video">
+            <i class="fas fa-video"></i>
+            <span>Vidéo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/editor.js"></script>
+
+  <!-- Page data for JavaScript -->
+  <script>
+    window.pageData = {
+      page: <%- JSON.stringify(page) %>,
+      sections: <%- JSON.stringify(sections) %>,
+      fonts: <%- JSON.stringify(fonts) %>
+    };
+  </script>
+</body>
+</html>
+
+<%
+// Helper function to render element preview
+function renderElementPreview(element) {
+  const settings = element.settings || {};
+
+  switch(element.type) {
+    case 'text':
+      return `<div class="text-preview">
+        <h4>${settings.title || 'Titre'}</h4>
+        <p>${settings.content ? settings.content.substring(0, 100) + '...' : 'Contenu...'}</p>
+      </div>`;
+
+    case 'media':
+      return `<div class="media-preview">
+        ${settings.image_url ? `<img src="${settings.image_url}" alt="Media">` : '<div class="placeholder">Image</div>'}
+      </div>`;
+
+    case 'card':
+      return `<div class="card-preview">
+        <h5>${settings.title || 'Titre carte'}</h5>
+        <p>${settings.description ? settings.description.substring(0, 50) + '...' : 'Description...'}</p>
+      </div>`;
+
+    case 'photo':
+      return `<div class="photo-preview">
+        ${settings.image_url ? `<img src="${settings.image_url}" alt="Photo">` : '<div class="placeholder">Photo</div>'}
+      </div>`;
+
+    case 'video':
+      return `<div class="video-preview">
+        ${settings.video_url ? `<div class="video-placeholder">🎥 Vidéo</div>` : '<div class="placeholder">Vidéo</div>'}
+      </div>`;
+
+    default:
+      return `<div class="unknown-preview">Type: ${element.type}</div>`;
+  }
+}
+%>

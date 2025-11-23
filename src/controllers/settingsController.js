@@ -10,7 +10,7 @@ export async function showSettings(req, res) {
     // Récupérer les paramètres généraux depuis la base de données
     // Pour l'instant, on utilise des valeurs par défaut
     const settings = {
-      siteTitle: 'Batala Vitrine',
+      siteTitle: 'Vitrine',
       siteDescription: 'Portfolio et vitrine professionnelle',
       contactEmail: 'contact@example.com',
       googleAnalytics: '',

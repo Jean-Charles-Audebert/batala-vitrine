@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { logger } from "../utils/logger.js";
+import { query } from "../config/db.js";
 
 /**
  * Envoie un email de contact
@@ -29,22 +30,33 @@ export const sendContactEmail = async (req, res) => {
     });
   }
 
-  // Configuration du transporteur email
-  const contactEmail = process.env.CONTACT_EMAIL;
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = process.env.SMTP_PORT || 587;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-
-  if (!contactEmail || !smtpHost || !smtpUser || !smtpPass) {
-    logger.error("Configuration email manquante dans .env");
-    return res.status(500).json({
-      success: false,
-      message: "Le formulaire de contact n'est pas configuré.",
-    });
-  }
-
   try {
+    // Récupérer l'email de contact depuis la base de données
+    const { rows } = await query('SELECT contact_email FROM page LIMIT 1');
+    const contactEmail = rows[0]?.contact_email;
+
+    if (!contactEmail) {
+      logger.error("Email de contact non configuré dans la table page");
+      return res.status(500).json({
+        success: false,
+        message: "Le formulaire de contact n'est pas configuré.",
+      });
+    }
+
+    // Configuration du transporteur email depuis les variables d'environnement
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT || 587;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    if (!smtpHost || !smtpUser || !smtpPass) {
+      logger.error("Configuration SMTP manquante dans .env");
+      return res.status(500).json({
+        success: false,
+        message: "Le formulaire de contact n'est pas configuré.",
+      });
+    }
+
     // Créer le transporteur SMTP
     const transporter = nodemailer.createTransport({
       host: smtpHost,

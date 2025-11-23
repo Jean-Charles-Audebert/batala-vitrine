@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<%= pageSettings.title || 'Mon Site' %>">
-  <title><%= title %> | <%= pageSettings.title || 'Mon Site' %></title>
+  <meta name="description" content="<%= page.title || 'Mon Site' %>">
+  <title><%= title %> | <%= page.title || 'Mon Site' %></title>
   
   <!-- Fonts -->
-  <% if (pageSettings.font_url) { %>
-    <link rel="stylesheet" href="<%= pageSettings.font_url %>">
-  <% } else if (pageSettings.font_file) { %>
-    <style>
-      @font-face {
-        font-family: '<%= pageSettings.font_name %>';
-        src: url('<%= pageSettings.font_file %>');
-      }
-    </style>
+  <% if (page.title_font_id && fonts) { %>
+    <% const font = fonts.find(f => f.id == page.title_font_id); %>
+    <% if (font && font.url) { %>
+      <link rel="stylesheet" href="<%= font.url %>">
+    <% } else if (font && font.file_path) { %>
+      <style>
+        @font-face {
+          font-family: '<%= font.name %>';
+          src: url('<%= font.file_path %>');
+        }
+      </style>
+    <% } %>
   <% } %>
   
   <!-- Styles -->
@@ -27,50 +30,58 @@
   <link rel="stylesheet" href="/css/design-system.css">
   
   <!-- CSS Variables pour thème -->
-  <style>
-    :root {
-      <% if (pageSettings.font_family) { %>
-      --font-family-title: <%= pageSettings.font_family.replace(/['"\\]/g, '') %>;
-      <% } %>
-      <% if (pageSettings.main_bg_color) { %>
-      --main-bg-color: <%= pageSettings.main_bg_color %>;
-      <% } %>
-      <% if (pageSettings.main_title_color) { %>
-      --main-title-color: <%= pageSettings.main_title_color %>;
-      <% } %>
-      
-      /* Variables pour les polices individuelles */
-      <% if (fonts && fonts.length > 0) { %>
-        <% fonts.forEach(font => { %>
-          <% if (font.font_family) { %>
-      --font-<%= font.id %>: <%= font.font_family.replace(/['"\\]/g, '') %>;
-          <% } %>
-        <% }); %>
-      <% } %>
+  <%
+    let cssVars = ':root {';
+    if (page.title_font_id && fonts) {
+      const font = fonts.find(f => f.id == page.title_font_id);
+      if (font && font.font_family) {
+        cssVars += `--font-family-title: ${font.font_family.replace(/['"\\]/g, '')};`;
+      }
     }
-  </style>
+    if (page.main_bg_color) {
+      cssVars += `--main-bg-color: ${page.main_bg_color};`;
+    }
+    if (page.main_title_color) {
+      cssVars += `--main-title-color: ${page.main_title_color};`;
+    }
+    if (fonts && fonts.length > 0) {
+      fonts.forEach(font => {
+        if (font.font_family) {
+          cssVars += `--font-${font.id}: ${font.font_family.replace(/['"\\]/g, '')};`;
+        }
+      });
+    }
+    cssVars += '}';
+  %>
+  <style><%= cssVars %></style>
 </head>
 <body class="vitrine-page">
-  <% if (pageSettings.main_bg_image) { %>
-    <div class="global-bg-image" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('<%= pageSettings.main_bg_image %>');background-repeat:<%= pageSettings.main_bg_image_repeat || 'no-repeat' %>;background-size:<%= pageSettings.main_bg_image_size || 'cover' %>;background-position:center;background-attachment:fixed;"></div>
+  <%
+    let bgImageStyle = '';
+    if (page.main_bg_image) {
+      bgImageStyle = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${page.main_bg_image}');background-repeat:${page.main_bg_image_repeat || 'no-repeat'};background-size:${page.main_bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
+    }
+  %>
+  <% if (bgImageStyle) { %>
+    <div class="global-bg-image" style="<%= bgImageStyle %>"></div>
   <% } %>
-  <% if (pageSettings.main_bg_video) { %>
+  <% if (page.main_bg_video) { %>
     <video class="section-bg-video global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
-      <source src="<%= pageSettings.main_bg_video %>" type="video/mp4">
+      <source src="<%= page.main_bg_video %>" type="video/mp4">
     </video>
-  <% } else if (pageSettings.main_bg_youtube) { %>
+  <% } else if (page.main_bg_youtube) { %>
     <% /* Extraction ID YouTube */ %>
     <% let videoId = '';
       try {
-        if (pageSettings.main_bg_youtube.includes('youtu.be/')) {
-          videoId = pageSettings.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (pageSettings.main_bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(pageSettings.main_bg_youtube);
+        if (page.main_bg_youtube.includes('youtu.be/')) {
+          videoId = page.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (page.main_bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(page.main_bg_youtube);
           videoId = url.searchParams.get('v');
-        } else if (pageSettings.main_bg_youtube.includes('youtube.com/embed/')) {
-          videoId = pageSettings.main_bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-        } else if (pageSettings.main_bg_youtube.includes('youtube.com/shorts/')) {
-          videoId = pageSettings.main_bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+        } else if (page.main_bg_youtube.includes('youtube.com/embed/')) {
+          videoId = page.main_bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+        } else if (page.main_bg_youtube.includes('youtube.com/shorts/')) {
+          videoId = page.main_bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
         }
       } catch (e) {}
     %>
@@ -84,7 +95,7 @@
     <% sections.forEach(section => { %>
       <% if (section.type === 'footer') { return; } %>
       <% if (section.type === 'hero') { %>
-        <%- include('../components/sections/hero', { section, user }) %>
+        <%- include('../components/sections/hero', { section, user, getSocialIcon }) %>
       <% } else if (section.type === 'content') { %>
         <%- include('../components/sections/content', { section, user }) %>
       <% } else if (section.type === 'card_grid') { %>
@@ -95,7 +106,7 @@
     <% }) %>
   </div>
   <% sections.forEach(section => { if (section.type === 'footer') { %>
-    <%- include('../components/sections/footer', { section, user, getSocialIcon }) %>
+    <%- include('../components/sections/footer', { section, user, getSocialIcon, socialLinks }) %>
   <% } }) %>
   
   <!-- FAB Auth -->

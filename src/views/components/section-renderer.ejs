@@ -79,20 +79,11 @@ function renderSection(section, options = {}) {
         break;
 
       case 'textMedia':
-        sectionContent = this.include('../components/sections/text-media', {
+        sectionContent = this.include('../components/sections/content', {
           section,
           mode,
           user,
           schema: schemas.textMedia
-        });
-        break;
-
-      case 'cards':
-        sectionContent = this.include('../components/sections/cards', {
-          section,
-          mode,
-          user,
-          schema: schemas.cards
         });
         break;
 

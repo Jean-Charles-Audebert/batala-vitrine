@@ -712,24 +712,9 @@ class SiteEditor {
       }
     });
 
-    // Contenu (pour section_content)
-    section.content = [{
-      title: formData.title, // Le titre principal
-      subtitle: formData.subtitle,
-      description: formData.description,
-      cta_label: formData.cta_label,
-      cta_url: formData.cta_url,
-      media_url: formData.media_url,
-      media_type: formData.media_type,
-      media_alt: formData.media_alt,
-      media_size: formData.media_size,
-      text_color: formData.text_color,
-      text_align: formData.text_align,
-      title_font_id: formData.title_font_id,
-      title_color: formData.title_color,
-      title_position_h: formData.title_position_h,
-      title_position_v: formData.title_position_v
-    }];
+    // Éléments (pour le système modulaire elements)
+    // Les éléments sont gérés séparément via l'API elements
+    // Cette partie peut être supprimée car les éléments sont maintenant gérés individuellement
 
     // Cartes (si présentes)
     if (formData.cards) {

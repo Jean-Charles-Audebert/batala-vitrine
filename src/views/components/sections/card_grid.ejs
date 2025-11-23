@@ -1,7 +1,7 @@
 <%
   /**
    * Composant: Section Card Grid
-   * Grille de cards (événements, services, etc.)
+   * Grille de cards (événements, services, etc.) - utilisant le système modulaire elements
    */
   const {
     id,
@@ -14,14 +14,17 @@
     is_transparent,
     padding_top = 'medium',
     padding_bottom = 'medium',
-    cards = [],
+    elements = [],
     decorations = []
   } = section;
-  
+
+  // Filtrer les éléments de type 'card'
+  const cards = elements.filter(element => element.type === 'card');
+
   const bgStyle = [];
   if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
   if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
-  
+
   const sectionClasses = [
     'section',
     'section-card-grid',
@@ -32,13 +35,13 @@
   if (is_transparent) sectionClasses.push('section-transparent');
 %>
 
-<section 
+<section
   class="<%= sectionClasses.join(' ') %>"
   data-section-id="<%= id %>"
   <% if (bgStyle.length > 0) { %>style="<%= bgStyle.join('; ') %>"<% } %>
 >
   <% if (bg_youtube) { %>
-  <% 
+  <%
     let videoId = '';
     try {
       if (bg_youtube.includes('youtu.be/')) {
@@ -56,11 +59,11 @@
     }
   %>
   <% if (videoId) { %>
-  <iframe 
-    class="section-bg-youtube" 
+  <iframe
+    class="section-bg-youtube"
     src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1"
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen
     style="pointer-events: none;">
@@ -77,23 +80,23 @@
       <%- include('../decorations/renderer', { decoration: deco }) %>
     <% }) %>
   <% } %>
-  
+
   <div class="container">
     <% if (sectionTitle) { %>
       <div class="section-title-container">
-        <h2 class="section-title" 
-            <% 
+        <h2 class="section-title"
+            <%
               let titleStyle = [];
               if (section.title_font_id) titleStyle.push(`font-family: var(--font-${section.title_font_id})`);
-              
+
               // Couleur par défaut blanche si vidéo de fond et pas de couleur définie
               let titleColor = section.title_color;
               if ((bg_video || bg_youtube) && !titleColor) {
                 titleColor = '#ffffff';
               }
               if (titleColor) titleStyle.push(`color: ${titleColor}`);
-              
-              if (titleStyle.length > 0) { 
+
+              if (titleStyle.length > 0) {
             %>
             style="<%= titleStyle.join('; ') %>"
             <% } %>
@@ -102,41 +105,42 @@
         </h2>
       </div>
     <% } %>
-    
+
     <div class="cards-grid cards-grid--<%= (layout || 'grid_3').replace('grid_', '') %>">
       <% if (cards && cards.length > 0) { %>
         <% cards.forEach(card => { %>
-          <article class="card" data-card-id="<%= card.id %>">
-            <% if (card.media_url) { %>
+          <% const settings = card.settings || {}; %>
+          <article class="card" data-element-id="<%= card.id %>">
+            <% if (settings.image_url) { %>
               <div class="card-media">
-                <% if (card.media_type === 'youtube') { %>
+                <% if (settings.media_type === 'youtube' || settings.video_url) { %>
                   <div class="video-wrapper">
-                    <iframe 
-                      src="<%= card.media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>" 
-                      frameborder="0" 
+                    <iframe
+                      src="<%= settings.video_url || settings.image_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>"
+                      frameborder="0"
                       allowfullscreen
                     ></iframe>
                   </div>
                 <% } else { %>
-                  <img src="<%= card.media_url %>" alt="<%= card.title || '' %>">
+                  <img src="<%= settings.image_url %>" alt="<%= settings.title || card.title || '' %>">
                 <% } %>
               </div>
             <% } %>
-            
+
             <div class="card-content">
-              <% if (card.title) { %>
-                <h3><%= card.title %></h3>
+              <% if (settings.title) { %>
+                <h3><%= settings.title %></h3>
               <% } %>
-              <% if (card.description) { %>
-                <p><%= card.description %></p>
+              <% if (settings.description) { %>
+                <p><%= settings.description %></p>
               <% } %>
-              <% if (card.event_date) { %>
-                <time datetime="<%= new Date(card.event_date).toISOString() %>">
-                  <%= new Date(card.event_date).toLocaleDateString('fr-FR') %>
+              <% if (settings.event_date) { %>
+                <time datetime="<%= new Date(settings.event_date).toISOString() %>">
+                  <%= new Date(settings.event_date).toLocaleDateString('fr-FR') %>
                 </time>
               <% } %>
-              <% if (card.link_url) { %>
-                <a href="<%= card.link_url %>" class="card-link">En savoir plus</a>
+              <% if (settings.link_url) { %>
+                <a href="<%= settings.link_url %>" class="card-link">En savoir plus</a>
               <% } %>
             </div>
           </article>

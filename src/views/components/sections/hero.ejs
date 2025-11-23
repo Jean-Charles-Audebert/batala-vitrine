@@ -1,19 +1,53 @@
 <%
 /**
- * Composant Section Hero - Version simplifiée
+ * Composant Section Hero - Version modulaire avec elements
  */
 
-// Utiliser la nouvelle structure DB
+// Trouver les éléments pertinents
+const textElement = section.elements?.find(el => el.type === 'text') || {};
+const textSettings = textElement.settings || {};
+
+const navElements = section.elements?.filter(el => el.type === 'link' && el.settings?.link_type === 'navigation') || [];
+const socialElements = section.elements?.filter(el => el.type === 'link' && el.settings?.link_type === 'social') || [];
+
+// Configuration de la section depuis settings JSONB
+const sectionSettings = section.settings || {};
 const {
-  title,
+  bg_color = '#1a1a1a',
+  bg_image,
+  bg_video,
+  bg_youtube,
+  is_transparent = false,
+  layout = 'center',
+  logo_url,
+  logo_position_h = 'center',
+  logo_position_v = 'center',
+  logo_width = 150,
+  show_social_links = socialElements.length > 0,
+  social_position_h = 'right',
+  social_position_v = 'top',
+  social_icon_size = 24,
+  social_icon_color = '#ffffff',
+  show_nav_links = navElements.length > 0,
+  nav_position_h = 'right',
+  nav_position_v = 'center',
+  nav_text_color = '#ffffff',
+  nav_bg_color = 'rgba(255,255,255,0.25)',
+  is_sticky = false
+} = sectionSettings;
+
+// Contenu du texte principal
+const {
+  title = textElement.title || 'Bienvenue',
   subtitle,
   description,
   cta_label,
   cta_url,
-  bg_color = '#1a1a1a',
-  bg_image,
-  is_transparent = false
-} = section.content && section.content[0] ? section.content[0] : section;
+  text_color,
+  title_color,
+  title_position_h,
+  title_position_v
+} = textSettings;
 
 // Styles pour le header
 const headerStyles = [];
@@ -23,22 +57,81 @@ if (bg_image) headerStyles.push(`background-image: url(${bg_image})`);
 // Classes pour le header
 const headerClasses = ['hero-section'];
 if (is_transparent) headerClasses.push('hero-transparent');
+if (is_sticky) headerClasses.push('hero-sticky');
+
+// Classes pour les éléments positionnés
+const logoClasses = ['hero-logo', `logo-${logo_position_v}`, `logo-${logo_position_h}`];
+const navClasses = ['hero-nav', `nav-${nav_position_v}`, `nav-${nav_position_h}`];
+const socialClasses = ['hero-social', `social-${social_position_v}`, `social-${social_position_h}`];
+const contentClasses = ['hero-content', `content-${title_position_h || 'center'}`, title_position_v ? `content-${title_position_v}` : ''];
 %>
 
 <header class="<%= headerClasses.join(' ') %>" <% if (headerStyles.length > 0) { %>style="<%= headerStyles.join('; ') %>"<% } %>>
+  <% if (bg_video) { %>
+    <video class="section-bg-video" autoplay muted loop playsinline>
+      <source src="<%= bg_video %>" type="video/mp4">
+    </video>
+  <% } else if (bg_youtube) { %>
+    <%
+      let videoId = '';
+      try {
+        if (bg_youtube.includes('youtu.be/')) {
+          videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(bg_youtube);
+          videoId = url.searchParams.get('v');
+        }
+      } catch (e) {}
+    %>
+    <% if (videoId) { %>
+      <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <% } %>
+  <% } %>
+
   <div class="container">
-    <!-- Titre principal -->
-    <% if (title) { %>
-      <h1 style="color: #ffffff;"><%= title %></h1>
+    <!-- Logo -->
+    <% if (logo_url) { %>
+      <div class="<%= logoClasses.join(' ') %>" data-logo-width="<%= logo_width %>">
+        <img src="<%= logo_url %>" alt="Logo">
+      </div>
     <% } %>
-    <% if (subtitle) { %>
-      <h2 style="color: #ffffff;"><%= subtitle %></h2>
+
+    <!-- Liens de navigation -->
+    <% if (show_nav_links && navElements.length > 0) { %>
+      <nav class="<%= navClasses.join(' ') %>" data-nav-bg="<%= nav_bg_color %>" data-nav-color="<%= nav_text_color %>">
+        <% navElements.forEach(navElement => { %>
+          <% const navSettings = navElement.settings || {}; %>
+          <a href="<%= navSettings.url || '#' %>"><%= navSettings.label || navElement.title %></a>
+        <% }); %>
+      </nav>
     <% } %>
-    <% if (description) { %>
-      <p style="color: #ffffff;"><%= description %></p>
+
+    <!-- Liens sociaux -->
+    <% if (show_social_links && socialElements.length > 0) { %>
+      <div class="<%= socialClasses.join(' ') %>" data-social-color="<%= social_icon_color %>" data-social-size="<%= social_icon_size %>">
+        <% socialElements.forEach(socialElement => { %>
+          <% const socialSettings = socialElement.settings || {}; %>
+          <a href="<%= socialSettings.url || '#' %>" target="_blank" rel="noopener">
+            <%= socialSettings.icon_svg || (typeof getSocialIcon === 'function' ? getSocialIcon(socialSettings.platform) : '') %>
+          </a>
+        <% }); %>
+      </div>
     <% } %>
-    <% if (cta_label && cta_url) { %>
-      <a href="<%= cta_url %>" class="btn btn-primary"><%= cta_label %></a>
-    <% } %>
+
+    <!-- Contenu principal -->
+    <div class="<%= contentClasses.filter(Boolean).join(' ') %>">
+      <% if (title) { %>
+        <h1 data-color="<%= title_color || text_color || '#ffffff' %>"><%= title %></h1>
+      <% } %>
+      <% if (subtitle) { %>
+        <h2 data-color="<%= text_color || '#ffffff' %>"><%= subtitle %></h2>
+      <% } %>
+      <% if (description) { %>
+        <p data-color="<%= text_color || '#ffffff' %>"><%= description %></p>
+      <% } %>
+      <% if (cta_label && cta_url) { %>
+        <a href="<%= cta_url %>" class="btn btn-primary"><%= cta_label %></a>
+      <% } %>
+    </div>
   </div>
 </header>

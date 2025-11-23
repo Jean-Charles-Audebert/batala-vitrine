@@ -1,7 +1,7 @@
 <%
   /**
-   * Composant: Section Gallery
-   * Galerie photos et vidéos
+   * Composant: Section Gallery - Version modulaire
+   * Galerie photos et vidéos utilisant elements
    */
   const {
     id,
@@ -13,14 +13,17 @@
     is_transparent,
     padding_top = 'medium',
     padding_bottom = 'medium',
-    cards = [],
+    elements = [],
     decorations = []
   } = section;
-  
+
+  // Filtrer les éléments média (photos et vidéos)
+  const mediaElements = elements.filter(el => ['photo', 'video'].includes(el.type));
+
   const bgStyle = [];
   if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
   if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
-  
+
   const sectionClasses = [
     'section',
     'section-gallery',
@@ -67,38 +70,39 @@
     <% } %>
     
     <div class="gallery-grid">
-      <% if (cards && cards.length > 0) { %>
-        <% cards.forEach(card => { %>
-          <div class="gallery-item" data-card-id="<%= card.id %>">
-            <% if (card.media_type === 'photo' && card.media_url) { %>
+      <% if (mediaElements && mediaElements.length > 0) { %>
+        <% mediaElements.forEach(element => { %>
+          <div class="gallery-item" data-element-id="<%= element.id %>">
+            <% if (element.type === 'photo' && (element.settings?.url || element.settings?.src)) { %>
               <% 
-                const originalPath = card.media_url.replace(/-(\d+)-(\d+)\.([a-z]+)$/i, '-$1-$2-original.$3');
+                const mediaUrl = element.settings?.url || element.settings?.src;
+                const originalPath = mediaUrl.replace(/-(\d+)-(\d+)\.([a-z]+)$/i, '-$1-$2-original.$3');
               %>
               <a href="<%= originalPath %>" target="_blank" class="gallery-photo">
-                <img src="<%= card.media_url %>" alt="<%= card.title || '' %>" loading="lazy">
-                <% if (card.title) { %>
-                  <span class="gallery-caption"><%= card.title %></span>
+                <img src="<%= mediaUrl %>" alt="<%= element.settings?.alt || element.settings?.title || '' %>" loading="lazy">
+                <% if (element.settings?.caption || element.settings?.title) { %>
+                  <span class="gallery-caption"><%= element.settings?.caption || element.settings?.title %></span>
                 <% } %>
               </a>
-            <% } else if (card.media_type === 'youtube' && card.media_url) { %>
+            <% } else if (element.type === 'youtube' && (element.settings?.url || element.settings?.src)) { %>
               <div class="gallery-video">
                 <iframe 
-                  src="<%= card.media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>" 
+                  src="<%= (element.settings?.url || element.settings?.src).replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>" 
                   frameborder="0" 
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                   allowfullscreen
                   loading="lazy"
                 ></iframe>
-                <% if (card.title) { %>
-                  <span class="gallery-caption"><%= card.title %></span>
+                <% if (element.settings?.caption || element.settings?.title) { %>
+                  <span class="gallery-caption"><%= element.settings?.caption || element.settings?.title %></span>
                 <% } %>
               </div>
             <% } %>
             
             <% if (typeof user !== 'undefined' && user) { %>
               <div class="gallery-item-actions">
-                <button class="edit-btn" data-card-id="<%= card.id %>"><img src="/icons/edit.svg" alt="" class="icon"></button>
-                <button class="delete-btn" data-card-id="<%= card.id %>"><img src="/icons/trash.svg" alt="" class="icon"></button>
+                <button class="edit-btn" data-element-id="<%= element.id %>"><img src="/icons/edit.svg" alt="" class="icon"></button>
+                <button class="delete-btn" data-element-id="<%= element.id %>"><img src="/icons/trash.svg" alt="" class="icon"></button>
               </div>
             <% } %>
           </div>
