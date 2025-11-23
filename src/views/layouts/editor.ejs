@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="<%= description || 'Éditeur de site vitrine' %>">
+  <title><%= title %></title>
+
+  <!-- Fonts -->
+  <% if (config.global.title_font_id && fonts) { %>
+    <% const font = fonts.find(f => f.id == config.global.title_font_id); %>
+    <% if (font && font.font_url) { %>
+      <link rel="stylesheet" href="<%= font.font_url %>">
+    <% } else if (font && font.file_path) { %>
+      <style>
+        @font-face {
+          font-family: '<%= font.name %>';
+          src: url('<%= font.file_path %>');
+        }
+      </style>
+    <% } %>
+  <% } %>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/editor/sections.css">
+  <link rel="stylesheet" href="/css/editor/editor.css">
+
+  <!-- CSS Variables pour thème global -->
+  <style>
+    :root {
+      <% if (config.global.title_font_id && fonts) { %>
+        <% const font = fonts.find(f => f.id == config.global.title_font_id); %>
+        <% if (font && font.font_family) { %>
+      --font-family-title: <%= font.font_family.replace(/['"\\]/g, '') %>;
+        <% } %>
+      <% } %>
+      <% if (config.global.main_bg_color) { %>
+      --main-bg-color: <%= config.global.main_bg_color %>;
+      <% } %>
+      /* Variables pour les polices individuelles */
+      <% if (fonts && fonts.length > 0) { %>
+        <% fonts.forEach(font => { %>
+          <% if (font.font_family) { %>
+      --font-<%= font.id %>: <%= font.font_family.replace(/['"\\]/g, '') %>;
+          <% } %>
+        <% }); %>
+      <% } %>
+    }
+  </style>
+</head>
+<body class="editor-page">
+  <!-- Fond global -->
+  <% if (config.global.main_bg_image) { %>
+    <div class="global-bg-image" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('<%= config.global.main_bg_image %>');background-repeat:<%= config.global.main_bg_image_repeat || 'no-repeat' %>;background-size:<%= config.global.main_bg_image_size || 'cover' %>;background-position:center;background-attachment:fixed;"></div>
+  <% } %>
+  <% if (config.global.main_bg_video) { %>
+    <video class="global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
+      <source src="<%= config.global.main_bg_video %>" type="video/mp4">
+    </video>
+  <% } else if (config.global.main_bg_youtube) { %>
+    <%
+      let videoId = '';
+      try {
+        if (config.global.main_bg_youtube.includes('youtu.be/')) {
+          videoId = config.global.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (config.global.main_bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(config.global.main_bg_youtube);
+          videoId = url.searchParams.get('v');
+        }
+      } catch (e) {}
+    %>
+    <% if (videoId) { %>
+      <iframe class="global-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></iframe>
+    <% } %>
+  <% } %>
+
+  <!-- Layout éditeur -->
+  <div class="editor-layout">
+    <!-- Indicateur mode édition -->
+    <div class="editor-mode-indicator">
+      <div class="editor-mode-badge">
+        <img src="/icons/edit.svg" alt="" class="icon">
+        Mode Édition
+      </div>
+      <div class="editor-mode-actions">
+        <button id="toggleSidebar" class="btn btn-sm btn-secondary">
+          <img src="/icons/sidebar.svg" alt="" class="icon"> Panneau
+        </button>
+        <a href="/page" class="btn btn-sm btn-outline">
+          <img src="/icons/eye.svg" alt="" class="icon"> Voir le site
+        </a>
+      </div>
+    </div>
+
+    <!-- Panneau latéral -->
+    <aside class="editor-sidebar" id="editorSidebar">
+      <%- include('../editor/sidebar', { config, schemas, fonts, socialLinks, user }) %>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="editor-main">
+      <div class="editor-canvas" id="editorCanvas">
+        <%- include('../components/section-renderer', { config, mode, user, schemas, socialLinks }) %>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/editor/editor.js"></script>
+  <script src="/js/media-picker.js"></script>
+</body>
+</html>

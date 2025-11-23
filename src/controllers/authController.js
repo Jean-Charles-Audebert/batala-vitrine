@@ -77,7 +77,7 @@ export async function loginWeb(req, res) {
     // Cookie pour refresh et access
     res.cookie('refresh_token', refreshToken, refreshCookieOptions);
     res.cookie('access_token', accessToken, accessCookieOptions);
-    return res.redirect('/admins');
+    return res.redirect('/editor');
   } catch {
     return res.render('pages/login', { title: 'Connexion', error: 'Erreur serveur.' });
   }

@@ -18,6 +18,43 @@ const router = express.Router();
 
 // Note: La route /api/contact est définie directement dans server.js pour éviter les conflits d'authentification
 
+// Routes pour l'éditeur JSON
+router.get("/site-config", requireAuth, async (req, res) => {
+  try {
+    const configPath = path.join(__dirname, "../../config/site.json");
+    const configData = await fs.readFile(configPath, 'utf8');
+    const config = JSON.parse(configData);
+    res.json(config);
+  } catch (error) {
+    logger.error("Erreur chargement config site:", error);
+    res.status(500).json({ error: "Erreur chargement configuration" });
+  }
+});
+
+router.post("/site-config", requireAuth, async (req, res) => {
+  try {
+    const configPath = path.join(__dirname, "../../config/site.json");
+    const configData = JSON.stringify(req.body, null, 2);
+    await fs.writeFile(configPath, configData, 'utf8');
+    res.json({ success: true, message: "Configuration sauvegardée" });
+  } catch (error) {
+    logger.error("Erreur sauvegarde config site:", error);
+    res.status(500).json({ error: "Erreur sauvegarde configuration" });
+  }
+});
+
+router.get("/schemas", requireAuth, async (req, res) => {
+  try {
+    const schemasPath = path.join(__dirname, "../../config/schemas.json");
+    const schemasData = await fs.readFile(schemasPath, 'utf8');
+    const schemas = JSON.parse(schemasData);
+    res.json(schemas);
+  } catch (error) {
+    logger.error("Erreur chargement schémas:", error);
+    res.status(500).json({ error: "Erreur chargement schémas" });
+  }
+});
+
 // Route API pour le réordonnancement des blocs - SUPPRIMÉ (système legacy)
 // router.post("/blocks/reorder", requireAuth, reorderBlocks);
 
@@ -185,6 +222,74 @@ router.get("/fonts", requireAuth, async (req, res) => {
   } catch (error) {
     logger.error("Erreur chargement fonts:", error);
     res.status(500).json({ error: "Erreur chargement fonts" });
+  }
+});
+
+// Route pour charger le HTML des polices dans l'editor
+router.get("/admin/fonts", requireAuth, async (req, res) => {
+  try {
+    const { rows: fonts } = await query('SELECT * FROM fonts ORDER BY source, name', []);
+    
+    let html = '';
+    if (fonts && fonts.length > 0) {
+      fonts.forEach(font => {
+        html += `
+        <div class="font-item" data-font-id="${font.id}">
+          <div class="font-info">
+            <span class="font-name" style="font-family: '${font.font_family || 'inherit'}';">${font.name}</span>
+            <span class="font-source">${font.source === 'google' ? 'Google Fonts' : 'Uploadée'}</span>
+          </div>
+          <div class="font-actions">
+            <button class="btn btn-sm btn-danger" data-action="delete-font" data-font-id="${font.id}">
+              <img src="/icons/trash.svg" alt="" class="icon">
+            </button>
+          </div>
+        </div>`;
+      });
+    } else {
+      html = '<p class="empty-state">Aucune police trouvée</p>';
+    }
+    
+    res.send(html);
+  } catch (error) {
+    logger.error("Erreur chargement HTML polices:", error);
+    res.status(500).send('<p class="error">Erreur lors du chargement des polices</p>');
+  }
+});
+
+// Route pour supprimer une police
+router.delete("/fonts/:id", requireAuth, async (req, res) => {
+  try {
+    const fontId = parseInt(req.params.id);
+    
+    // Récupérer les infos de la police avant suppression
+    const { rows: fonts } = await query('SELECT * FROM fonts WHERE id = $1', [fontId]);
+    if (fonts.length === 0) {
+      return res.status(404).json({ error: 'Police non trouvée' });
+    }
+    
+    const font = fonts[0];
+    
+    // Supprimer de la base de données
+    await query('DELETE FROM fonts WHERE id = $1', [fontId]);
+    
+    // Supprimer le fichier physique si c'est une police uploadée
+    if (font.file_path && font.source === 'upload') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const fullPath = path.join(process.cwd(), 'public', font.file_path);
+        await fs.unlink(fullPath);
+        logger.info(`Fichier police supprimé: ${fullPath}`);
+      } catch (fileError) {
+        logger.warn(`Impossible de supprimer le fichier police: ${fileError.message}`);
+      }
+    }
+    
+    res.json({ success: true, message: 'Police supprimée avec succès' });
+  } catch (error) {
+    logger.error("Erreur suppression police:", error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de la police' });
   }
 });
 

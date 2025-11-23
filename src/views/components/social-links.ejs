@@ -22,7 +22,7 @@
         <% if (link.icon_svg) { %>
           <%- link.icon_svg %>
         <% } else { %>
-          <%- getSocialIcon(link.platform) %>
+          <span class="social-icon-placeholder"><%= link.platform %></span>
         <% } %>
       </a>
     <% }) %>

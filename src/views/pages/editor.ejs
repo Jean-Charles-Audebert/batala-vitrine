@@ -1,0 +1,18 @@
+<%
+/**
+ * Page d'édition (mode admin)
+ * Utilise le layout editor.ejs
+ */
+%>
+<%-
+  include('../layouts/editor', {
+    title,
+    description: 'Éditeur de site vitrine',
+    config,
+    schemas,
+    fonts,
+    socialLinks,
+    user,
+    mode
+  })
+%>

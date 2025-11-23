@@ -258,76 +258,97 @@ export const updateSection = async (sectionId, sectionData) => {
       layout,
       padding_top,
       padding_bottom,
-      is_visible
+      is_visible,
+      content
     } = sectionData;
     
-    // Construire dynamiquement la requête pour ne mettre à jour QUE les champs fournis
-    const updates = [];
-    const values = [];
+    // Mettre à jour la section principale
+    const sectionUpdates = [];
+    const sectionValues = [];
     let paramIndex = 1;
     
     if (title !== undefined) {
-      updates.push(`title = $${paramIndex++}`);
-      values.push(title);
+      sectionUpdates.push(`title = $${paramIndex++}`);
+      sectionValues.push(title);
     }
     if (bg_color !== undefined) {
-      updates.push(`bg_color = $${paramIndex++}`);
-      values.push(bg_color);
+      sectionUpdates.push(`bg_color = $${paramIndex++}`);
+      sectionValues.push(bg_color);
     }
     if (bg_image !== undefined) {
-      updates.push(`bg_image = $${paramIndex++}`);
-      values.push(bg_image);
+      sectionUpdates.push(`bg_image = $${paramIndex++}`);
+      sectionValues.push(bg_image);
     }
     if (bg_video !== undefined) {
-      updates.push(`bg_video = $${paramIndex++}`);
-      values.push(bg_video);
+      sectionUpdates.push(`bg_video = $${paramIndex++}`);
+      sectionValues.push(bg_video);
     }
     if (bg_youtube !== undefined) {
-      updates.push(`bg_youtube = $${paramIndex++}`);
-      values.push(bg_youtube);
+      sectionUpdates.push(`bg_youtube = $${paramIndex++}`);
+      sectionValues.push(bg_youtube);
     }
     if (is_transparent !== undefined) {
-      updates.push(`is_transparent = $${paramIndex++}`);
-      values.push(is_transparent);
+      sectionUpdates.push(`is_transparent = $${paramIndex++}`);
+      sectionValues.push(is_transparent);
     }
     if (layout !== undefined) {
-      updates.push(`layout = $${paramIndex++}`);
-      values.push(layout);
+      sectionUpdates.push(`layout = $${paramIndex++}`);
+      sectionValues.push(layout);
     }
     if (padding_top !== undefined) {
-      updates.push(`padding_top = $${paramIndex++}`);
-      values.push(padding_top);
+      sectionUpdates.push(`padding_top = $${paramIndex++}`);
+      sectionValues.push(padding_top);
     }
     if (padding_bottom !== undefined) {
-      updates.push(`padding_bottom = $${paramIndex++}`);
-      values.push(padding_bottom);
+      sectionUpdates.push(`padding_bottom = $${paramIndex++}`);
+      sectionValues.push(padding_bottom);
     }
     if (is_visible !== undefined) {
-      updates.push(`is_visible = $${paramIndex++}`);
-      values.push(is_visible);
+      sectionUpdates.push(`is_visible = $${paramIndex++}`);
+      sectionValues.push(is_visible);
     }
     
-    if (updates.length === 0) {
-      logger.info(`Section #${sectionId} - aucune mise à jour`);
+    let updatedSection = null;
+    if (sectionUpdates.length > 0) {
+      sectionValues.push(sectionId);
+      
+      const { rows } = await query(`
+        UPDATE sections SET ${sectionUpdates.join(', ')}, updated_at = NOW()
+        WHERE id = $${paramIndex}
+        RETURNING *
+      `, sectionValues);
+      
+      updatedSection = rows[0] || null;
+    } else {
+      // Récupérer la section actuelle si aucune mise à jour
       const { rows } = await query('SELECT * FROM sections WHERE id = $1', [sectionId]);
-      return rows[0] || null;
+      updatedSection = rows[0] || null;
     }
     
-    values.push(sectionId);
-    
-    const { rows } = await query(`
-      UPDATE sections SET ${updates.join(', ')}
-      WHERE id = $${paramIndex}
-      RETURNING *
-    `, values);
-    
-    if (rows.length === 0) {
-      logger.info(`Section mise à jour: #${sectionId} - non trouvée`);
-      return null;
+    // Mettre à jour le contenu si fourni
+    if (content && content.length > 0) {
+      const contentData = content[0];
+      
+      // Vérifier si le contenu existe déjà
+      const { rows: existingContent } = await query(
+        'SELECT id FROM section_content WHERE section_id = $1 LIMIT 1',
+        [sectionId]
+      );
+      
+      if (existingContent.length > 0) {
+        // Mettre à jour le contenu existant
+        const contentId = existingContent[0].id;
+        await updateSectionContent(contentId, contentData);
+      } else {
+        // Créer nouveau contenu
+        await addSectionContent(sectionId, contentData);
+      }
     }
+    
+    // TODO: Gérer la mise à jour des cartes si nécessaire
     
     logger.info(`Section mise à jour: #${sectionId}`);
-    return rows[0];
+    return updatedSection;
   } catch (error) {
     logger.error('Erreur updateSection:', error);
     throw error;

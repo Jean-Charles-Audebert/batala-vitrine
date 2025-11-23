@@ -1,0 +1,164 @@
+<%
+/**
+ * Renderer générique de sections
+ * Lit la configuration JSON et inclut automatiquement le bon template
+ *
+ * @param {Object} config - Configuration du site
+ * @param {Array} config.sections - Liste des sections
+ * @param {Object} options - Options supplémentaires
+ * @param {string} options.mode - 'view' ou 'edit'
+ * @param {Object} options.user - Utilisateur connecté (pour mode edit)
+ * @param {Object} options.schemas - Schémas des sections (pour mode edit)
+ */
+
+// Fonction helper pour obtenir les classes CSS d'une section
+function getSectionClasses(section) {
+  const classes = ['section', `section-${section.type}`];
+
+  // Layout
+  if (section.layout) {
+    classes.push(`section-${section.layout}`);
+  }
+
+  // Transparence
+  if (section.is_transparent) {
+    classes.push('section-transparent');
+  }
+
+  // Padding
+  if (section.padding_top) {
+    classes.push(`padding-top-${section.padding_top}`);
+  }
+  if (section.padding_bottom) {
+    classes.push(`padding-bottom-${section.padding_bottom}`);
+  }
+
+  return classes.join(' ');
+}
+
+// Fonction helper pour obtenir les styles inline d'une section
+function getSectionStyles(section) {
+  const styles = [];
+
+  // Couleur de fond
+  if (section.bg_color && !section.is_transparent) {
+    styles.push(`background-color: ${section.bg_color}`);
+  }
+
+  // Image de fond
+  if (section.bg_image) {
+    styles.push(`background-image: url(${section.bg_image})`);
+  }
+
+  return styles.length > 0 ? styles.join('; ') : null;
+}
+
+// Fonction helper pour rendre une section
+function renderSection(section, options = {}) {
+  const { mode = 'view', user = null, schemas = {} } = options;
+
+  // Classes et styles
+  const classes = getSectionClasses(section);
+  const styles = getSectionStyles(section);
+
+  // Attributs data pour l'édition
+  const dataAttrs = mode === 'edit' ? `data-section-id="${section.id}" data-section-type="${section.type}"` : '';
+
+  // Contenu de la section selon le type
+  let sectionContent = '';
+
+  try {
+    switch (section.type) {
+      case 'hero':
+        sectionContent = this.include('../components/sections/hero', {
+          section,
+          mode,
+          user,
+          schema: schemas.hero
+        });
+        break;
+
+      case 'textMedia':
+        sectionContent = this.include('../components/sections/text-media', {
+          section,
+          mode,
+          user,
+          schema: schemas.textMedia
+        });
+        break;
+
+      case 'cards':
+        sectionContent = this.include('../components/sections/cards', {
+          section,
+          mode,
+          user,
+          schema: schemas.cards
+        });
+        break;
+
+      default:
+        sectionContent = `<div class="section-error">Type de section inconnu: ${section.type}</div>`;
+    }
+  } catch (error) {
+    console.error(`Erreur rendu section ${section.type}:`, error);
+    sectionContent = `<div class="section-error">Erreur de rendu: ${error.message}</div>`;
+  }
+
+  // Structure HTML de la section
+  return `
+    <section class="${classes}" ${styles ? `style="${styles}"` : ''} ${dataAttrs}>
+      ${sectionContent}
+    </section>
+  `;
+}
+
+// Rendre toutes les sections
+const sections = config.sections || [];
+%>
+<% for (const section of sections) { %>
+  <% if (section.is_visible !== false) { %>
+    <%
+      // Classes et styles
+      const classes = ['section', `section-${section.type}`];
+      if (section.layout) {
+        classes.push(`section-${section.layout}`);
+      }
+      if (section.is_transparent) {
+        classes.push('section-transparent');
+      }
+      if (section.padding_top) {
+        classes.push(`padding-top-${section.padding_top}`);
+      }
+      if (section.padding_bottom) {
+        classes.push(`padding-bottom-${section.padding_bottom}`);
+      }
+      const classString = classes.join(' ');
+
+      // Styles
+      const styles = [];
+      if (section.bg_color && !section.is_transparent) {
+        styles.push(`background-color: ${section.bg_color}`);
+      }
+      if (section.bg_image) {
+        styles.push(`background-image: url(${section.bg_image})`);
+      }
+      const styleString = styles.length > 0 ? styles.join('; ') : null;
+
+      // Attributs data pour l'édition
+      const dataAttrs = mode === 'edit' ? `data-section-id="${section.id}" data-section-type="${section.type}"` : '';
+    %>
+    <section class="<%= classString %>" <% if (styleString) { %>style="<%= styleString %>"<% } %> <%= dataAttrs %>>
+      <% if (section.type === 'hero') { %>
+        <%- include('./sections/hero', { section, mode, user }) %>
+      <% } else if (section.type === 'content') { %>
+        <%- include('./sections/content', { section, mode, user }) %>
+      <% } else if (section.type === 'card_grid') { %>
+        <%- include('./sections/card_grid', { section, mode, user }) %>
+      <% } else if (section.type === 'footer') { %>
+        <%- include('./sections/footer', { section, mode, user }) %>
+      <% } else { %>
+        <div class="section-error">Type de section inconnu: <%= section.type %></div>
+      <% } %>
+    </section>
+  <% } %>
+<% } %>

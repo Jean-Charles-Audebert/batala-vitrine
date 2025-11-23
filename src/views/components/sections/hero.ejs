@@ -1,199 +1,44 @@
 <%
-  /**
-   * Composant: Section Hero
-   * Header avec logo, titre, social links et navigation positionnables
-   */
-  const {
-    id,
-    title,
-    bg_color,
-    bg_image,
-    bg_video,
-    bg_youtube,
-    is_transparent,
-    is_sticky = false,
-    padding_top = 'medium',
-    padding_bottom = 'medium',
-    layout = 'centered',
-    logo_url,
-    logo_width = 150,
-    logo_position_h = 'center',
-    logo_position_v = 'center',
-    show_social_links = false,
-    social_position_h = 'right',
-    social_position_v = 'top',
-    social_icon_size = 24,
-    social_icon_color = '#ffffff',
-    show_nav_links = false,
-    nav_position_h = 'right',
-    nav_position_v = 'center',
-    nav_text_color = '#ffffff',
-    nav_bg_color = 'rgba(255,255,255,0.25)',
-    content = [],
-    nav_links = [],
-    decorations = []
-  } = section;
-  
-  const sectionContent = content[0] || {};
-  const {
-    title: heroTitle,
-    subtitle,
-    cta_label,
-    cta_url,
-    title_font_id,
-    title_color = '#ffffff',
-    title_position_h = 'center',
-    title_position_v = 'center',
-    text_align = 'center'
-  } = sectionContent;
-  
-  const bgStyle = [];
-  if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
-  if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
-  
-  const sectionClasses = [
-    'section',
-    'section-hero',
-    `section-hero--${layout}`,
-    `padding-top-${padding_top}`,
-    `padding-bottom-${padding_bottom}`
-  ];
-  if (is_transparent) sectionClasses.push('section-transparent');
-  if (is_sticky) sectionClasses.push('section-sticky');
-  
-  // CSS Grid areas basées sur les positions
-  const gridAreas = {
-    logo: `${logo_position_v}-${logo_position_h}`,
-    title: `${title_position_v}-${title_position_h}`,
-    social: `${social_position_v}-${social_position_h}`,
-    nav: `${nav_position_v}-${nav_position_h}`
-  };
+/**
+ * Composant Section Hero - Version simplifiée
+ */
+
+// Utiliser la nouvelle structure DB
+const {
+  title,
+  subtitle,
+  description,
+  cta_label,
+  cta_url,
+  bg_color = '#1a1a1a',
+  bg_image,
+  is_transparent = false
+} = section.content && section.content[0] ? section.content[0] : section;
+
+// Styles pour le header
+const headerStyles = [];
+if (bg_color && !is_transparent) headerStyles.push(`background-color: ${bg_color}`);
+if (bg_image) headerStyles.push(`background-image: url(${bg_image})`);
+
+// Classes pour le header
+const headerClasses = ['hero-section'];
+if (is_transparent) headerClasses.push('hero-transparent');
 %>
 
-<section 
-  class="<%= sectionClasses.join(' ') %>"
-  data-section-id="<%= id %>"
-  style="<%= bgStyle.join('; ') %>"
->
-  <% if (bg_youtube) { %>
-  <%# Extraire l'ID YouTube de différents formats d'URL %>
-  <% 
-    let videoId = '';
-    try {
-      if (bg_youtube.includes('youtu.be/')) {
-        videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-      } else if (bg_youtube.includes('youtube.com/watch')) {
-        const url = new URL(bg_youtube);
-        videoId = url.searchParams.get('v');
-      } else if (bg_youtube.includes('youtube.com/embed/')) {
-        videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-      } else if (bg_youtube.includes('youtube.com/shorts/')) {
-        videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
-      }
-    } catch (e) {
-      console.error('Erreur extraction ID YouTube:', e);
-    }
-  %>
-  <% if (videoId) { %>
-  <iframe 
-    class="section-bg-youtube" 
-    src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1"
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    referrerpolicy="strict-origin-when-cross-origin"
-    allowfullscreen
-    style="pointer-events: none;">
-  </iframe>
-  <% } %>
-  <% } else if (bg_video) { %>
-  <video class="section-bg-video" autoplay muted loop playsinline>
-    <source src="<%= bg_video %>" type="video/mp4">
-  </video>
-  <% } %>  <% if (decorations && decorations.length > 0) { %>
-    <% decorations.forEach(deco => { %>
-      <%- include('../decorations/renderer', { decoration: deco }) %>
-    <% }) %>
-  <% } %>
-  
-  <div class="hero-grid" 
-       data-logo-area="<%= gridAreas.logo %>" 
-       data-title-area="<%= gridAreas.title %>"
-       data-social-area="<%= gridAreas.social %>"
-       data-nav-area="<%= gridAreas.nav %>">
-    
-    <%# Logo %>
-    <% if (logo_url) { %>
-      <div class="hero-element hero-logo" data-position="<%= logo_position_v %>-<%= logo_position_h %>">
-        <img src="<%= logo_url %>" alt="Logo" style="max-width: <%= logo_width %>px; max-height: 150px; object-fit: contain;">
-      </div>
+<header class="<%= headerClasses.join(' ') %>" <% if (headerStyles.length > 0) { %>style="<%= headerStyles.join('; ') %>"<% } %>>
+  <div class="container">
+    <!-- Titre principal -->
+    <% if (title) { %>
+      <h1 style="color: #ffffff;"><%= title %></h1>
     <% } %>
-    
-    <%# Titre principal %>
-    <% if (heroTitle) { %>
-      <div class="hero-element hero-title" data-position="<%= title_position_v %>-<%= title_position_h %>">
-        <h1 style="color: <%= title_color %>; <%= title_font_id ? `font-family: var(--font-${title_font_id});` : 'font-family: var(--font-family-title, Arial, sans-serif);' %>">
-          <%= heroTitle %>
-        </h1>
-        <% if (subtitle) { %>
-          <p class="hero-subtitle" style="color: <%= title_color %>;"><%= subtitle %></p>
-        <% } %>
-        <% if (cta_label && cta_url) { %>
-          <a href="<%= cta_url %>" class="btn-cta"><%= cta_label %></a>
-        <% } %>
-      </div>
+    <% if (subtitle) { %>
+      <h2 style="color: #ffffff;"><%= subtitle %></h2>
     <% } %>
-    
-    <%# Social Links %>
-    <% if (show_social_links && typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
-      <div class="hero-element hero-social" data-position="<%= social_position_v %>-<%= social_position_h %>">
-        <div class="social-icons">
-          <% const headerSocials = socialLinks.filter(s => s.location === 'header' || s.location === 'both'); %>
-          <% headerSocials.forEach(social => { %>
-            <a href="<%= social.url %>" target="_blank" rel="noopener noreferrer" title="<%= social.label || social.platform %>">
-              <img src="/icons/<%= social.platform %>.svg" alt="<%= social.platform %>" class="icon" 
-                   style="width: <%= social_icon_size || 24 %>px; height: <%= social_icon_size || 24 %>px; filter: brightness(0) saturate(100%) invert(<%= social_icon_color === '#ffffff' ? 100 : 0 %>%);">
-            </a>
-          <% }) %>
-        </div>
-      </div>
+    <% if (description) { %>
+      <p style="color: #ffffff;"><%= description %></p>
     <% } %>
-    
-    <%# Navigation vers sections %>
-    <% if (show_nav_links && nav_links && nav_links.length > 0) { %>
-      <div class="hero-element hero-nav" data-position="<%= nav_position_v %>-<%= nav_position_h %>">
-        <nav class="hero-nav-links">
-          <% nav_links.forEach(link => { %>
-            <a href="#section-<%= link.target_section_id %>" class="nav-link" 
-               style="color: <%= nav_text_color || '#ffffff' %>; background: <%= nav_bg_color || 'rgba(255,255,255,0.25)' %>;">
-              <%= link.label %>
-            </a>
-          <% }) %>
-        </nav>
-      </div>
+    <% if (cta_label && cta_url) { %>
+      <a href="<%= cta_url %>" class="btn btn-primary"><%= cta_label %></a>
     <% } %>
   </div>
-  
-  <% if (typeof user !== 'undefined' && user) { %>
-    <div class="edit-controls">
-      <button 
-        class="edit-btn" 
-        data-section-id="<%= id %>"
-        data-action="edit-section"
-        aria-label="Paramètres section"
-        title="Paramètres (fond, layout)"
-      >
-        <img src="/icons/settings.svg" alt="" class="icon">
-      </button>
-      <button 
-        class="edit-btn" 
-        data-section-id="<%= id %>"
-        data-content-id="<%= sectionContent.id || '' %>"
-        data-action="edit-content"
-        aria-label="Éditer le contenu"
-        title="Logo, titre, social, navigation"
-      >
-        <img src="/icons/edit.svg" alt="" class="icon">
-      </button>
-    </div>
-  <% } %>
-</section>
+</header>

@@ -1,0 +1,144 @@
+<%
+/**
+ * Composant Section Text + Media
+ * Section avec du texte et une image/vidéo
+ */
+
+const {
+  title,
+  description,
+  media_url,
+  media_type = 'image',
+  media_position = 'right',
+  media_size = 'medium',
+  media_width_percent = 50,
+  title_color = '#333333',
+  text_color = '#666666',
+  bg_color = '#ffffff',
+  text_align = 'left',
+  title_font_id,
+  text_font_id,
+  text_font_size = 'medium',
+  is_transparent = false,
+  padding_top = 'medium',
+  padding_bottom = 'medium'
+} = section.data || section;
+
+// Classes pour la section
+const sectionClasses = ['text-media-section'];
+if (is_transparent) sectionClasses.push('section-transparent');
+
+// Styles pour la section
+const sectionStyles = [];
+if (bg_color && !is_transparent) sectionStyles.push(`background-color: ${bg_color}`);
+
+// Classes pour le média
+const mediaClasses = [
+  'text-media-media',
+  `text-media-media--${media_position}`,
+  `text-media-media--${media_size}`
+];
+
+// Styles pour le texte
+const textStyles = [];
+if (text_color) textStyles.push(`color: ${text_color}`);
+if (text_align) textStyles.push(`text-align: ${text_align}`);
+if (text_font_id) textStyles.push(`font-family: var(--font-${text_font_id})`);
+
+// Taille de police
+const fontSizeMap = { small: '0.9rem', medium: '1rem', large: '1.2rem', xl: '1.5rem' };
+if (text_font_size && fontSizeMap[text_font_size]) {
+  textStyles.push(`font-size: ${fontSizeMap[text_font_size]}`);
+}
+
+// Styles pour le média
+const mediaStyles = [];
+if (media_width_percent && media_width_percent > 0) {
+  mediaStyles.push(`width: ${media_width_percent}%`);
+}
+%>
+
+<section class="<%= sectionClasses.join(' ') %>" <% if (sectionStyles.length > 0) { %>style="<%= sectionStyles.join('; ') %>"<% } %>>
+  <% if (mode === 'edit') { %>
+    <div class="section-edit-overlay">
+      <button class="edit-section-btn" data-section-id="<%= section.id %>">
+        <img src="/icons/edit.svg" alt="" class="icon"> Modifier
+      </button>
+    </div>
+  <% } %>
+  <div class="container">
+    <div class="text-media-wrapper text-media--<%= media_position %>">
+      <!-- Média (si positionné à gauche ou au centre) -->
+      <% if (media_url && (media_position === 'left' || media_position === 'center')) { %>
+        <div class="<%= mediaClasses.join(' ') %>" <% if (mediaStyles.length > 0) { %>style="<%= mediaStyles.join('; ') %>"<% } %>>
+          <div class="media-container">
+            <% if (media_type === 'youtube') { %>
+              <div class="video-wrapper">
+                <iframe
+                  src="<%= media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            <% } else { %>
+              <img src="<%= media_url %>" alt="<%= title || 'Média' %>">
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Texte -->
+      <div class="text-media-text" <% if (textStyles.length > 0) { %>style="<%= textStyles.join('; ') %>"<% } %>>
+        <% if (title) { %>
+          <h2 <% if (title_font_id) { %>style="font-family: var(--font-<%= title_font_id %>); color: <%= title_color %>;"<% } else { %>style="color: <%= title_color %>;"<% } %>>
+            <%= title %>
+          </h2>
+        <% } %>
+        <% if (description) { %>
+          <div class="text-media-description"><%= description %></div>
+        <% } %>
+      </div>
+
+      <!-- Média (si positionné à droite) -->
+      <% if (media_url && media_position === 'right') { %>
+        <div class="<%= mediaClasses.join(' ') %>" <% if (mediaStyles.length > 0) { %>style="<%= mediaStyles.join('; ') %>"<% } %>>
+          <div class="media-container">
+            <% if (media_type === 'youtube') { %>
+              <div class="video-wrapper">
+                <iframe
+                  src="<%= media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            <% } else { %>
+              <img src="<%= media_url %>" alt="<%= title || 'Média' %>">
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Média pleine largeur (si centré) -->
+    <% if (media_url && media_position === 'full') { %>
+      <div class="text-media-media text-media-media--full">
+        <div class="media-container">
+          <% if (media_type === 'youtube') { %>
+            <div class="video-wrapper">
+              <iframe
+                src="<%= media_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') %>"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          <% } else { %>
+            <img src="<%= media_url %>" alt="<%= title || 'Média' %>">
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</section>

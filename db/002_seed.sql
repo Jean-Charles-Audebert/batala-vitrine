@@ -1,4 +1,4 @@
--- Seed consolidé: Batala Vitrine WMS (sections v2)
+-- Seed consolidé: Site Vitrine WMS (sections v2)
 
 -- Sections de base (remplacement du système blocks legacy)
 INSERT INTO sections (type, title, position, is_visible, layout, padding_top, padding_bottom)
@@ -61,7 +61,7 @@ ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_act
 
 -- Admin de test pour E2E (password: SecureP@ss123)
 INSERT INTO admins (email, password_hash, is_active)
-VALUES ('admin@batala.fr', '$argon2id$v=19$m=65536,t=3,p=4$T+ptavBGgyk2ox+u+ZF46g$u9zuOPKAXB2uRRu3pM30Vk/2KpAcQx+4cQiVbOI0mCU', TRUE)
+VALUES ('admin@test.com', '$argon2id$v=19$m=65536,t=3,p=4$T+ptavBGgyk2ox+u+ZF46g$u9zuOPKAXB2uRRu3pM30Vk/2KpAcQx+4cQiVbOI0mCU', TRUE)
 ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = TRUE;
 
 -- ===============================  
@@ -83,7 +83,7 @@ INSERT INTO fonts (name, source, url, font_family) VALUES
 --  PAGE SETTINGS (singleton)
 -- ===============================
 INSERT INTO page (id, title, main_bg_color, main_title_color, footer_bg_color, footer_text_color, title_font_id)
-VALUES (1, 'Batala Vitrine', '#f5f5f5', '#333333', '#2c3e50', '#ecf0f1', 4) -- Montserrat par défaut
+VALUES (1, 'Site Vitrine', '#f5f5f5', '#333333', '#2c3e50', '#ecf0f1', 4) -- Montserrat par défaut
 ON CONFLICT (id) DO UPDATE SET 
   title = EXCLUDED.title,
   main_bg_color = EXCLUDED.main_bg_color,

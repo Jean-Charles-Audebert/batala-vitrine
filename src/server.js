@@ -17,14 +17,15 @@ import refreshRoutes from "./routes/refreshRoutes.js";
 // import blockRoutes from "./routes/blockRoutes.js"; // Supprimé - système legacy remplacé par sections v2
 // import cardRoutes from "./routes/cardRoutes.js"; // Supprimé - système legacy remplacé par sections v2
 // import footerElementRoutes from "./routes/footerElementRoutes.js";
-// import fontRoutes from "./routes/fontRoutes.js"; // Supprimé - remplacé par SPA
+// // import fontRoutes from "./routes/fontRoutes.js"; // Supprimé - remplacé par SPA
 import apiRoutes from "./routes/apiRoutes.js";
 import sectionsAdminRoutes from "./routes/sectionsAdminRoutes.js";
 import sectionsApiRoutes from "./routes/sectionsApiRoutes.js";
 import socialLinksRoutes from "./routes/socialLinksRoutes.js";
 import adminContentRoutes from "./routes/adminContentRoutes.js";
 import settingsRoutes from "./routes/settings.js";
-import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
+// import adminDashboardRoutes from "./routes/adminDashboardRoutes.js"; // Supprimé - remplacé par /editor
+import pagesRoutes from "./routes/pages.js";
 import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
@@ -217,10 +218,11 @@ app.use("/auth", refreshRoutes);
 // app.use("/blocks", blockRoutes); // Supprimé - système legacy remplacé par sections v2
 // app.use("/blocks/:blockId/cards", cardRoutes); // Supprimé - système legacy remplacé par sections v2
 // Redirections vers le SPA admin
-app.get("/fonts", (req, res) => res.redirect("/admin?section=fonts"));
+// app.get("/fonts", (req, res) => res.redirect("/admin?section=fonts")); // Supprimé - fonts maintenant dans /editor
 // app.get("/blocks", (req, res) => res.redirect("/admin?section=blocks")); // Supprimé - blocs plus utilisés
 app.get("/admins", (req, res) => res.redirect("/admin?section=admins"));
 app.use("/sections", sectionsAdminRoutes);
+app.use("/", pagesRoutes);
 
 // Route de contact PUBLIQUE (AVANT footerElementRoutes pour éviter son middleware global)
 app.post("/contact", sendContactEmail);
@@ -232,7 +234,7 @@ app.use("/api", sectionsApiRoutes);
 app.use("/api", socialLinksRoutes);
 // app.use("/api", cardRoutes); // Supprimé - système legacy remplacé par sections v2
 app.use("/api/admin", adminContentRoutes);
-app.use("/admin", adminDashboardRoutes);
+// app.use("/admin", adminDashboardRoutes); // Supprimé - remplacé par /editor
 app.use("/admin", settingsRoutes);
 
 // --- Lancement du serveur ---

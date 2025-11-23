@@ -1,64 +1,137 @@
 <%
   // Composant Footer pour sections v2
-  // Variables attendues: section, user, getSocialIcon
-  
-  // Pour l'instant, footer statique
-  // TODO: Gérer contenu dynamique via section_content
+  // Variables attendues: section, user, socialLinks
+
+  const {
+    id,
+    title: sectionTitle,
+    bg_color,
+    bg_image,
+    bg_video,
+    bg_youtube,
+    is_transparent,
+    padding_top = 'medium',
+    padding_bottom = 'medium',
+    content = [],
+    decorations = []
+  } = section;
+
+  const bgStyle = [];
+  if (bg_color && !is_transparent) bgStyle.push(`background-color: ${bg_color}`);
+  if (bg_image) bgStyle.push(`background-image: url(${bg_image})`);
+
+  const sectionClasses = [
+    'section',
+    'section-footer',
+    `padding-top-${padding_top}`,
+    `padding-bottom-${padding_bottom}`
+  ];
+  if (is_transparent) sectionClasses.push('section-transparent');
+
+  // Extraire le contenu par position
+  const aboutContent = content.find(c => c.position === 0) || {};
+  const contactContent = content.find(c => c.position === 1) || {};
 %>
 
-<footer class="section section-footer" data-section-id="<%= section.id %>" role="contentinfo">
+<footer class="<%= sectionClasses.join(' ') %>" data-section-id="<%= id %>" <% if (bgStyle.length > 0) { %>style="<%= bgStyle.join('; ') %>"<% } %>>
+  <% if (bg_youtube) { %>
+  <%
+    let videoId = '';
+    try {
+      if (bg_youtube.includes('youtu.be/')) {
+        videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+      } else if (bg_youtube.includes('youtube.com/watch')) {
+        const url = new URL(bg_youtube);
+        videoId = url.searchParams.get('v');
+      } else if (bg_youtube.includes('youtube.com/embed/')) {
+        videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+      } else if (bg_youtube.includes('youtube.com/shorts/')) {
+        videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+      }
+    } catch (e) {
+      console.error('Erreur extraction ID YouTube:', e);
+    }
+  %>
+  <% if (videoId) { %>
+  <iframe
+    class="section-bg-youtube"
+    src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+    style="pointer-events: none;">
+  </iframe>
+  <% } %>
+  <% } else if (bg_video) { %>
+  <video class="section-bg-video" autoplay muted loop playsinline>
+    <source src="<%= bg_video %>" type="video/mp4">
+  </video>
+  <% } %>
+
+  <% if (decorations && decorations.length > 0) { %>
+    <% decorations.forEach(deco => { %>
+      <%- include('../decorations/renderer', { decoration: deco }) %>
+    <% }) %>
+  <% } %>
+
   <div class="container">
     <div class="footer-content">
       <div class="footer-column">
         <details>
-          <summary>À propos</summary>
+          <summary><%= aboutContent.title || 'À propos' %></summary>
           <div role="region" aria-label="Informations sur l'organisation">
-            <p>Batala Paris - Groupe de percussions brésiliennes</p>
+            <p><%= aboutContent.description || 'Batala Paris - Groupe de percussions brésiliennes' %></p>
           </div>
         </details>
       </div>
-      
+
       <div class="footer-column">
         <details>
-          <summary>Contact</summary>
+          <summary><%= contactContent.title || 'Contact' %></summary>
           <div role="region" aria-label="Formulaire de contact">
+            <% if (contactContent.description) { %>
+              <div class="contact-info">
+                <%= contactContent.description.replace(/\n/g, '<br>') %>
+              </div>
+            <% } %>
             <form id="contact-form" class="contact-form">
               <div class="form-group-inline">
-                <input 
-                  type="text" 
-                  id="contact-nom" 
-                  name="nom" 
-                  placeholder="Nom *" 
+                <input
+                  type="text"
+                  id="contact-nom"
+                  name="nom"
+                  placeholder="Nom *"
                   required
                   aria-label="Votre nom"
                 >
               </div>
               <div class="form-group-inline">
-                <input 
-                  type="text" 
-                  id="contact-prenom" 
-                  name="prenom" 
-                  placeholder="Prénom *" 
+                <input
+                  type="text"
+                  id="contact-prenom"
+                  name="prenom"
+                  placeholder="Prénom *"
                   required
                   aria-label="Votre prénom"
                 >
               </div>
               <div class="form-group-inline">
-                <input 
-                  type="text" 
-                  id="contact-contact" 
-                  name="contact" 
-                  placeholder="Email ou Téléphone *" 
+                <input
+                  type="text"
+                  id="contact-contact"
+                  name="contact"
+                  placeholder="Email ou Téléphone *"
                   required
                   aria-label="Votre email ou téléphone"
                 >
               </div>
               <div class="form-group-inline">
-                <textarea 
-                  id="contact-message" 
-                  name="message" 
-                  rows="3" 
-                  placeholder="Votre message *" 
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows="3"
+                  placeholder="Votre message *"
                   required
                   aria-label="Votre message"
                 ></textarea>
@@ -69,14 +142,14 @@
           </div>
         </details>
       </div>
-      
+
       <div class="footer-column">
         <details>
           <summary>Suivez-nous</summary>
-          <%- include('../social-links', { location: 'footer', socialLinks, user, getSocialIcon }) %>
+          <%- include('../social-links', { location: 'footer', socialLinks }) %>
         </details>
       </div>
-      
+
       <div class="footer-column">
         <details>
           <summary>Liens utiles</summary>
@@ -86,21 +159,9 @@
         </details>
       </div>
     </div>
-    
+
     <div class="footer-bottom">
       <p>&copy; 2025 <a href="https://caixadev.dev" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">caixaDev</a>. Tous droits réservés.</p>
     </div>
   </div>
-
-  <% if (user) { %>
-    <!-- Bouton d'édition admin -->
-    <button 
-      class="edit-btn" 
-      data-section-id="<%= section.id %>" 
-      data-action="edit-section"
-      aria-label="Modifier le footer"
-    >
-      <img src="/icons/edit.svg" alt="" class="icon">
-    </button>
-  <% } %>
 </footer>
