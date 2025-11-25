@@ -10,18 +10,85 @@ async function seedDatabase() {
     logger.info('🌱 Début du seeding de la base de données...');
 
     // 1. Créer des polices par défaut
-    await query(`
-      INSERT INTO fonts (name, source, font_family, url)
-      VALUES
-        ('Titre par défaut', 'system', 'Arial', null),
-        ('Texte par défaut', 'system', 'Arial', null)
-      ON CONFLICT (name) DO NOTHING
-    `);
+    const fonts = [
+      {
+        name: 'Titre par défaut',
+        source: 'system',
+        font_family: 'Arial',
+        url: null,
+        variants: ['400', '700'],
+      },
+      {
+        name: 'Texte par défaut',
+        source: 'system',
+        font_family: 'Arial',
+        url: null,
+        variants: ['400', '700'],
+      },
+      {
+        name: 'Inter',
+        source: 'google',
+        font_family: 'Inter',
+        url: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
+        variants: ['300', '400', '500', '600', '700'],
+      },
+      {
+        name: 'Roboto',
+        source: 'google',
+        font_family: 'Roboto',
+        url: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+        variants: ['300', '400', '500', '700'],
+      },
+      {
+        name: 'Open Sans',
+        source: 'google',
+        font_family: 'Open Sans',
+        url: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap',
+        variants: ['300', '400', '600', '700'],
+      },
+      {
+        name: 'Lato',
+        source: 'google',
+        font_family: 'Lato',
+        url: 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap',
+        variants: ['300', '400', '700'],
+      },
+    ];
 
-    logger.info('🔤 Polices par défaut créées');
+    for (const font of fonts) {
+      await query(
+        `INSERT INTO fonts (name, source, font_family, url, variants)
+         VALUES ($1,$2,$3,$4,$5)
+         ON CONFLICT (name) DO UPDATE
+           SET source=EXCLUDED.source,
+               font_family=EXCLUDED.font_family,
+               url=EXCLUDED.url,
+               variants=EXCLUDED.variants,
+               updated_at=NOW()`,
+        [
+          font.name,
+          font.source,
+          font.font_family,
+          font.url,
+          JSON.stringify(font.variants),
+        ]
+      );
+      logger.info(`🔤 Font seedée: ${font.name}`);
+    }
+
+    // Récupérer les IDs des fonts par défaut
+    const { rows: titleFontRows } = await query(
+      `SELECT id FROM fonts WHERE name='Titre par défaut' LIMIT 1`
+    );
+    const { rows: textFontRows } = await query(
+      `SELECT id FROM fonts WHERE name='Texte par défaut' LIMIT 1`
+    );
+    const defaultFontTitleId = titleFontRows[0].id;
+    const defaultFontTextId = textFontRows[0].id;
 
     // 2. Créer ou mettre à jour la page principale
-    const { rows: pageRows } = await query(`
+    const { rows: pageRows } = await query(
+      `
       INSERT INTO page (title, default_font_title, default_font_text, contact_email, settings)
       VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (id) DO UPDATE SET
@@ -31,24 +98,26 @@ async function seedDatabase() {
         contact_email = EXCLUDED.contact_email,
         settings = EXCLUDED.settings
       RETURNING id
-    `, [
-      'Site Démo',
-      1, // default_font_title
-      2, // default_font_text
-      'contact@example.com',
-      JSON.stringify({
-        bg_color: '#ffffff',
-        bg_image: null,
-        bg_video: null,
-        bg_video_youtube: null,
-        bg_transparent: false
-      })
-    ]);
+    `,
+      [
+        'Site Démo',
+        defaultFontTitleId,
+        defaultFontTextId,
+        'contact@example.com',
+        JSON.stringify({
+          bg_color: '#ffffff',
+          bg_image: null,
+          bg_video: null,
+          bg_video_youtube: null,
+          bg_transparent: false,
+        }),
+      ]
+    );
 
     const pageId = pageRows[0].id;
     logger.info(`📄 Page principale créée (ID: ${pageId})`);
 
-    // 2. Créer les sections selon le modèle JSON
+    // 3. Créer les sections selon le modèle JSON
     const sections = [
       {
         type: 'hero',
@@ -62,7 +131,7 @@ async function seedDatabase() {
           bg_video_youtube: null,
           title: 'Bienvenue',
           title_color: '#000000',
-          title_font: null,
+          title_font: defaultFontTitleId,
           title_size: 48,
           layout: '12-cols-grid',
         },
@@ -89,6 +158,7 @@ async function seedDatabase() {
               color: '#000000',
               align: 'center',
               vertical_align: 'center',
+              font_id: defaultFontTitleId,
             },
           },
           {
@@ -119,7 +189,7 @@ async function seedDatabase() {
           bg_video_youtube: null,
           title: 'Présentation',
           title_color: '#333333',
-          title_font: null,
+          title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
         },
@@ -134,6 +204,7 @@ async function seedDatabase() {
               color: '#333333',
               align: 'center',
               vertical_align: 'top',
+              font_id: defaultFontTextId,
             },
           },
         ],
@@ -150,7 +221,7 @@ async function seedDatabase() {
           bg_video_youtube: null,
           title: 'Image + Texte',
           title_color: '#333333',
-          title_font: null,
+          title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
         },
@@ -175,6 +246,7 @@ async function seedDatabase() {
               color: '#000',
               align: 'left',
               vertical_align: 'center',
+              font_id: defaultFontTextId,
             },
           },
         ],
@@ -191,7 +263,7 @@ async function seedDatabase() {
           bg_video_youtube: null,
           title: 'Nos services',
           title_color: '#333333',
-          title_font: null,
+          title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
         },
@@ -201,8 +273,25 @@ async function seedDatabase() {
             col_start: 1,
             col_end: 5,
             settings: {
-              content: 'Description du service 1',
               media_url: '/assets/icon-consulting.svg',
+              title: {
+                text: 'Consulting',
+                font_id:
+                  fonts.find((f) => f.name === 'Roboto')?.id ||
+                  defaultFontTitleId,
+                size: '20px',
+                color: '#333',
+                bg_color: null,
+              },
+              description: {
+                text: 'Description du service 1',
+                font_id:
+                  fonts.find((f) => f.name === 'Open Sans')?.id ||
+                  defaultFontTextId,
+                size: '16px',
+                color: '#666',
+                bg_color: null,
+              },
             },
           },
           {
@@ -210,8 +299,21 @@ async function seedDatabase() {
             col_start: 5,
             col_end: 9,
             settings: {
-              content: 'Description du service 2',
               media_url: '/assets/icon-support.svg',
+              title: {
+                text: 'Support',
+                font_id: defaultFontTitleId,
+                size: '20px',
+                color: '#333',
+                bg_color: null,
+              },
+              description: {
+                text: 'Description du service 2',
+                font_id: defaultFontTextId,
+                size: '16px',
+                color: '#666',
+                bg_color: null,
+              },
             },
           },
           {
@@ -219,8 +321,21 @@ async function seedDatabase() {
             col_start: 9,
             col_end: 12,
             settings: {
-              content: 'Description du service 3',
               media_url: '/assets/icon-event.svg',
+              title: {
+                text: 'Événements',
+                font_id: defaultFontTitleId,
+                size: '20px',
+                color: '#333',
+                bg_color: null,
+              },
+              description: {
+                text: 'Description du service 3',
+                font_id: defaultFontTextId,
+                size: '16px',
+                color: '#666',
+                bg_color: null,
+              },
             },
           },
         ],
@@ -237,7 +352,7 @@ async function seedDatabase() {
           bg_video_youtube: null,
           title: 'Galerie',
           title_color: '#333333',
-          title_font: null,
+          title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
         },
@@ -313,6 +428,7 @@ async function seedDatabase() {
               content: '© caixaDev 2025 - Tous droits réservés',
               color: '#ffffff',
               size: '14px',
+              font_id: defaultFontTextId,
             },
           },
           {
@@ -332,42 +448,48 @@ async function seedDatabase() {
       },
     ];
 
-    // Insérer les sections et leurs éléments
+    // 4. Insérer les sections et leurs éléments
     for (const sectionData of sections) {
-      const { rows: sectionRows } = await query(`
+      const { rows: sectionRows } = await query(
+        `
         INSERT INTO sections (page_id, type, position, is_visible, settings)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id
-      `, [
-        pageId,
-        sectionData.type,
-        sectionData.position,
-        sectionData.is_visible,
-        JSON.stringify(sectionData.settings)
-      ]);
+      `,
+        [
+          pageId,
+          sectionData.type,
+          sectionData.position,
+          sectionData.is_visible,
+          JSON.stringify(sectionData.settings),
+        ]
+      );
 
       const sectionId = sectionRows[0].id;
       logger.info(`📄 Section ${sectionData.type} créée (ID: ${sectionId})`);
 
-      // Insérer les éléments de la section
       for (const elementData of sectionData.elements) {
-        await query(`
+        await query(
+          `
           INSERT INTO elements (section_id, type, col_start, col_end, settings)
           VALUES ($1, $2, $3, $4, $5)
-        `, [
-          sectionId,
-          elementData.type,
-          elementData.col_start,
-          elementData.col_end,
-          JSON.stringify(elementData.settings)
-        ]);
+        `,
+          [
+            sectionId,
+            elementData.type,
+            elementData.col_start,
+            elementData.col_end,
+            JSON.stringify(elementData.settings),
+          ]
+        );
       }
 
-      logger.info(`🎯 ${sectionData.elements.length} éléments créés pour la section ${sectionData.type}`);
+      logger.info(
+        `🎯 ${sectionData.elements.length} éléments créés pour la section ${sectionData.type}`
+      );
     }
 
     logger.info('✅ Base de données seedée avec succès');
-
   } catch (error) {
     logger.error('❌ Erreur lors du seeding:', error);
     throw error;

@@ -47,8 +47,10 @@ CREATE TABLE fonts (
     name VARCHAR(255) NOT NULL UNIQUE,
     source VARCHAR(20) NOT NULL CHECK (source IN ('google', 'upload', 'system')),
     url VARCHAR(1024),
+    variants JSONB DEFAULT '[]', -- Poids, styles, ex ["300", "400", "700 italic"]
     font_family VARCHAR(512) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE INDEX idx_fonts_source ON fonts(source);
@@ -121,3 +123,15 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_page_updated_at
 BEFORE UPDATE ON page
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE OR REPLACE FUNCTION update_fonts_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER update_fonts_updated_at
+BEFORE UPDATE ON fonts
+FOR EACH ROW EXECUTE FUNCTION update_fonts_updated_at();
