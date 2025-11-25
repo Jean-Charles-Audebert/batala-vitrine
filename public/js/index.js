@@ -203,6 +203,9 @@ document.addEventListener('keydown', (e) => {
 // Gestion des cartes (CRUD)
 // ==========================================================================
 
+// Ne pas exécuter sur la page publique - toutes les éditions se font dans /editor
+if (window.location.pathname !== '/' && window.location.pathname !== '/public') {
+
 /**
  * Éditer une carte existante - ouverture modale et sauvegarde en AJAX
  */
@@ -400,6 +403,7 @@ if (cardForm) {
       window.alert(err.message);
     }
   });
+}
 }
 
 // ==========================================================================

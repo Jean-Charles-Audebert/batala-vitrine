@@ -11,8 +11,8 @@
     bg_video,
     bg_youtube,
     is_transparent,
-    padding_top = 'medium',
-    padding_bottom = 'medium',
+    padding_top = section.settings?.padding_top || 'medium',
+    padding_bottom = section.settings?.padding_bottom || 'medium',
     elements = [],
     decorations = []
   } = section;
@@ -183,16 +183,4 @@
 </div>
 <% } %>
 
-<script>
-  // Synchroniser le color picker du titre avec le champ texte
-  (function() {
-    const colorInput = document.getElementById('titleColor-<%= id %>');
-    const textInput = colorInput?.parentNode?.querySelector('.color-hex-input');
-    
-    if (colorInput && textInput) {
-      colorInput.addEventListener('input', function() {
-        textInput.value = this.value;
-      });
-    }
-  })();
-</script>
+<script src="/js/components/gallery.js"></script>

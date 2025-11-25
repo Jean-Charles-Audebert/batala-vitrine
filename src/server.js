@@ -83,16 +83,18 @@ async function initializeDefaultSections() {
 
     for (const section of defaultSections) {
       await query(`
-        INSERT INTO sections (type, title, position, layout, is_visible, padding_top, padding_bottom)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO sections (title, position, layout, is_visible, settings)
+        VALUES ($1, $2, $3, $4, $5)
       `, [
-        section.type,
         section.title,
         section.position,
         section.layout,
         section.is_visible,
-        'medium',
-        'medium'
+        JSON.stringify({
+          type: section.type,
+          padding_top: 'medium',
+          padding_bottom: 'medium'
+        })
       ]);
       logger.info(`📄 Section créée: ${section.type} - ${section.title}`);
     }

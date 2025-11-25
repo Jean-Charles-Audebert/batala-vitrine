@@ -26,11 +26,11 @@ function getSectionClasses(section) {
   }
 
   // Padding
-  if (section.padding_top) {
-    classes.push(`padding-top-${section.padding_top}`);
+  if (section.settings && section.settings.padding_top) {
+    classes.push(`padding-top-${section.settings.padding_top}`);
   }
-  if (section.padding_bottom) {
-    classes.push(`padding-bottom-${section.padding_bottom}`);
+  if (section.settings && section.settings.padding_bottom) {
+    classes.push(`padding-bottom-${section.settings.padding_bottom}`);
   }
 
   return classes.join(' ');
@@ -117,11 +117,11 @@ const sections = config.sections || [];
       if (section.is_transparent) {
         classes.push('section-transparent');
       }
-      if (section.padding_top) {
-        classes.push(`padding-top-${section.padding_top}`);
+      if (section.settings && section.settings.padding_top) {
+        classes.push(`padding-top-${section.settings.padding_top}`);
       }
-      if (section.padding_bottom) {
-        classes.push(`padding-bottom-${section.padding_bottom}`);
+      if (section.settings && section.settings.padding_bottom) {
+        classes.push(`padding-bottom-${section.settings.padding_bottom}`);
       }
       const classString = classes.join(' ');
 

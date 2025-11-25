@@ -10,8 +10,8 @@
     bg_video,
     bg_youtube,
     is_transparent,
-    padding_top = 'medium',
-    padding_bottom = 'medium',
+    padding_top = section.settings?.padding_top || 'medium',
+    padding_bottom = section.settings?.padding_bottom || 'medium',
     content = [],
     decorations = []
   } = section;

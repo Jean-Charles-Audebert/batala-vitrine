@@ -170,8 +170,8 @@ class SectionsAdmin {
     document.getElementById('sectionAccentColor').value = section.accent_color || '#007bff';
     document.getElementById('sectionBorderRadius').value = section.border_radius || 'none';
     document.getElementById('sectionShadow').value = section.shadow || 'none';
-    document.getElementById('sectionPaddingTop').value = section.padding_top || 'medium';
-    document.getElementById('sectionPaddingBottom').value = section.padding_bottom || 'medium';
+    document.getElementById('sectionPaddingTop').value = section.settings?.padding_top || 'medium';
+    document.getElementById('sectionPaddingBottom').value = section.settings?.padding_bottom || 'medium';
   }
 
   // ========== SUPPRESSION ==========

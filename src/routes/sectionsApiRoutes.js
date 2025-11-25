@@ -9,8 +9,6 @@ import {
   createSection,
   updateSection,
   deleteSection,
-  addSectionDecoration,
-  getAllDecorations,
   getAllFonts
 } from '../controllers/sectionController.js';
 import { requireAuth } from '../middlewares/requireAuth.js';
@@ -160,48 +158,11 @@ router.get('/videos', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-// GET /api/decorations - Liste toutes les décorations
-router.get('/decorations', async (req, res) => {
-  try {
-    const decorations = await getAllDecorations();
-    res.json(decorations);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // GET /api/fonts - Liste toutes les polices
 router.get('/fonts', async (req, res) => {
   try {
     const fonts = await getAllFonts();
     res.json(fonts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// POST /api/sections/:id/decorations - Ajouter une décoration à une section
-router.post('/sections/:sectionId/decorations', async (req, res) => {
-  try {
-    const decoration = await addSectionDecoration(
-      parseInt(req.params.sectionId, 10),
-      req.body
-    );
-    res.status(201).json(decoration);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// DELETE /api/sections/:sectionId/decorations/:decorationId - Retirer une décoration
-router.delete('/sections/:sectionId/decorations/:decorationId', async (req, res) => {
-  try {
-    const { query } = await import('../config/db.js');
-    await query('DELETE FROM section_decorations WHERE section_id = $1 AND decoration_id = $2', [
-      parseInt(req.params.sectionId, 10),
-      parseInt(req.params.decorationId, 10)
-    ]);
-    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

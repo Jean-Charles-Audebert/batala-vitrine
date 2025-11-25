@@ -15,9 +15,9 @@ export const listSections = async (req, res) => {
     const { query } = await import('../config/db.js');
     const { rows } = await query(`
       SELECT 
-        id, type, title, position, is_visible,
+        id, title, position, is_visible,
         bg_color, bg_image, bg_video, is_transparent,
-        layout, padding_top, padding_bottom,
+        layout, settings,
         created_at, updated_at
       FROM sections
       ORDER BY position ASC NULLS LAST, id ASC

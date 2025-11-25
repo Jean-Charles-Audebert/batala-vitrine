@@ -38,16 +38,4 @@
   <% } %>
 </div>
 
-<script>
-  // Synchroniser le color picker avec le champ texte
-  (function() {
-    const colorInput = document.getElementById('<%= fieldId %>');
-    const textInput = document.getElementById('<%= displayId %>');
-    
-    if (colorInput && textInput) {
-      colorInput.addEventListener('input', function() {
-        textInput.value = this.value;
-      });
-    }
-  })();
-</script>
+<script src="/js/components/color-picker.js"></script>

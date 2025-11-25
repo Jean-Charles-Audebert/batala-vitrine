@@ -59,14 +59,10 @@ CREATE INDEX idx_fonts_source ON fonts(source);
 CREATE TABLE page (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) DEFAULT 'Mon Site',
-    title_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
-    text_font_id INT REFERENCES fonts(id) ON DELETE SET NULL,
+    default_font_title INT REFERENCES fonts(id) ON DELETE SET NULL,
+    default_font_text INT REFERENCES fonts(id) ON DELETE SET NULL,
     contact_email VARCHAR(255),
-    main_bg_color VARCHAR(20) DEFAULT '#ffffff',
-    main_bg_media_url VARCHAR(255) DEFAULT NULL,
-    main_bg_youtube_url VARCHAR(255) DEFAULT NULL,
-    main_bg_opacity NUMERIC(3,2) DEFAULT 1.0,
-    main_bg_position VARCHAR(50) DEFAULT 'center',
+    settings JSONB DEFAULT '{}',
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -75,34 +71,33 @@ CREATE TABLE page (
 -- ===============================
 CREATE TABLE sections (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255),
-    show_title BOOLEAN DEFAULT TRUE,
+    page_id INT NOT NULL REFERENCES page(id) ON DELETE CASCADE,
+    type VARCHAR(20) NOT NULL CHECK (type IN ('hero', 'standard', 'footer')),
+    position INT NOT NULL DEFAULT 0,
     is_visible BOOLEAN DEFAULT TRUE,
-    position INT DEFAULT 0,
-    layout JSONB, -- configuration de la grille / positions des éléments
-    settings JSONB, -- paramètres généraux (bg_color, bg_image, bg_video, padding, etc.)
+    settings JSONB DEFAULT '{}',
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE INDEX idx_sections_page_id ON sections(page_id);
 CREATE INDEX idx_sections_position ON sections(position);
 
 -- ===============================
--- ELEMENTS (texte, media, card, photo, video)
+-- ELEMENTS (texte, media, card, gallery, youtube)
 -- ===============================
 CREATE TABLE elements (
     id SERIAL PRIMARY KEY,
     section_id INT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
-    type VARCHAR(20) NOT NULL CHECK (type IN ('text', 'media', 'card', 'photo', 'video')),
-    title VARCHAR(255),
-    position INT DEFAULT 0,
-    settings JSONB, -- paramètres spécifiques (taille, couleur, url, alignment, etc.)
+    type VARCHAR(20) NOT NULL CHECK (type IN ('text', 'media', 'card', 'gallery', 'youtube', 'contact')),
+    col_start INT NOT NULL CHECK (col_start >= 1 AND col_start <= 12),
+    col_end INT NOT NULL CHECK (col_end >= 1 AND col_end <= 12),
+    settings JSONB DEFAULT '{}',
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE INDEX idx_elements_section_id ON elements(section_id);
-CREATE INDEX idx_elements_position ON elements(position);
 
 -- ===============================
 -- TRIGGERS: updated_at

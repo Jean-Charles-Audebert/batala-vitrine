@@ -1,0 +1,20 @@
+/* Variables CSS dynamiques pour le layout editor */
+:root {
+  <% if (config.global.title_font_id && fonts) { %>
+    <% const font = fonts.find(f => f.id == config.global.title_font_id); %>
+    <% if (font && font.font_family) { %>
+  --font-family-title: <%= font.font_family.replace(/['"\\]/g, '') %>;
+    <% } %>
+  <% } %>
+  <% if (config.global.main_bg_color) { %>
+  --main-bg-color: <%= config.global.main_bg_color %>;
+  <% } %>
+  /* Variables pour les polices individuelles */
+  <% if (fonts && fonts.length > 0) { %>
+    <% fonts.forEach(font => { %>
+      <% if (font.font_family) { %>
+  --font-<%= font.id %>: <%= font.font_family.replace(/['"\\]/g, '') %>;
+      <% } %>
+    <% }); %>
+  <% } %>
+}

@@ -5,12 +5,15 @@
 
 /* global document, confirm, window, fetch, alert, setTimeout */
 
-// Import du media picker
-import { openMediaPicker } from './media-picker.js';
+// ==========================================================================
+// Vérification de la page - ne pas exécuter sur la page publique
+// ==========================================================================
 
-// ==========================================================================
-// Gestion des modales
-// ==========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Ne pas exécuter sur la page publique - toutes les éditions se font dans /editor
+  if (window.location.pathname === '/' || window.location.pathname === '/public') {
+    return;
+  }
 
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
@@ -93,21 +96,21 @@ function createSectionModal(section) {
           <label for="sectionLayout">Layout</label>
           <select name="layout" id="sectionLayout">
             <option value="">— Par défaut —</option>
-            <option value="centered" ${section.layout === 'centered' ? 'selected' : ''}>Centré</option>
-            <option value="image_left" ${section.layout === 'image_left' ? 'selected' : ''}>Image à gauche</option>
-            <option value="image_right" ${section.layout === 'image_right' ? 'selected' : ''}>Image à droite</option>
-            <option value="grid_2" ${section.layout === 'grid_2' ? 'selected' : ''}>Grille 2 colonnes</option>
-            <option value="grid_3" ${section.layout === 'grid_3' ? 'selected' : ''}>Grille 3 colonnes</option>
-            <option value="grid_4" ${section.layout === 'grid_4' ? 'selected' : ''}>Grille 4 colonnes</option>
+            <option value="centered" ${(section.layout?.type || section.layout) === 'centered' ? 'selected' : ''}>Centré</option>
+            <option value="image_left" ${(section.layout?.type || section.layout) === 'image_left' ? 'selected' : ''}>Image à gauche</option>
+            <option value="image_right" ${(section.layout?.type || section.layout) === 'image_right' ? 'selected' : ''}>Image à droite</option>
+            <option value="grid_2" ${(section.layout?.type || section.layout) === 'grid_2' ? 'selected' : ''}>Grille 2 colonnes</option>
+            <option value="grid_3" ${(section.layout?.type || section.layout) === 'grid_3' ? 'selected' : ''}>Grille 3 colonnes</option>
+            <option value="grid_4" ${(section.layout?.type || section.layout) === 'grid_4' ? 'selected' : ''}>Grille 4 colonnes</option>
           </select>
         </div>
         
         <div class="form-group">
           <label for="sectionBgColor">Couleur de fond</label>
           <div class="color-picker-row">
-            <input type="color" name="bg_color" id="sectionBgColor" class="color-input" value="${section.bg_color || '#ffffff'}">
-            <input type="text" class="color-hex-input" value="${section.bg_color || '#ffffff'}" maxlength="9" pattern="#([0-9a-fA-F]{3,8})" title="Code hexadécimal" style="width: 90px;" autocomplete="off">
-            <span class="color-preview" style="display:inline-block;width:28px;height:28px;border-radius:4px;border:1px solid #ccc;background:${section.bg_color || '#ffffff'};"></span>
+            <input type="color" name="bg_color" id="sectionBgColor" class="color-input" value="${section.settings?.bg_color || '#ffffff'}">
+            <input type="text" class="color-hex-input" value="${section.settings?.bg_color || '#ffffff'}" maxlength="9" pattern="#([0-9a-fA-F]{3,8})" title="Code hexadécimal" style="width: 90px;" autocomplete="off">
+            <span class="color-preview" style="display:inline-block;width:28px;height:28px;border-radius:4px;border:1px solid #ccc;background:${section.settings?.bg_color || '#ffffff'};"></span>
           </div>
           <script>
             // Synchronisation input color <-> hex
@@ -135,9 +138,9 @@ function createSectionModal(section) {
         <div class="form-group">
           <label for="sectionBgImage">Image de fond</label>
           <div class="image-upload-field">
-            <input type="text" name="bg_image" id="sectionBgImage" value="${section.bg_image || ''}" placeholder="/uploads/..." readonly>
+            <input type="text" name="bg_image" id="sectionBgImage" value="${section.settings?.bg_image || ''}" placeholder="/uploads/..." readonly>
             <button type="button" class="btn btn-sm btn-secondary select-bg-image"><img src="/icons/image.svg" alt="" class="icon"> Choisir</button>
-            ${section.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+            ${section.settings?.bg_image ? '<button type="button" class="btn btn-sm btn-danger clear-bg-image" title="Supprimer l\'image"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">💡 <strong>Tailles recommandées pour hero :</strong><br>
           • Bannière large : 2700×600px (ratio 4.5:1) - affichage optimal<br>
@@ -149,9 +152,9 @@ function createSectionModal(section) {
         <div class="form-group">
           <label for="sectionBgVideo"><img src="/icons/video.svg" alt="" class="icon"> Vidéo locale (MP4)</label>
           <div class="image-upload-field">
-            <input type="text" name="bg_video" id="sectionBgVideo" value="${section.bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
+            <input type="text" name="bg_video" id="sectionBgVideo" value="${section.settings?.bg_video || ''}" placeholder="/uploads/video.mp4" readonly>
             <button type="button" class="btn btn-sm btn-secondary select-bg-video"><img src="/icons/image.svg" alt="" class="icon"> Choisir</button>
-            ${section.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+            ${section.settings?.bg_video ? '<button type="button" class="btn btn-sm btn-danger clear-bg-video" title="Supprimer la vidéo"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">Fichier MP4 local uniquement (max 50 MB)</small>
         </div>
@@ -159,15 +162,15 @@ function createSectionModal(section) {
         <div class="form-group">
           <label for="sectionBgYoutube"><img src="/icons/youtube.svg" alt="" class="icon"> Vidéo YouTube</label>
           <div style="display: flex; gap: 0.5rem;">
-            <input type="text" name="bg_youtube" id="sectionBgYoutube" value="${section.bg_youtube || ''}" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." style="flex: 1;">
-            ${section.bg_youtube ? '<button type="button" class="btn btn-sm btn-danger clear-bg-youtube" title="Supprimer l\'URL YouTube"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
+            <input type="text" name="bg_youtube" id="sectionBgYoutube" value="${section.settings?.bg_youtube || ''}" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." style="flex: 1;">
+            ${section.settings?.bg_youtube ? '<button type="button" class="btn btn-sm btn-danger clear-bg-youtube" title="Supprimer l\'URL YouTube"><img src="/icons/trash.svg" alt="" class="icon"></button>' : ''}
           </div>
           <small class="form-hint">URL YouTube complète (prioritaire sur MP4 local)</small>
         </div>
         
         <div class="form-group">
           <label>
-            <input type="checkbox" name="is_transparent" ${section.is_transparent ? 'checked' : ''}>
+            <input type="checkbox" name="is_transparent" ${section.settings?.is_transparent ? 'checked' : ''}>
             Fond transparent (ignore la couleur)
           </label>
         </div>

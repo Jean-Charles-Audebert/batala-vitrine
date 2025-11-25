@@ -3,15 +3,20 @@
 -- ===============================
 
 -- Sections de démonstration
-INSERT INTO sections (title, show_title, is_visible, position, layout, settings)
-VALUES
-  ('Accueil', TRUE, TRUE, 1, '{"type":"hero"}', '{"padding_top":"large","padding_bottom":"large","background_color":"#ffffff"}'),
-  ('Présentation', TRUE, TRUE, 2, '{"type":"image_left"}', '{"padding_top":"medium","padding_bottom":"medium"}'),
-  ('Services', TRUE, TRUE, 3, '{"type":"grid_3"}', '{"padding_top":"medium","padding_bottom":"medium","background_color":"#f8f9fa"}'),
-  ('Équipe', TRUE, TRUE, 4, '{"type":"grid_3"}', '{"padding_top":"medium","padding_bottom":"medium"}'),
-  ('Témoignages', TRUE, TRUE, 5, '{"type":"grid_2"}', '{"padding_top":"medium","padding_bottom":"medium","background_color":"#f8f9fa"}'),
-  ('Contact', TRUE, TRUE, 999, '{"type":"full_width"}', '{"padding_top":"large","padding_bottom":"large","background_color":"#343a40","text_color":"#ffffff"}');
 
+INSERT INTO sections (title, type, show_title, is_visible, position, layout, settings)
+VALUES
+  ('Hero', 'hero', TRUE, TRUE, 0, '{"columns":12}', '{"padding_top":"large","padding_bottom":"large","background_color":"#ffffff"}');
+
+INSERT INTO sections (title, type, show_title, is_visible, position, layout, settings)
+VALUES
+  ('Présentation','body', TRUE, TRUE, 1, '{"columns":12}', '{"padding_top":"medium","padding_bottom":"medium"}'),
+  ('Services','body', TRUE, TRUE, 2, '{"columns":12}', '{"padding_top":"medium","padding_bottom":"medium","background_color":"#f8f9fa"}'),
+  ('Équipe','body', TRUE, TRUE, 3, '{"columns":12}', '{"padding_top":"medium","padding_bottom":"medium"}'),
+  ('Témoignages','body', TRUE, TRUE, 4, '{"columns":12}', '{"padding_top":"medium","padding_bottom":"medium","background_color":"#f8f9fa"}'),
+  ('Footer','footer', TRUE, TRUE, 999, '{"columns":12}', '{"background_color":"#343a40"}');
+
+  
 -- Section Hero - Texte principal
 INSERT INTO elements (section_id, type, title, position, settings)
 SELECT id, 'text', 'Bienvenue sur notre site', 0, '{"content":"Découvrez nos services et notre expertise","subtitle":"Votre partenaire de confiance","alignment":"center","font_size":48}'

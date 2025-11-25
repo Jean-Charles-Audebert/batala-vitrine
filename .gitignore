@@ -74,6 +74,12 @@ web_modules/
 public/uploads/*
 !public/uploads/.gitkeep
 
+# Admin creation script (contains sensitive data)
+scripts/create-admins.js
+
+# Admin accounts documentation (contains account info)
+ADMIN_ACCOUNTS.md
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache

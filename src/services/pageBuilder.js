@@ -1,6 +1,6 @@
 /**
  * Page Builder Service
- * Construit les données JSON complètes de la page depuis la base de données
+ * Construit les données JSON complètes de la page depuis la base de données PostgreSQL uniquement
  */
 
 import { query } from '../config/db.js';
@@ -10,25 +10,13 @@ import { query } from '../config/db.js';
  * @returns {Promise<Object>} Données de la page avec sections visibles et leurs éléments
  */
 export async function buildPageData() {
-  try {
-    // Charger les données de base de la page
-    const pageData = await loadPageData();
+  const pageData = await loadPageData();
+  const sections = await loadSectionsWithElements(true); // visible only
 
-    // Charger toutes les sections visibles avec leurs éléments
-    const sections = await loadSectionsWithElements(true); // visible only
-
-    // Charger les fonts utilisées
-    const fonts = await loadFonts();
-
-    return {
-      page: pageData,
-      sections: sections,
-      fonts: fonts
-    };
-  } catch (error) {
-    console.error('Erreur lors de la construction des données de page:', error);
-    throw error;
-  }
+  return {
+    page: pageData,
+    sections: sections
+  };
 }
 
 /**
@@ -36,25 +24,13 @@ export async function buildPageData() {
  * @returns {Promise<Object>} Données de la page avec toutes les sections et leurs éléments
  */
 export async function buildEditorData() {
-  try {
-    // Charger les données de base de la page
-    const pageData = await loadPageData();
+  const pageData = await loadPageData();
+  const sections = await loadSectionsWithElements(false); // all sections
 
-    // Charger toutes les sections (visibles et invisibles) avec leurs éléments
-    const sections = await loadSectionsWithElements(false); // all sections
-
-    // Charger les fonts utilisées
-    const fonts = await loadFonts();
-
-    return {
-      page: pageData,
-      sections: sections,
-      fonts: fonts
-    };
-  } catch (error) {
-    console.error('Erreur lors de la construction des données éditeur:', error);
-    throw error;
-  }
+  return {
+    page: pageData,
+    sections: sections
+  };
 }
 
 /**
@@ -62,7 +38,16 @@ export async function buildEditorData() {
  */
 async function loadPageData() {
   const { rows } = await query('SELECT * FROM page LIMIT 1');
-  return rows[0] || {};
+  const page = rows[0] || {};
+
+  // Retourner exactement les champs attendus par le frontend
+  return {
+    title: page.title || 'Mon Site',
+    default_font_title: page.default_font_title || null,
+    default_font_text: page.default_font_text || null,
+    contact_email: page.contact_email || null,
+    settings: page.settings || {}
+  };
 }
 
 /**
@@ -71,7 +56,11 @@ async function loadPageData() {
  */
 async function loadSectionsWithElements(visibleOnly = true) {
   // Charger les sections de base
-  let queryText = 'SELECT * FROM sections';
+  let queryText = `
+    SELECT
+      id, type, position, is_visible, settings
+    FROM sections
+  `;
   const values = [];
 
   if (visibleOnly) {
@@ -82,14 +71,19 @@ async function loadSectionsWithElements(visibleOnly = true) {
 
   const { rows: sections } = await query(queryText, values);
 
-  // Pour chaque section, charger les éléments
+  // Pour chaque section, charger ses éléments
   const sectionsWithElements = await Promise.all(
     sections.map(async (section) => {
       const elements = await loadSectionElements(section.id);
 
+      // Retourner exactement la structure attendue par le frontend
       return {
-        ...section,
-        elements
+        id: section.id,
+        type: section.type,
+        position: section.position,
+        is_visible: section.is_visible,
+        settings: section.settings || {},
+        elements: elements
       };
     })
   );
@@ -102,18 +96,19 @@ async function loadSectionsWithElements(visibleOnly = true) {
  */
 async function loadSectionElements(sectionId) {
   const { rows } = await query(`
-    SELECT * FROM elements
+    SELECT
+      id, type, col_start, col_end, settings
+    FROM elements
     WHERE section_id = $1
-    ORDER BY position ASC, id ASC
+    ORDER BY col_start ASC, id ASC
   `, [sectionId]);
 
-  return rows;
-}
-
-/**
- * Charge toutes les fonts utilisées
- */
-async function loadFonts() {
-  const { rows } = await query('SELECT * FROM fonts ORDER BY name');
-  return rows;
+  // Retourner exactement la structure attendue par le frontend
+  return rows.map(element => ({
+    id: element.id,
+    type: element.type,
+    col_start: element.col_start,
+    col_end: element.col_end,
+    settings: element.settings || {}
+  }));
 }

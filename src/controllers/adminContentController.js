@@ -13,9 +13,9 @@ export const getSectionsContent = async (req, res) => {
   try {
     const { rows: sections } = await query(`
       SELECT
-        id, type, title, position, is_visible,
+        id, title, position, is_visible,
         bg_color, bg_image, bg_video, is_transparent,
-        layout, padding_top, padding_bottom,
+        layout, settings,
         created_at, updated_at
       FROM sections
       ORDER BY position ASC NULLS LAST, id ASC

@@ -1,20 +1,11 @@
 import express from "express";
-// import { reorderBlocks } from "../controllers/blockController.js"; // Supprimé - blocs plus utilisés
-// import { reorderCards, getCardJson, updateCardJson, createCardJson } from "../controllers/cardController.js"; // Supprimé - blocs plus utilisés
-// import { getFooterElementJson, listFooterElementsJson, upsertFooterElementJson, deleteFooterElementJson } from "../controllers/footerElementController.js"; // Supprimé - blocs plus utilisés
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
 import { logger } from "../utils/logger.js";
 import { createOptimizedVersion } from "../utils/imageOptimizer.js";
 import { query } from "../config/db.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs/promises";
 import { buildPageData } from "../services/pageBuilder.js";
 import { getSocialIcon } from "../utils/socialIcons.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -69,41 +60,17 @@ router.get("/preview", async (req, res) => {
   }
 });
 
-// Routes pour l'éditeur JSON
+// Routes pour l'éditeur JSON - SUPPRIMÉ (utilise uniquement la BDD)
 router.get("/site-config", requireAuth, async (req, res) => {
-  try {
-    const configPath = path.join(__dirname, "../../config/site.json");
-    const configData = await fs.readFile(configPath, 'utf8');
-    const config = JSON.parse(configData);
-    res.json(config);
-  } catch (error) {
-    logger.error("Erreur chargement config site:", error);
-    res.status(500).json({ error: "Erreur chargement configuration" });
-  }
+  res.status(410).json({ error: "Endpoint supprimé - utiliser uniquement la BDD" });
 });
 
 router.post("/site-config", requireAuth, async (req, res) => {
-  try {
-    const configPath = path.join(__dirname, "../../config/site.json");
-    const configData = JSON.stringify(req.body, null, 2);
-    await fs.writeFile(configPath, configData, 'utf8');
-    res.json({ success: true, message: "Configuration sauvegardée" });
-  } catch (error) {
-    logger.error("Erreur sauvegarde config site:", error);
-    res.status(500).json({ error: "Erreur sauvegarde configuration" });
-  }
+  res.status(410).json({ error: "Endpoint supprimé - utiliser uniquement la BDD" });
 });
 
 router.get("/schemas", requireAuth, async (req, res) => {
-  try {
-    const schemasPath = path.join(__dirname, "../../config/schemas.json");
-    const schemasData = await fs.readFile(schemasPath, 'utf8');
-    const schemas = JSON.parse(schemasData);
-    res.json(schemas);
-  } catch (error) {
-    logger.error("Erreur chargement schémas:", error);
-    res.status(500).json({ error: "Erreur chargement schémas" });
-  }
+  res.status(410).json({ error: "Endpoint supprimé - utiliser uniquement la BDD" });
 });
 
 // Route API pour le réordonnancement des blocs - SUPPRIMÉ (système legacy)
@@ -114,8 +81,8 @@ router.get("/schemas", requireAuth, async (req, res) => {
 // ===============================
 router.get("/page", requireAuth, async (req, res) => {
   try {
-    const { rows } = await query(`SELECT id, title_font_id, main_bg_color, main_bg_image, main_bg_video FROM page WHERE id=1`);
-    res.json(rows[0] || {});
+    const pageData = await buildPageData();
+    res.json(pageData);
   } catch (error) {
     logger.error("Erreur chargement page settings:", error);
     res.status(500).json({ error: "Erreur chargement page settings" });
@@ -125,9 +92,22 @@ router.get("/page", requireAuth, async (req, res) => {
 router.put("/page/theme", requireAuth, async (req, res) => {
   try {
     const { title_font_id, main_bg_color, main_bg_image, main_bg_video } = req.body;
+
+    // Récupérer les settings actuels
+    const { rows } = await query('SELECT settings FROM page WHERE id = 1');
+    const currentSettings = rows[0]?.settings || {};
+
+    // Mettre à jour les settings
+    const updatedSettings = {
+      ...currentSettings,
+      bg_color: main_bg_color || currentSettings.bg_color,
+      bg_image: main_bg_image || currentSettings.bg_image,
+      bg_video: main_bg_video || currentSettings.bg_video
+    };
+
     await query(
-      `UPDATE page SET title_font_id = $1, main_bg_color = $2, main_bg_image = $3, main_bg_video = $4, updated_at = NOW() WHERE id = 1`,
-      [title_font_id || null, main_bg_color || null, main_bg_image || null, main_bg_video || null]
+      `UPDATE page SET settings = $1, updated_at = NOW() WHERE id = 1`,
+      [JSON.stringify(updatedSettings)]
     );
     res.json({ success: true, message: "Thème global mis à jour" });
   } catch (error) {
@@ -140,41 +120,29 @@ router.put("/page/theme", requireAuth, async (req, res) => {
 router.put("/pages/:id", requireAuth, async (req, res) => {
   try {
     const pageId = parseInt(req.params.id);
-    const { 
-      title, 
-      contact_email, 
-      main_bg_color, 
-      main_bg_media_url, 
-      main_bg_youtube_url, 
-      main_bg_opacity, 
-      main_bg_position,
-      title_font_id,
-      text_font_id
+    const {
+      title,
+      contact_email,
+      default_font_title,
+      default_font_text,
+      settings
     } = req.body;
 
     await query(
-      `UPDATE page SET 
-        title = $1, 
-        contact_email = $2, 
-        main_bg_color = $3, 
-        main_bg_media_url = $4, 
-        main_bg_youtube_url = $5, 
-        main_bg_opacity = $6, 
-        main_bg_position = $7,
-        title_font_id = $8,
-        text_font_id = $9,
-        updated_at = NOW() 
-       WHERE id = $10`,
+      `UPDATE page SET
+        title = $1,
+        contact_email = $2,
+        default_font_title = $3,
+        default_font_text = $4,
+        settings = $5,
+        updated_at = NOW()
+       WHERE id = $6`,
       [
-        title || null, 
-        contact_email || null, 
-        main_bg_color || '#ffffff', 
-        main_bg_media_url || null, 
-        main_bg_youtube_url || null, 
-        main_bg_opacity || 1.0, 
-        main_bg_position || 'center',
-        title_font_id || null,
-        text_font_id || null,
+        title || null,
+        contact_email || null,
+        default_font_title || null,
+        default_font_text || null,
+        JSON.stringify(settings || {}),
         pageId
       ]
     );

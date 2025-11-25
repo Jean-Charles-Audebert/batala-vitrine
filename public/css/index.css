@@ -783,6 +783,7 @@ footer .social-link:hover .social-icon,
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
+  padding-bottom: 5rem; /* Espace pour les boutons sticky */
 }
 
 .modal-close {

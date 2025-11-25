@@ -18,15 +18,15 @@ export const getAllSections = async () => {
       ORDER BY position ASC NULLS LAST, id ASC
     `);
 
-    // Pour chaque section, charger ses éléments et décorations
+    // Pour chaque section, charger ses éléments et extraire le type
     const sectionsWithElements = await Promise.all(
       sections.map(async (section) => {
         const elements = await loadSectionElements(section.id);
-        const decorations = await loadSectionDecorations(section.id);
+        const type = section.settings?.type || 'unknown';
         return {
           ...section,
-          elements,
-          decorations
+          type,
+          elements
         };
       })
     );
@@ -51,12 +51,12 @@ export const getSectionById = async (sectionId) => {
 
     const section = rows[0];
     const elements = await loadSectionElements(sectionId);
-    const decorations = await loadSectionDecorations(sectionId);
+    const type = section.settings?.type || 'unknown';
 
     return {
       ...section,
-      elements,
-      decorations
+      type,
+      elements
     };
   } catch (error) {
     logger.error('Erreur getSectionById:', error);
@@ -78,21 +78,6 @@ async function loadSectionElements(sectionId) {
 }
 
 /**
- * Charger les décorations d'une section
- */
-async function loadSectionDecorations(sectionId) {
-  const { rows } = await query(`
-    SELECT d.*, sd.position, sd.color, sd.opacity, sd.scale
-    FROM decorations d
-    JOIN section_decorations sd ON d.id = sd.decoration_id
-    WHERE sd.section_id = $1 AND d.is_active = TRUE
-    ORDER BY sd.position ASC
-  `, [sectionId]);
-
-  return rows;
-}
-
-/**
  * Créer une nouvelle section
  */
 export const createSection = async (sectionData) => {
@@ -100,37 +85,36 @@ export const createSection = async (sectionData) => {
     const {
       type,
       title,
-      position,
+      show_title = true,
       is_visible = true,
       layout,
-      settings = {},
-      padding_top = 'medium',
-      padding_bottom = 'medium'
+      settings = {}
     } = sectionData;
 
-    // Calculer la position automatiquement si non fournie
-    let finalPosition = position;
-    if (finalPosition === null || finalPosition === undefined) {
-      const { rows: maxPosRows } = await query(`
-        SELECT COALESCE(MAX(position), 0) as max_pos
-        FROM sections
-        WHERE position < 999
-      `);
-      finalPosition = maxPosRows[0].max_pos + 1;
+    // Ajouter le type aux settings si fourni
+    const finalSettings = { ...settings };
+    if (type) {
+      finalSettings.type = type;
     }
+
+    // Calculer la position automatiquement
+    const { rows: maxPosRows } = await query(`
+      SELECT COALESCE(MAX(position), 0) as max_pos
+      FROM sections
+      WHERE position < 999
+    `);
+    const position = maxPosRows[0].max_pos + 1;
 
     const { rows } = await query(`
       INSERT INTO sections (
-        type, title, position, is_visible, layout,
-        padding_top, padding_bottom
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        title, show_title, is_visible, position, layout, settings
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `, [
-      type, title, finalPosition, is_visible, layout,
-      padding_top, padding_bottom
+      title, show_title, is_visible, position, layout, JSON.stringify(finalSettings)
     ]);
 
-    logger.info(`Section créée: #${rows[0].id} (${type}) à la position ${finalPosition}`);
+    logger.info(`Section créée: #${rows[0].id} (${type || 'unknown'}) à la position ${position}`);
     return rows[0];
   } catch (error) {
     logger.error('Erreur createSection:', error);
@@ -145,17 +129,11 @@ export const updateSection = async (sectionId, sectionData) => {
   try {
     const {
       title,
-      position,
+      show_title,
       is_visible,
       layout,
       settings,
-      padding_top,
-      padding_bottom,
-      bg_color,
-      bg_image,
-      bg_video,
-      bg_youtube,
-      is_transparent
+      type
     } = sectionData;
 
     const updates = [];
@@ -167,9 +145,9 @@ export const updateSection = async (sectionId, sectionData) => {
       updates.push(`title = $${paramIndex++}`);
       values.push(title);
     }
-    if (position !== undefined) {
-      updates.push(`position = $${paramIndex++}`);
-      values.push(position);
+    if (show_title !== undefined) {
+      updates.push(`show_title = $${paramIndex++}`);
+      values.push(show_title);
     }
     if (is_visible !== undefined) {
       updates.push(`is_visible = $${paramIndex++}`);
@@ -179,38 +157,23 @@ export const updateSection = async (sectionId, sectionData) => {
       updates.push(`layout = $${paramIndex++}`);
       values.push(layout);
     }
+
+    // Gérer le settings complet
     if (settings !== undefined) {
-      // Note: settings column may not exist in current schema
-      // Settings are handled at element level now
-      logger.info('Settings update skipped - handled at element level');
-    }
-    if (padding_top !== undefined) {
-      updates.push(`padding_top = $${paramIndex++}`);
-      values.push(padding_top);
-    }
-    if (padding_bottom !== undefined) {
-      updates.push(`padding_bottom = $${paramIndex++}`);
-      values.push(padding_bottom);
-    }
-    if (bg_color !== undefined) {
-      updates.push(`bg_color = $${paramIndex++}`);
-      values.push(bg_color);
-    }
-    if (bg_image !== undefined) {
-      updates.push(`bg_image = $${paramIndex++}`);
-      values.push(bg_image);
-    }
-    if (bg_video !== undefined) {
-      updates.push(`bg_video = $${paramIndex++}`);
-      values.push(bg_video);
-    }
-    if (bg_youtube !== undefined) {
-      updates.push(`bg_youtube = $${paramIndex++}`);
-      values.push(bg_youtube);
-    }
-    if (is_transparent !== undefined) {
-      updates.push(`is_transparent = $${paramIndex++}`);
-      values.push(is_transparent);
+      const finalSettings = { ...settings };
+      if (type !== undefined) {
+        finalSettings.type = type;
+      }
+      updates.push(`settings = $${paramIndex++}`);
+      values.push(JSON.stringify(finalSettings));
+    } else if (type !== undefined) {
+      // Si seulement type est fourni, mettre à jour le settings existant
+      const { rows: currentRows } = await query('SELECT settings FROM sections WHERE id = $1', [sectionId]);
+      const currentSettings = currentRows[0]?.settings || {};
+      const updatedSettings = { ...currentSettings, type };
+
+      updates.push(`settings = $${paramIndex++}`);
+      values.push(JSON.stringify(updatedSettings));
     }
 
     if (updates.length === 0) {
@@ -262,28 +225,6 @@ export const deleteSection = async (sectionId) => {
 };
 
 /**
- * Récupérer toutes les décorations disponibles
- */
-export const getAllDecorations = async () => {
-  try {
-    const { rows } = await query(`
-      SELECT
-        id, name, display_name, type, description,
-        svg_code, default_color, default_opacity, default_scale,
-        supported_positions, preview_url
-      FROM decorations
-      WHERE is_active = TRUE
-      ORDER BY type, display_name
-    `);
-
-    return rows;
-  } catch (error) {
-    logger.error('Erreur getAllDecorations:', error);
-    throw error;
-  }
-};
-
-/**
  * Récupérer toutes les polices disponibles
  */
 export const getAllFonts = async () => {
@@ -298,26 +239,6 @@ export const getAllFonts = async () => {
     return rows;
   } catch (error) {
     logger.error('Erreur getAllFonts:', error);
-    throw error;
-  }
-};
-
-/**
- * Ajouter une décoration à une section
- */
-export const addSectionDecoration = async (sectionId, decorationData) => {
-  try {
-    const { decoration_id, position = 0, color, opacity, scale } = decorationData;
-
-    const { rows } = await query(`
-      INSERT INTO section_decorations (section_id, decoration_id, position, color, opacity, scale)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-    `, [sectionId, decoration_id, position, color, opacity, scale]);
-
-    return rows[0];
-  } catch (error) {
-    logger.error('Erreur addSectionDecoration:', error);
     throw error;
   }
 };

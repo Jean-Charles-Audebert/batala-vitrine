@@ -4,6 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Ne pas exécuter sur la page publique - toutes les éditions se font dans /editor
+  if (window.location.pathname === '/' || window.location.pathname === '/public') {
+    return;
+  }
   
   /**
    * Édition de section (hero, content, etc.)

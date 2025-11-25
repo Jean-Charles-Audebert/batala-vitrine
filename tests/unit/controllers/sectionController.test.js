@@ -3,8 +3,7 @@ import {
   getSectionById,
   createSection,
   updateSection,
-  deleteSection,
-  getAllDecorations
+  deleteSection
 } from '../../../src/controllers/sectionController.js';
 
 /**
@@ -29,8 +28,6 @@ describe('sectionController - tests d\'intégration', () => {
         expect(firstSection).toHaveProperty('position');
         expect(firstSection).toHaveProperty('elements');
         expect(Array.isArray(firstSection.elements)).toBe(true);
-        expect(firstSection).toHaveProperty('decorations');
-        expect(Array.isArray(firstSection.decorations)).toBe(true);
       }
     });
 
@@ -60,8 +57,6 @@ describe('sectionController - tests d\'intégration', () => {
         expect(section).toHaveProperty('type');
         expect(section).toHaveProperty('elements');
         expect(Array.isArray(section.elements)).toBe(true);
-        expect(section).toHaveProperty('decorations');
-        expect(Array.isArray(section.decorations)).toBe(true);
         
         // Vérifier les éléments selon le type
         if (section.type === 'card_grid') {
@@ -84,8 +79,8 @@ describe('sectionController - tests d\'intégration', () => {
       const sectionData = {
         type: 'content',
         title: 'Test Section',
-        layout: 'centered',
-        position: 999
+        layout: null,
+        settings: { bg_color: '#ffffff' }
       };
 
       const section = await createSection(sectionData);
@@ -93,8 +88,8 @@ describe('sectionController - tests d\'intégration', () => {
 
       expect(section).toBeTruthy();
       expect(section.id).toBeDefined();
-      expect(section.type).toBe('content');
       expect(section.title).toBe('Test Section');
+      expect(section.settings.type).toBe('content');
     });
 
     afterAll(async () => {
@@ -113,7 +108,8 @@ describe('sectionController - tests d\'intégration', () => {
       const section = await createSection({
         type: 'content',
         title: 'Section à modifier',
-        position: 998
+        layout: null,
+        settings: { bg_color: '#ffffff' }
       });
       testSectionId = section.id;
     });
@@ -121,14 +117,14 @@ describe('sectionController - tests d\'intégration', () => {
     it('doit mettre à jour une section existante', async () => {
       const updates = {
         title: 'Titre modifié',
-        bg_color: '#000000'
+        settings: { bg_color: '#000000' }
       };
 
       const section = await updateSection(testSectionId, updates);
 
       expect(section).toBeTruthy();
       expect(section.title).toBe('Titre modifié');
-      expect(section.bg_color).toBe('#000000');
+      expect(section.settings.bg_color).toBe('#000000');
     });
 
     it('doit retourner null pour un ID inexistant', async () => {
@@ -150,7 +146,8 @@ describe('sectionController - tests d\'intégration', () => {
       const section = await createSection({
         type: 'content',
         title: 'Section à supprimer',
-        position: 997
+        layout: null,
+        settings: { bg_color: '#ffffff' }
       });
 
       const result = await deleteSection(section.id);
@@ -164,35 +161,6 @@ describe('sectionController - tests d\'intégration', () => {
     it('doit retourner false pour un ID inexistant', async () => {
       const result = await deleteSection(99999);
       expect(result).toBe(false);
-    });
-  });
-
-  describe('getAllDecorations', () => {
-    it('doit retourner toutes les décorations disponibles', async () => {
-      const decorations = await getAllDecorations();
-
-      expect(Array.isArray(decorations)).toBe(true);
-      expect(decorations.length).toBeGreaterThan(0);
-
-      if (decorations.length > 0) {
-        const firstDecoration = decorations[0];
-        expect(firstDecoration).toHaveProperty('id');
-        expect(firstDecoration).toHaveProperty('display_name');
-        expect(firstDecoration).toHaveProperty('name');
-        expect(firstDecoration).toHaveProperty('type');
-        expect(firstDecoration).toHaveProperty('svg_code');
-        expect(firstDecoration).toHaveProperty('default_color');
-        expect(firstDecoration).toHaveProperty('supported_positions');
-      }
-    });
-
-    it('les décorations contiennent du code SVG valide', async () => {
-      const decorations = await getAllDecorations();
-
-      decorations.forEach(decoration => {
-        expect(decoration.svg_code).toContain('<svg');
-        expect(decoration.svg_code).toContain('</svg>');
-      });
     });
   });
 });
