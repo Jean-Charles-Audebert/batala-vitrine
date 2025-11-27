@@ -36,15 +36,23 @@
   <% } %>
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/css/common.css">
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/buttons.css">
-  <link rel="stylesheet" href="/css/admin.css">
-  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/page.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS Variables pour thème global -->
-  <link rel="stylesheet" href="/css/pages/index-v2.css">
+
+  <style>
+    :root {
+      <% if (page.default_font_title) { %>
+        --default-font-title: var(--font-<%= page.default_font_title %>);
+      <% } %>
+      <% if (page.default_font_text) { %>
+        --default-font-text: var(--font-<%= page.default_font_text %>);
+      <% } %>
+    }
+  </style>
 </head>
 <body class="vitrine-page">
   <%
@@ -90,26 +98,20 @@
       %>
       <% if (sectionType === 'footer') { return; } %>
       <% if (sectionType === 'hero') { %>
-        <%- include('../components/sections/hero', { section }) %>
-      <% } else if (sectionType === 'content' || sectionType === 'image_left' || sectionType === 'text-media') { %>
-        <%- include('../components/sections/text-media', { section }) %>
-      <% } else if (sectionType === 'card_grid' || sectionType === 'grid_3' || sectionType === 'grid_2') { %>
-        <%- include('../components/sections/card_grid', { section }) %>
-      <% } else if (sectionType === 'gallery') { %>
-        <%- include('../components/sections/gallery', { section }) %>
+        <section id="section-<%= section.id %>" class="section-wrapper section-hero-wrapper">
+          <%- include('../components/sections/hero', { section, socialLinks }) %>
+        </section>
       <% } else { %>
-        <!-- Section non supportée: <%= sectionType %> -->
-        <section class="block-section" data-type="<%= sectionType %>">
-          <div class="container">
-            <h2><%= section.title || 'Section' %></h2>
-            <p>Type de section non supporté: <%= sectionType %></p>
-          </div>
+        <section id="section-<%= section.id %>" class="section-wrapper">
+          <%- include('../components/sections/standard', { section }) %>
         </section>
       <% } %>
     <% }) %>
   </div>
   <% sections.forEach(section => { if (section.type === 'footer') { %>
-    <%- include('../components/sections/footer', { section, user, getSocialIcon, socialLinks }) %>
+    <section id="section-<%= section.id %>" class="section-wrapper">
+      <%- include('../components/sections/footer', { section, user, getSocialIcon, socialLinks }) %>
+    </section>
   <% } }) %>
   
   <!-- FAB Auth -->
@@ -119,6 +121,36 @@
   <script src="/js/index.js"></script>
   <script src="/js/image-upload.js"></script>
   <script src="/js/contact-form.js"></script>
+  
+  <!-- Gallery Video Handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle video thumbnail clicks
+      document.addEventListener('click', function(e) {
+        const videoThumbWrapper = e.target.closest('.video-thumb-wrapper');
+        if (videoThumbWrapper) {
+          e.preventDefault();
+          const videoId = videoThumbWrapper.dataset.videoId;
+          if (videoId) {
+            // Replace thumbnail with YouTube iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1`;
+            iframe.frameBorder = '0';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            iframe.className = 'youtube-iframe';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = 'var(--border-radius-md)';
+            
+            videoThumbWrapper.innerHTML = '';
+            videoThumbWrapper.appendChild(iframe);
+          }
+        }
+      });
+    });
+  </script>
   
   <% if (user) { %>
     <!-- FAB Add Section -->

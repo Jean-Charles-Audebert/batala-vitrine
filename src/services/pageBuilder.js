@@ -19,10 +19,6 @@ export async function buildPageData() {
   };
 }
 
-/**
- * Construit les données complètes de la page pour l'éditeur (toutes les sections)
- * @returns {Promise<Object>} Données de la page avec toutes les sections et leurs éléments
- */
 export async function buildEditorData() {
   const pageData = await loadPageData();
   const sections = await loadSectionsWithElements(false); // all sections
@@ -71,10 +67,23 @@ async function loadSectionsWithElements(visibleOnly = true) {
 
   const { rows: sections } = await query(queryText, values);
 
-  // Pour chaque section, charger ses éléments
+  // Pour chaque section, charger ses éléments et données supplémentaires
   const sectionsWithElements = await Promise.all(
     sections.map(async (section) => {
       const elements = await loadSectionElements(section.id);
+
+      // Parser les settings de la section si c'est une string JSON
+      let sectionSettings = section.settings || {};
+      if (typeof sectionSettings === 'string') {
+        try {
+          sectionSettings = JSON.parse(sectionSettings);
+        } catch (e) {
+          sectionSettings = {};
+        }
+      }
+
+      // Extraire le titre des settings pour le frontend
+      const title = sectionSettings.title || null;
 
       // Retourner exactement la structure attendue par le frontend
       return {
@@ -82,7 +91,8 @@ async function loadSectionsWithElements(visibleOnly = true) {
         type: section.type,
         position: section.position,
         is_visible: section.is_visible,
-        settings: section.settings || {},
+        title: title,
+        settings: sectionSettings,
         elements: elements
       };
     })
@@ -104,11 +114,22 @@ async function loadSectionElements(sectionId) {
   `, [sectionId]);
 
   // Retourner exactement la structure attendue par le frontend
-  return rows.map(element => ({
-    id: element.id,
-    type: element.type,
-    col_start: element.col_start,
-    col_end: element.col_end,
-    settings: element.settings || {}
-  }));
+  return rows.map(element => {
+    let settings = element.settings || {};
+    // Parser les settings si c'est une string JSON
+    if (typeof settings === 'string') {
+      try {
+        settings = JSON.parse(settings);
+      } catch (e) {
+        settings = {};
+      }
+    }
+    return {
+      id: element.id,
+      type: element.type,
+      col_start: element.col_start,
+      col_end: element.col_end,
+      settings: settings
+    };
+  });
 }

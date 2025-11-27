@@ -1,9 +1,5 @@
 import { query } from '../config/db.js';
 import { logger } from '../utils/logger.js';
-import {
-  createSectionSchema,
-  updateSectionSchema
-} from '../config/schemas.js';
 
 /**
  * GET /api/sections

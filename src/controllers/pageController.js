@@ -2,10 +2,6 @@ import { query } from '../config/db.js';
 import { logger } from '../utils/logger.js';
 import { deleteFileAndOriginal } from '../utils/imageOptimizer.js';
 import path from 'path';
-import {
-  pageSchema,
-  updatePageSchema
-} from '../config/schemas.js';
 
 /**
  * GET /api/page

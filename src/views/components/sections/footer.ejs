@@ -33,7 +33,7 @@
   const contactContent = content.find(c => c.position === 1) || {};
 %>
 
-<footer class="<%= sectionClasses.join(' ') %>" data-section-id="<%= id %>" <% if (bgStyle.length > 0) { %>style="<%= bgStyle.join('; ') %>"<% } %>>
+<footer class="<%= sectionClasses.join(' ') %>" data-section-id="<%= id %>">
   <% if (bg_youtube) { %>
   <%
     let videoId = '';

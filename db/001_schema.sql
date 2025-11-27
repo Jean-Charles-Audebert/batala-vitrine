@@ -91,7 +91,7 @@ CREATE INDEX idx_sections_position ON sections(position);
 CREATE TABLE elements (
     id SERIAL PRIMARY KEY,
     section_id INT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
-    type VARCHAR(20) NOT NULL CHECK (type IN ('text', 'media', 'card', 'gallery', 'youtube', 'contact')),
+    type VARCHAR(20) NOT NULL CHECK (type IN ('text', 'media', 'card', 'gallery', 'youtube', 'contact', 'link')),
     col_start INT NOT NULL CHECK (col_start >= 1 AND col_start <= 12),
     col_end INT NOT NULL CHECK (col_end >= 1 AND col_end <= 12),
     settings JSONB DEFAULT '{}',

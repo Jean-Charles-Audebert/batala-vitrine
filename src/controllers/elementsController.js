@@ -1,9 +1,5 @@
 import { query } from '../config/db.js';
 import { logger } from '../utils/logger.js';
-import {
-  createElementSchema,
-  updateElementSchema
-} from '../config/schemas.js';
 
 /**
  * GET /api/elements?section_id=:sectionId

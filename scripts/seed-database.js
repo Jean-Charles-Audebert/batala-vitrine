@@ -9,6 +9,16 @@ async function seedDatabase() {
   try {
     logger.info('🌱 Début du seeding de la base de données...');
 
+    // Nettoyer complètement la base avant de seed
+    logger.info('🧹 Nettoyage complet de la base de données...');
+    await query('TRUNCATE TABLE elements CASCADE');
+    await query('TRUNCATE TABLE sections CASCADE');
+    await query('TRUNCATE TABLE page CASCADE');
+    await query('TRUNCATE TABLE fonts CASCADE');
+    await query('TRUNCATE TABLE admins CASCADE');
+    await query('TRUNCATE TABLE refresh_tokens CASCADE');
+    logger.info('✅ Base de données nettoyée');
+
     // 1. Créer des polices par défaut
     const fonts = [
       {
@@ -134,6 +144,8 @@ async function seedDatabase() {
           title_font: defaultFontTitleId,
           title_size: 48,
           layout: '12-cols-grid',
+          align: 'center',
+          vertical_align: 'center',
         },
         elements: [
           {
@@ -146,19 +158,6 @@ async function seedDatabase() {
               height: '80px',
               align: 'left',
               vertical_align: 'center',
-            },
-          },
-          {
-            type: 'text',
-            col_start: 3,
-            col_end: 10,
-            settings: {
-              content: 'Bienvenue sur notre site',
-              size: '48px',
-              color: '#000000',
-              align: 'center',
-              vertical_align: 'center',
-              font_id: defaultFontTitleId,
             },
           },
           {
@@ -188,6 +187,7 @@ async function seedDatabase() {
           bg_video: null,
           bg_video_youtube: null,
           title: 'Présentation',
+          show_title: true,
           title_color: '#333333',
           title_font: defaultFontTitleId,
           title_size: 32,
@@ -199,7 +199,7 @@ async function seedDatabase() {
             col_start: 3,
             col_end: 11,
             settings: {
-              content: 'Voici une section texte simple.',
+              content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
               size: '20px',
               color: '#333333',
               align: 'center',
@@ -360,48 +360,48 @@ async function seedDatabase() {
           {
             type: 'gallery',
             col_start: 1,
-            col_end: 4,
+            col_end: 6,
             settings: { media_url: '/assets/icon-consulting.svg' },
           },
           {
             type: 'gallery',
-            col_start: 4,
-            col_end: 7,
+            col_start: 7,
+            col_end: 12,
             settings: { media_url: '/assets/placeholder-1.svg' },
           },
           {
             type: 'gallery',
-            col_start: 7,
-            col_end: 10,
+            col_start: 1,
+            col_end: 6,
             settings: { media_url: '/assets/placeholder-2.svg' },
           },
           {
             type: 'gallery',
-            col_start: 10,
+            col_start: 7,
             col_end: 12,
             settings: { media_url: '/assets/placeholder-3.svg' },
           },
           {
             type: 'gallery',
             col_start: 1,
-            col_end: 4,
+            col_end: 6,
             settings: { media_url: '/assets/placeholder-person1.svg' },
           },
           {
             type: 'gallery',
-            col_start: 4,
-            col_end: 7,
+            col_start: 7,
+            col_end: 12,
             settings: { media_url: '/assets/placeholder-person2.svg' },
           },
           {
             type: 'youtube',
-            col_start: 7,
-            col_end: 10,
+            col_start: 1,
+            col_end: 6,
             settings: { youtube_url: 'https://youtu.be/2WPplCREC1c' },
           },
           {
             type: 'youtube',
-            col_start: 10,
+            col_start: 7,
             col_end: 12,
             settings: { youtube_url: 'https://youtu.be/xbZVTo_9Bfg' },
           },
@@ -454,6 +454,9 @@ async function seedDatabase() {
         `
         INSERT INTO sections (page_id, type, position, is_visible, settings)
         VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (page_id, type, position) DO UPDATE SET
+          is_visible = EXCLUDED.is_visible,
+          settings = EXCLUDED.settings
         RETURNING id
       `,
         [
@@ -466,7 +469,10 @@ async function seedDatabase() {
       );
 
       const sectionId = sectionRows[0].id;
-      logger.info(`📄 Section ${sectionData.type} créée (ID: ${sectionId})`);
+      logger.info(`📄 Section ${sectionData.type} créée/mise à jour (ID: ${sectionId})`);
+
+      // Supprimer les anciens éléments de cette section avant d'en ajouter de nouveaux
+      await query('DELETE FROM elements WHERE section_id = $1', [sectionId]);
 
       for (const elementData of sectionData.elements) {
         await query(
@@ -489,7 +495,83 @@ async function seedDatabase() {
       );
     }
 
+    // 5. Ajouter des liens de navigation automatiques dans le HERO
+    logger.info('➕ Ajout des liens de navigation par défaut dans le HERO...');
+
+    // Récupérer le hero
+    const { rows: heroRow } = await query(
+      `SELECT id FROM sections WHERE page_id=$1 AND type='hero' LIMIT 1`,
+      [pageId]
+    );
+    if (!heroRow.length) {
+      logger.warn('⚠️ Aucun HERO trouvé, impossible d’ajouter les liens.');
+    } else {
+      const heroId = heroRow[0].id;
+
+      // Récupérer les autres sections (sauf hero + footer)
+      const { rows: otherSections } = await query(
+        `SELECT id, type, position, settings
+     FROM sections
+     WHERE page_id=$1 AND type NOT IN ('hero', 'footer')
+     ORDER BY position ASC`,
+        [pageId]
+      );
+
+      // Générer les liens
+      for (const sec of otherSections) {
+        const sectionSettings = sec.settings || {};
+        const sectionTitle = sectionSettings.title || (sec.type === 'standard' ? `Section ${sec.position}` : sec.type);
+
+        const linkSettings = {
+          link_type: 'navigation',
+          label: sectionTitle, // Utilise toujours le vrai titre de la section
+          target_section_id: sec.id,
+          text_color: '#ffffff',
+          bg_color: 'rgba(255,255,255,0.15)',
+          hover_bg_color: 'rgba(255,255,255,0.35)',
+          align: 'left',
+          vertical_align: 'bottom',
+        };
+
+        await query(
+          `
+      INSERT INTO elements (section_id, type, col_start, col_end, settings)
+      VALUES ($1, 'link', 4, 9, $2)
+    `,
+          [heroId, JSON.stringify(linkSettings)]
+        );
+      }
+
+      logger.info(
+        `🔗 ${otherSections.length} liens de navigation créés dans le HERO.`
+      );
+    }
+
     logger.info('✅ Base de données seedée avec succès');
+
+    // Créer un admin par défaut si aucun n'existe
+    const { rows: existingAdmins } = await query('SELECT COUNT(*) as count FROM admins');
+    if (parseInt(existingAdmins[0].count) === 0) {
+      logger.info('👤 Création d\'un admin par défaut...');
+
+      // Importer argon2 pour le hashage du mot de passe
+      const argon2 = await import('argon2');
+
+      const defaultPassword = 'admin123'; // À changer en production
+      const hashedPassword = await argon2.hash(defaultPassword);
+
+      await query(
+        `INSERT INTO admins (email, password_hash, is_active, is_super_admin, created_by)
+         VALUES ($1, $2, $3, $4, $5)`,
+        ['admin@example.com', hashedPassword, true, true, null]
+      );
+
+      logger.info('✅ Admin par défaut créé: admin@example.com / admin123');
+      logger.info('⚠️  Pensez à changer le mot de passe par défaut !');
+    } else {
+      logger.info('ℹ️ Un admin existe déjà, pas de création');
+    }
+
   } catch (error) {
     logger.error('❌ Erreur lors du seeding:', error);
     throw error;

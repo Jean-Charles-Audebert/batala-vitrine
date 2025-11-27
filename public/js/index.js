@@ -407,8 +407,40 @@ if (cardForm) {
 }
 
 // ==========================================================================
-// Placeholders pour fonctionnalités futures
+// Gestion des vidéos de galerie (clic sur miniature pour jouer)
 // ==========================================================================
+
+/**
+ * Gestionnaire de clic pour les miniatures vidéo YouTube dans la galerie
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Gérer les clics sur les miniatures vidéo
+  document.querySelectorAll('.video-thumb-wrapper').forEach(wrapper => {
+    wrapper.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const videoId = this.dataset.videoId;
+      if (!videoId) return;
+      
+      // Créer l'iframe YouTube
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.frameBorder = '0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.style.cssText = 'width: 100%; height: 100%; border-radius: var(--border-radius-md);';
+      
+      // Remplacer la miniature par l'iframe
+      this.innerHTML = '';
+      this.appendChild(iframe);
+      
+      // Retirer les styles de survol après le clic
+      this.style.cursor = 'default';
+      this.removeEventListener('mouseenter', null);
+      this.removeEventListener('mouseleave', null);
+    });
+  });
+});
 
 /**
  * Édition du header - redirige vers l'interface admin des blocs
@@ -422,4 +454,45 @@ document.querySelectorAll('[data-action="edit-header"]').forEach(btn => {
   });
 });
 
-// Note: Footer édité via modales inline (footer-edit.js)
+// ==========================================================================
+// Navigation smooth scroll pour les liens de section
+// ==========================================================================
+
+/**
+ * Gestion du smooth scrolling pour les liens de navigation interne
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Gérer les clics sur les liens de navigation du hero
+  document.querySelectorAll('nav a[href^="#section-"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const targetId = this.getAttribute('href').substring(1); // Enlever le #
+      const targetElement = document.getElementById(targetId);
+      
+      if (targetElement) {
+        // Smooth scroll vers la section
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // Mettre à jour l'URL sans déclencher un scroll
+        history.pushState(null, null, '#' + targetId);
+      }
+    });
+  });
+  
+  // Gérer le scroll au chargement si on arrive avec un hash
+  if (window.location.hash && window.location.hash.startsWith('#section-')) {
+    const targetElement = document.getElementById(window.location.hash.substring(1));
+    if (targetElement) {
+      setTimeout(() => {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100); // Petit délai pour s'assurer que la page est chargée
+    }
+  }
+});
