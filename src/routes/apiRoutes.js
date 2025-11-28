@@ -4,7 +4,7 @@ import { upload, handleMulterError } from "../config/upload.js";
 import { logger } from "../utils/logger.js";
 import { createOptimizedVersion } from "../utils/imageOptimizer.js";
 import { query } from "../config/db.js";
-import { buildPageData } from "../services/pageBuilder.js";
+import { buildPageData, buildEditorData } from "../services/pageBuilder.js";
 import { getSocialIcon } from "../utils/socialIcons.js";
 
 const router = express.Router();
@@ -16,30 +16,15 @@ router.get("/preview", async (req, res) => {
   try {
     logger.info('🖼️ Génération aperçu page publique...');
 
-    // Construire les données complètes de la page
-    const pageData = await buildPageData();
+    // Construire les données complètes de la page (toutes les sections pour l'aperçu)
+    const pageData = await buildEditorData();
 
-    // Charger les liens sociaux (si la table existe)
-    let socialLinks = [];
-    try {
-      const result = await query(`
-        SELECT * FROM social_links
-        WHERE is_visible = true
-        ORDER BY position ASC
-      `);
-      socialLinks = result.rows;
-    } catch (socialError) {
-      // La table social_links n'existe pas encore, c'est OK
-      logger.info('ℹ️ Table social_links non trouvée, utilisation d\'une liste vide');
-    }
-
-    logger.info(`📊 Aperçu généré avec ${pageData.sections.length} sections`);
+    logger.info(`📊 Aperçu généré avec ${pageData.sections.length} sections et ${pageData.socialLinks.length} liens sociaux`);
 
     // Rendre la vue avec les données unifiées
     return res.render('pages/index-v2', {
       title: 'Aperçu',
       ...pageData,
-      socialLinks,
       user: null, // Pas d'utilisateur pour l'aperçu
       getSocialIcon
     });

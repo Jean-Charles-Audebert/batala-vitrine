@@ -137,8 +137,8 @@ app.use("/api/admin", adminContentRoutes);
 app.use("/admin", settingsRoutes);
 app.use("/editor", editorRoutes);
 app.use("/admin/fonts", fontRoutes);
-// app.use("/api/sections", sectionsRoutes);
-// app.use("/api/elements", elementsRoutes);
+app.use("/api/sections", sectionsRoutes);
+app.use("/api/elements", elementsRoutes);
 
 // --- Lancement du serveur ---
 const PORT = process.env.PORT || 3000;

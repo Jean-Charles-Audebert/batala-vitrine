@@ -22,10 +22,12 @@ export async function buildPageData() {
 export async function buildEditorData() {
   const pageData = await loadPageData();
   const sections = await loadSectionsWithElements(false); // all sections
+  const socialLinks = await loadSocialLinks();
 
   return {
     page: pageData,
-    sections: sections
+    sections: sections,
+    socialLinks: socialLinks
   };
 }
 
@@ -132,4 +134,20 @@ async function loadSectionElements(sectionId) {
       settings: settings
     };
   });
+}
+
+/**
+ * Charge les liens sociaux depuis la base de données
+ */
+async function loadSocialLinks() {
+  try {
+    const { rows } = await query(`
+      SELECT * FROM social_links
+      ORDER BY position ASC
+    `);
+    return rows;
+  } catch (error) {
+    // La table social_links n'existe pas encore, retourner un tableau vide
+    return [];
+  }
 }
