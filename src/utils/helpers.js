@@ -1,0 +1,54 @@
+/**
+ * Helper pour générer les réseaux sociaux
+ * @param {Array} socialIcons - Liste des réseaux sociaux
+ * @param {String} color - Couleur des icônes
+ * @param {Number} size - Taille des icônes
+ */
+export function renderSocialLinks(socialIcons, color = '#ffffff', size = 24) {
+  if (!socialIcons || socialIcons.length === 0) {
+    return '<p class="text-muted">Aucun réseau social configuré.</p>';
+  }
+
+  return socialIcons.map(socialItem => {
+    let faClass = '';
+    switch (socialItem.type) {
+      case 'facebook':
+        faClass = 'fab fa-facebook-f';
+        break;
+      case 'instagram':
+        faClass = 'fab fa-instagram';
+        break;
+      case 'youtube':
+        faClass = 'fab fa-youtube';
+        break;
+      case 'twitter':
+        faClass = 'fab fa-twitter';
+        break;
+      case 'linkedin':
+        faClass = 'fab fa-linkedin-in';
+        break;
+      default:
+        faClass = 'fas fa-globe';
+    }
+
+    return `
+      <a href="${socialItem.url || '#'}" target="_blank" rel="noopener" title="${socialItem.type}">
+        <i class="${faClass}" style="color: ${color}; font-size: ${size}px;"></i>
+      </a>
+    `;
+  }).join('');
+}
+
+/**
+ * Helper pour générer les raccourcis de navigation
+ * @param {Array} navLinks - Liste des liens de navigation
+ */
+export function renderNavLinks(navLinks) {
+  if (!navLinks || navLinks.length === 0) {
+    return '<li>Aucun lien disponible</li>';
+  }
+
+  return navLinks.map(navItem => {
+    return `<li><a href="#section-${navItem.settings?.target_section_id}">${navItem.settings?.label}</a></li>`;
+  }).join('');
+}

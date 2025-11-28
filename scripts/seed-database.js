@@ -1,25 +1,105 @@
 /**
- * Script de seed pour initialiser la base avec des données conformes au modèle JSON
+ * Seed complet : toutes les sections conservées, Hero/Footer dynamiques, DRY
  */
-
-import { query } from '../src/config/db.js';
+import { pool } from '../src/config/db.js';
 import { logger } from '../src/utils/logger.js';
+import argon2 from 'argon2';
+import 'dotenv/config';
 
+// --- Seed principal ---
 async function seedDatabase() {
+  const client = await pool.connect();
   try {
-    logger.info('🌱 Début du seeding de la base de données...');
-
-    // Nettoyer complètement la base avant de seed
+    await client.query('BEGIN');
     logger.info('🧹 Nettoyage complet de la base de données...');
-    await query('TRUNCATE TABLE elements CASCADE');
-    await query('TRUNCATE TABLE sections CASCADE');
-    await query('TRUNCATE TABLE page CASCADE');
-    await query('TRUNCATE TABLE fonts CASCADE');
-    await query('TRUNCATE TABLE admins CASCADE');
-    await query('TRUNCATE TABLE refresh_tokens CASCADE');
+    await client.query('TRUNCATE TABLE elements CASCADE');
+    await client.query('TRUNCATE TABLE sections CASCADE');
+    await client.query('TRUNCATE TABLE page CASCADE');
+    await client.query('TRUNCATE TABLE fonts CASCADE');
+    await client.query('TRUNCATE TABLE admins CASCADE');
+    await client.query('TRUNCATE TABLE refresh_tokens CASCADE');
+    await client.query('TRUNCATE TABLE social_links CASCADE');
+    await client.query('TRUNCATE TABLE nav_links CASCADE');
     logger.info('✅ Base de données nettoyée');
 
-    // 1. Créer des polices par défaut
+    // --- Seed admins ---
+    async function seedAdmins() {
+      const admins = [
+        {
+          email: process.env.ADMIN_EMAIL,
+          password: process.env.ADMIN_PASSWORD,
+          is_super_admin: false,
+        },
+        {
+          email: process.env.SUPER_ADMIN_EMAIL,
+          password: process.env.SUPER_ADMIN_PASSWORD,
+          is_super_admin: true,
+        },
+      ];
+      for (const admin of admins) {
+        if (!admin.email || !admin.password) continue;
+        const { rows: existing } = await client.query(
+          `SELECT id FROM admins WHERE email=$1 LIMIT 1`,
+          [admin.email]
+        );
+        if (existing.length > 0) continue;
+        const hashed = await argon2.hash(admin.password);
+        await client.query(
+          `INSERT INTO admins (email, password_hash, is_active, is_super_admin, created_by)
+           VALUES ($1,$2,$3,$4,$5)`,
+          [admin.email, hashed, true, admin.is_super_admin, null]
+        );
+      }
+    }
+
+    // --- Fonction DRY pour injecter nav_links et social_links dans Hero/Footer ---
+    async function injectDynamicElements(sectionId, pageId) {
+      logger.info(`Injecting dynamic elements for section ${sectionId}, page ${pageId}`);
+      // nav_links dynamiques
+      const { rows: otherSections } = await client.query(
+        `SELECT id, settings, type, position FROM sections WHERE page_id=$1 AND type NOT IN ('hero','footer') ORDER BY position ASC`,
+        [pageId]
+      );
+      for (const sec of otherSections) {
+        const label = sec.settings?.title || `Section ${sec.position}`;
+        const navEl = {
+          link_type: 'navigation',
+          label,
+          target_section_id: sec.id,
+          text_color: '#fff',
+          bg_color: 'rgba(255,255,255,0.15)',
+          hover_bg_color: 'rgba(255,255,255,0.35)',
+          align: 'left',
+          vertical_align: 'bottom',
+        };
+        await client.query(
+          `INSERT INTO elements (section_id,type,col_start,col_end,settings) VALUES ($1,'link',4,9,$2)`,
+          [sectionId, JSON.stringify(navEl)]
+        );
+      }
+
+      // social_links dynamiques - récupérer les liens existants et créer les éléments
+      const { rows: socials } = await client.query(
+        `SELECT id, label, url, icon_name, settings FROM social_links ORDER BY position ASC`
+      );
+      for (const s of socials) {
+        const socialEl = {
+          link_type: 'social',
+          label: s.label,
+          url: s.url,
+          icon_name: s.icon_name,
+          color: s.settings?.color || '#fff',
+          hover_color: s.settings?.hover_color || '#ccc',
+          size: s.settings?.size || '44px',
+        };
+        await client.query(
+          `INSERT INTO elements (section_id,type,col_start,col_end,settings) VALUES ($1,'link',10,12,$2)`,
+          [sectionId, JSON.stringify(socialEl)]
+        );
+      }
+    }
+
+    // Fonts
     const fonts = [
       {
         name: 'Titre par défaut',
@@ -64,58 +144,32 @@ async function seedDatabase() {
         variants: ['300', '400', '700'],
       },
     ];
-
-    for (const font of fonts) {
-      await query(
+    for (const f of fonts)
+      await client.query(
         `INSERT INTO fonts (name, source, font_family, url, variants)
-         VALUES ($1,$2,$3,$4,$5)
-         ON CONFLICT (name) DO UPDATE
-           SET source=EXCLUDED.source,
-               font_family=EXCLUDED.font_family,
-               url=EXCLUDED.url,
-               variants=EXCLUDED.variants,
-               updated_at=NOW()`,
-        [
-          font.name,
-          font.source,
-          font.font_family,
-          font.url,
-          JSON.stringify(font.variants),
-        ]
+       VALUES ($1,$2,$3,$4,$5)`,
+        [f.name, f.source, f.font_family, f.url, JSON.stringify(f.variants)]
       );
-      logger.info(`🔤 Font seedée: ${font.name}`);
-    }
-
-    // Récupérer les IDs des fonts par défaut
-    const { rows: titleFontRows } = await query(
+    const { rows: titleFontRows } = await client.query(
       `SELECT id FROM fonts WHERE name='Titre par défaut' LIMIT 1`
     );
-    const { rows: textFontRows } = await query(
+    const { rows: textFontRows } = await client.query(
       `SELECT id FROM fonts WHERE name='Texte par défaut' LIMIT 1`
     );
     const defaultFontTitleId = titleFontRows[0].id;
     const defaultFontTextId = textFontRows[0].id;
 
-    // 2. Créer ou mettre à jour la page principale
-    const { rows: pageRows } = await query(
-      `
-      INSERT INTO page (title, default_font_title, default_font_text, contact_email, settings)
-      VALUES ($1, $2, $3, $4, $5)
-      ON CONFLICT (id) DO UPDATE SET
-        title = EXCLUDED.title,
-        default_font_title = EXCLUDED.default_font_title,
-        default_font_text = EXCLUDED.default_font_text,
-        contact_email = EXCLUDED.contact_email,
-        settings = EXCLUDED.settings
-      RETURNING id
-    `,
+    // Page principale
+    const { rows: pageRows } = await client.query(
+      `INSERT INTO page (title, default_font_title, default_font_text, contact_email, settings)
+       VALUES ($1,$2,$3,$4,$5) RETURNING id`,
       [
         'Site Démo',
         defaultFontTitleId,
         defaultFontTextId,
         'contact@example.com',
         JSON.stringify({
-          bg_color: '#ffffff',
+          bg_color: '#fff',
           bg_image: null,
           bg_video: null,
           bg_video_youtube: null,
@@ -123,72 +177,19 @@ async function seedDatabase() {
         }),
       ]
     );
-
     const pageId = pageRows[0].id;
-    logger.info(`📄 Page principale créée (ID: ${pageId})`);
 
-    // 3. Créer les sections selon le modèle JSON
+    // --- Toutes tes sections existantes (standard, gallery, card, etc.) ---
     const sections = [
-      {
-        type: 'hero',
-        position: 0,
-        is_visible: true,
-        settings: {
-          bg_color: '#f0f0f0',
-          bg_transparent: false,
-          bg_image: '/assets/header-bg-default.svg',
-          bg_video: null,
-          bg_video_youtube: null,
-          title: 'Bienvenue',
-          title_color: '#000000',
-          title_font: defaultFontTitleId,
-          title_size: 48,
-          layout: '12-cols-grid',
-          align: 'center',
-          vertical_align: 'center',
-        },
-        elements: [
-          {
-            type: 'media',
-            col_start: 1,
-            col_end: 3,
-            settings: {
-              media_url: '/assets/logo-default.svg',
-              width: 'auto',
-              height: '80px',
-              align: 'left',
-              vertical_align: 'center',
-            },
-          },
-          {
-            type: 'media',
-            col_start: 10,
-            col_end: 12,
-            settings: {
-              social_icons: [
-                { type: 'facebook', url: 'https://facebook.com' },
-                { type: 'instagram', url: 'https://instagram.com' },
-                { type: 'youtube', url: 'https://youtube.com' },
-              ],
-              align: 'right',
-              vertical_align: 'center',
-            },
-          },
-        ],
-      },
       {
         type: 'standard',
         position: 1,
         is_visible: true,
         settings: {
-          bg_color: '#ffffff',
-          bg_transparent: false,
-          bg_image: null,
-          bg_video: null,
-          bg_video_youtube: null,
+          bg_color: '#fff',
           title: 'Présentation',
           show_title: true,
-          title_color: '#333333',
+          title_color: '#333',
           title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
@@ -199,9 +200,9 @@ async function seedDatabase() {
             col_start: 3,
             col_end: 11,
             settings: {
-              content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+              content: 'Lorem ipsum dolor sit amet...',
               size: '20px',
-              color: '#333333',
+              color: '#333',
               align: 'center',
               vertical_align: 'top',
               font_id: defaultFontTextId,
@@ -215,12 +216,8 @@ async function seedDatabase() {
         is_visible: true,
         settings: {
           bg_color: '#f8f9fa',
-          bg_transparent: false,
-          bg_image: null,
-          bg_video: null,
-          bg_video_youtube: null,
           title: 'Image + Texte',
-          title_color: '#333333',
+          title_color: '#333',
           title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
@@ -256,13 +253,9 @@ async function seedDatabase() {
         position: 3,
         is_visible: true,
         settings: {
-          bg_color: '#ffffff',
-          bg_transparent: false,
-          bg_image: null,
-          bg_video: null,
-          bg_video_youtube: null,
+          bg_color: '#fff',
           title: 'Nos services',
-          title_color: '#333333',
+          title_color: '#333',
           title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
@@ -276,18 +269,14 @@ async function seedDatabase() {
               media_url: '/assets/icon-consulting.svg',
               title: {
                 text: 'Consulting',
-                font_id:
-                  fonts.find((f) => f.name === 'Roboto')?.id ||
-                  defaultFontTitleId,
+                font_id: defaultFontTitleId,
                 size: '20px',
                 color: '#333',
                 bg_color: null,
               },
               description: {
                 text: 'Description du service 1',
-                font_id:
-                  fonts.find((f) => f.name === 'Open Sans')?.id ||
-                  defaultFontTextId,
+                font_id: defaultFontTextId,
                 size: '16px',
                 color: '#666',
                 bg_color: null,
@@ -346,12 +335,8 @@ async function seedDatabase() {
         is_visible: true,
         settings: {
           bg_color: '#f8f9fa',
-          bg_transparent: false,
-          bg_image: null,
-          bg_video: null,
-          bg_video_youtube: null,
           title: 'Galerie',
-          title_color: '#333333',
+          title_color: '#333',
           title_font: defaultFontTitleId,
           title_size: 32,
           layout: '12-cols-grid',
@@ -407,176 +392,150 @@ async function seedDatabase() {
           },
         ],
       },
-      {
-        type: 'footer',
-        position: 999,
-        is_visible: true,
-        settings: {
-          bg_color: '#333333',
-          bg_transparent: false,
-          bg_image: null,
-          bg_video: null,
-          bg_video_youtube: null,
-          layout: '12-cols-grid',
-        },
-        elements: [
-          {
-            type: 'text',
-            col_start: 1,
-            col_end: 7,
-            settings: {
-              content: '© caixaDev 2025 - Tous droits réservés',
-              color: '#ffffff',
-              size: '14px',
-              font_id: defaultFontTextId,
-            },
-          },
-          {
-            type: 'media',
-            col_start: 7,
-            col_end: 12,
-            settings: {
-              social_icons: [
-                { type: 'facebook', url: 'https://facebook.com' },
-                { type: 'instagram', url: 'https://instagram.com' },
-                { type: 'youtube', url: 'https://youtube.com' },
-              ],
-              align: 'right',
-            },
-          },
-        ],
-      },
     ];
 
-    // 4. Insérer les sections et leurs éléments
-    for (const sectionData of sections) {
-      const { rows: sectionRows } = await query(
-        `
-        INSERT INTO sections (page_id, type, position, is_visible, settings)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (page_id, type, position) DO UPDATE SET
-          is_visible = EXCLUDED.is_visible,
-          settings = EXCLUDED.settings
-        RETURNING id
-      `,
+    for (const secData of sections) {
+      const { rows: secRows } = await client.query(
+        `INSERT INTO sections (page_id,type,position,is_visible,settings)
+         VALUES ($1,$2,$3,$4,$5) RETURNING id`,
         [
           pageId,
-          sectionData.type,
-          sectionData.position,
-          sectionData.is_visible,
-          JSON.stringify(sectionData.settings),
+          secData.type,
+          secData.position,
+          secData.is_visible,
+          JSON.stringify(secData.settings),
         ]
       );
-
-      const sectionId = sectionRows[0].id;
-      logger.info(`📄 Section ${sectionData.type} créée/mise à jour (ID: ${sectionId})`);
-
-      // Supprimer les anciens éléments de cette section avant d'en ajouter de nouveaux
-      await query('DELETE FROM elements WHERE section_id = $1', [sectionId]);
-
-      for (const elementData of sectionData.elements) {
-        await query(
-          `
-          INSERT INTO elements (section_id, type, col_start, col_end, settings)
-          VALUES ($1, $2, $3, $4, $5)
-        `,
+      const secId = secRows[0].id;
+      await client.query('DELETE FROM elements WHERE section_id=$1', [secId]);
+      for (const el of secData.elements) {
+        await client.query(
+          `INSERT INTO elements (section_id,type,col_start,col_end,settings)
+           VALUES ($1,$2,$3,$4,$5)`,
           [
-            sectionId,
-            elementData.type,
-            elementData.col_start,
-            elementData.col_end,
-            JSON.stringify(elementData.settings),
+            secId,
+            el.type,
+            el.col_start,
+            el.col_end,
+            JSON.stringify(el.settings),
           ]
         );
       }
-
-      logger.info(
-        `🎯 ${sectionData.elements.length} éléments créés pour la section ${sectionData.type}`
-      );
     }
 
-    // 5. Ajouter des liens de navigation automatiques dans le HERO
-    logger.info('➕ Ajout des liens de navigation par défaut dans le HERO...');
+    // Social links par défaut - insérés une seule fois
+    const socialLinks = [
+      {
+        label: 'Facebook',
+        url: 'https://facebook.com',
+        icon_name: 'fa-brands fa-facebook',
+        position: 1,
+        settings: { color: '#fff', hover_color: '#3b5998', size: '44px' },
+      },
+      {
+        label: 'Instagram',
+        url: 'https://instagram.com',
+        icon_name: 'fa-brands fa-instagram',
+        position: 2,
+        settings: { color: '#fff', hover_color: '#d6249f', size: '44px' },
+      },
+      {
+        label: 'YouTube',
+        url: 'https://youtube.com',
+        icon_name: 'fa-brands fa-youtube',
+        position: 3,
+        settings: { color: '#fff', hover_color: '#FF0000', size: '44px' },
+      },
+    ];
 
-    // Récupérer le hero
-    const { rows: heroRow } = await query(
-      `SELECT id FROM sections WHERE page_id=$1 AND type='hero' LIMIT 1`,
-      [pageId]
-    );
-    if (!heroRow.length) {
-      logger.warn('⚠️ Aucun HERO trouvé, impossible d’ajouter les liens.');
-    } else {
-      const heroId = heroRow[0].id;
-
-      // Récupérer les autres sections (sauf hero + footer)
-      const { rows: otherSections } = await query(
-        `SELECT id, type, position, settings
-     FROM sections
-     WHERE page_id=$1 AND type NOT IN ('hero', 'footer')
-     ORDER BY position ASC`,
-        [pageId]
+    for (const s of socialLinks) {
+      await client.query(
+        `INSERT INTO social_links (label,url,icon_name,position,settings)
+           VALUES ($1,$2,$3,$4,$5)`,
+        [s.label, s.url, s.icon_name, s.position, JSON.stringify(s.settings)]
       );
+    }
+    logger.info(`Inserted ${socialLinks.length} social links`);
 
-      // Générer les liens
-      for (const sec of otherSections) {
-        const sectionSettings = sec.settings || {};
-        const sectionTitle = sectionSettings.title || (sec.type === 'standard' ? `Section ${sec.position}` : sec.type);
+    // Hero et Footer dynamiques
+    const heroId = (
+      await client.query(
+        `INSERT INTO sections (page_id,type,position,is_visible,settings)
+     VALUES ($1,'hero',0,true,$2) RETURNING id`,
+        [
+          pageId,
+          JSON.stringify({
+            title: 'Bienvenue',
+            title_font: defaultFontTitleId,
+            title_color: '#000',
+            title_size: 80,
+            bg_color: '#f0f0f0',
+            bg_transparent: false,
+            layout: '12-cols-grid',
+            bg_image: '/assets/header-bg-default.svg',
+            align: 'center',
+            vertical_align: 'center',
+          }),
+        ]
+      )
+    ).rows[0].id;
 
-        const linkSettings = {
-          link_type: 'navigation',
-          label: sectionTitle, // Utilise toujours le vrai titre de la section
-          target_section_id: sec.id,
-          text_color: '#ffffff',
-          bg_color: 'rgba(255,255,255,0.15)',
-          hover_bg_color: 'rgba(255,255,255,0.35)',
+    // Hero - Logo
+    await client.query(
+      `INSERT INTO elements (section_id,type,col_start,col_end,settings)
+   VALUES ($1,'media',1,3,$2)`,
+      [
+        heroId,
+        JSON.stringify({
+          media_url: '/assets/logo-default.svg',
+          width: 'auto',
+          height: '80px',
           align: 'left',
-          vertical_align: 'bottom',
-        };
+          vertical_align: 'center',
+        }),
+      ]
+    );
 
-        await query(
-          `
-      INSERT INTO elements (section_id, type, col_start, col_end, settings)
-      VALUES ($1, 'link', 4, 9, $2)
-    `,
-          [heroId, JSON.stringify(linkSettings)]
-        );
-      }
+    const footerId = (
+      await client.query(
+        `INSERT INTO sections (page_id,type,position,is_visible,settings)
+       VALUES ($1,'footer',999,true,$2) RETURNING id`,
+        [
+          pageId,
+          JSON.stringify({
+            bg_color: '#333',
+            bg_transparent: false,
+            layout: '12-cols-grid',
+          }),
+        ]
+      )
+    ).rows[0].id;
 
-      logger.info(
-        `🔗 ${otherSections.length} liens de navigation créés dans le HERO.`
-      );
-    }
+    // Inject dynamiques
+    await injectDynamicElements(heroId, pageId);
+    await injectDynamicElements(footerId, pageId);
 
-    logger.info('✅ Base de données seedée avec succès');
+    // Seed admins
+    await seedAdmins();
+    logger.info(
+      '✅ Seed complet Hero/Footer dynamiques avec toutes les sections conservées'
+    );
 
-    // Créer un admin par défaut si aucun n'existe
-    const { rows: existingAdmins } = await query('SELECT COUNT(*) as count FROM admins');
-    if (parseInt(existingAdmins[0].count) === 0) {
-      logger.info('👤 Création d\'un admin par défaut...');
+    // Vérification finale
+    const { rows: finalCheck } = await client.query('SELECT COUNT(*) FROM social_links');
+    logger.info(`Final count of social links: ${finalCheck[0].count}`);
+    await client.query('COMMIT');
 
-      // Importer argon2 pour le hashage du mot de passe
-      const argon2 = await import('argon2');
-
-      const defaultPassword = 'admin123'; // À changer en production
-      const hashedPassword = await argon2.hash(defaultPassword);
-
-      await query(
-        `INSERT INTO admins (email, password_hash, is_active, is_super_admin, created_by)
-         VALUES ($1, $2, $3, $4, $5)`,
-        ['admin@example.com', hashedPassword, true, true, null]
-      );
-
-      logger.info('✅ Admin par défaut créé: admin@example.com / admin123');
-      logger.info('⚠️  Pensez à changer le mot de passe par défaut !');
-    } else {
-      logger.info('ℹ️ Un admin existe déjà, pas de création');
-    }
-
-  } catch (error) {
-    logger.error('❌ Erreur lors du seeding:', error);
-    throw error;
+    // Vérification après commit
+    const { rows: afterCommit } = await client.query('SELECT * FROM social_links');
+    logger.info(`After commit: ${afterCommit.length} social links`);
+  } catch (err) {
+    logger.error('❌ Erreur seed:', err);
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 }
 
-// Exécuter le seeding
 seedDatabase().catch(console.error);

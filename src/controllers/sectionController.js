@@ -18,14 +18,12 @@ export const getAllSections = async () => {
       ORDER BY position ASC NULLS LAST, id ASC
     `);
 
-    // Pour chaque section, charger ses éléments et extraire le type
+    // Pour chaque section, charger ses éléments
     const sectionsWithElements = await Promise.all(
       sections.map(async (section) => {
         const elements = await loadSectionElements(section.id);
-        const type = section.settings?.type || 'unknown';
         return {
           ...section,
-          type,
           elements
         };
       })
@@ -51,11 +49,9 @@ export const getSectionById = async (sectionId) => {
 
     const section = rows[0];
     const elements = await loadSectionElements(sectionId);
-    const type = section.settings?.type || 'unknown';
 
     return {
       ...section,
-      type,
       elements
     };
   } catch (error) {
@@ -71,7 +67,7 @@ async function loadSectionElements(sectionId) {
   const { rows } = await query(`
     SELECT * FROM elements
     WHERE section_id = $1
-    ORDER BY position ASC, id ASC
+    ORDER BY col_start ASC, id ASC
   `, [sectionId]);
 
   return rows;
@@ -84,17 +80,17 @@ export const createSection = async (sectionData) => {
   try {
     const {
       type,
-      title,
-      show_title = true,
+      page_id = 1, // Valeur par défaut pour les tests
       is_visible = true,
-      layout,
       settings = {}
     } = sectionData;
 
-    // Ajouter le type aux settings si fourni
-    const finalSettings = { ...settings };
-    if (type) {
-      finalSettings.type = type;
+    // Validation
+    if (!type) {
+      throw new Error('Le type de section est requis');
+    }
+    if (!page_id) {
+      throw new Error('Le page_id est requis');
     }
 
     // Calculer la position automatiquement
@@ -107,14 +103,14 @@ export const createSection = async (sectionData) => {
 
     const { rows } = await query(`
       INSERT INTO sections (
-        title, show_title, is_visible, position, layout, settings
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+        type, page_id, is_visible, position, settings
+      ) VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `, [
-      title, show_title, is_visible, position, layout, JSON.stringify(finalSettings)
+      type, page_id, is_visible, position, JSON.stringify(settings)
     ]);
 
-    logger.info(`Section créée: #${rows[0].id} (${type || 'unknown'}) à la position ${position}`);
+    logger.info(`Section créée: #${rows[0].id} (${type}) à la position ${position}`);
     return rows[0];
   } catch (error) {
     logger.error('Erreur createSection:', error);
@@ -128,12 +124,10 @@ export const createSection = async (sectionData) => {
 export const updateSection = async (sectionId, sectionData) => {
   try {
     const {
-      title,
-      show_title,
+      type,
       is_visible,
-      layout,
-      settings,
-      type
+      position,
+      settings
     } = sectionData;
 
     const updates = [];
@@ -141,39 +135,23 @@ export const updateSection = async (sectionId, sectionData) => {
     let paramIndex = 1;
 
     // Champs de base
-    if (title !== undefined) {
-      updates.push(`title = $${paramIndex++}`);
-      values.push(title);
-    }
-    if (show_title !== undefined) {
-      updates.push(`show_title = $${paramIndex++}`);
-      values.push(show_title);
+    if (type !== undefined) {
+      updates.push(`type = $${paramIndex++}`);
+      values.push(type);
     }
     if (is_visible !== undefined) {
       updates.push(`is_visible = $${paramIndex++}`);
       values.push(is_visible);
     }
-    if (layout !== undefined) {
-      updates.push(`layout = $${paramIndex++}`);
-      values.push(layout);
+    if (position !== undefined) {
+      updates.push(`position = $${paramIndex++}`);
+      values.push(position);
     }
 
     // Gérer le settings complet
     if (settings !== undefined) {
-      const finalSettings = { ...settings };
-      if (type !== undefined) {
-        finalSettings.type = type;
-      }
       updates.push(`settings = $${paramIndex++}`);
-      values.push(JSON.stringify(finalSettings));
-    } else if (type !== undefined) {
-      // Si seulement type est fourni, mettre à jour le settings existant
-      const { rows: currentRows } = await query('SELECT settings FROM sections WHERE id = $1', [sectionId]);
-      const currentSettings = currentRows[0]?.settings || {};
-      const updatedSettings = { ...currentSettings, type };
-
-      updates.push(`settings = $${paramIndex++}`);
-      values.push(JSON.stringify(updatedSettings));
+      values.push(JSON.stringify(settings));
     }
 
     if (updates.length === 0) {

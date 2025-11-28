@@ -10,6 +10,9 @@ DROP TABLE IF EXISTS page CASCADE;
 DROP TABLE IF EXISTS fonts CASCADE;
 DROP TABLE IF EXISTS admins CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
+DROP TABLE IF EXISTS fonts CASCADE;
+DROP TABLE IF EXISTS social_links CASCADE;
+DROP TABLE IF EXISTS nav_links CASCADE;
 
 -- ===============================
 -- ADMINS
@@ -100,6 +103,27 @@ CREATE TABLE elements (
 );
 
 CREATE INDEX idx_elements_section_id ON elements(section_id);
+
+-- ===============================
+-- LINKS (social et navigation)
+-- ===============================
+
+CREATE TABLE social_links (
+  id SERIAL PRIMARY KEY,
+  label TEXT NOT NULL,
+  url TEXT NOT NULL,
+  icon_name TEXT NOT NULL,     -- ex: "fa-brands fa-facebook"
+  position INT DEFAULT 0,
+  settings JSONB DEFAULT '{}'  -- couleurs, taille, hover, etc.
+);
+
+CREATE TABLE nav_links (
+  id SERIAL PRIMARY KEY,
+  label TEXT NOT NULL,
+  url TEXT NOT NULL,
+  position INT DEFAULT 0,
+  settings JSONB DEFAULT '{}'
+);
 
 -- ===============================
 -- TRIGGERS: updated_at

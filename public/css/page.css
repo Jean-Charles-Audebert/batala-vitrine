@@ -28,7 +28,7 @@
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
+  --font-size-3xl: 2rem;
 
   /* Layout */
   --main-bg-color: #f5f5f5;
@@ -181,6 +181,10 @@ body.vitrine-page {
 }
 
 .hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
@@ -188,9 +192,10 @@ body.vitrine-page {
 }
 
 .hero-content h1 {
+  margin: 0;
+  padding: 0;
   font-size: var(--font-size-3xl);
   font-weight: 700;
-  margin-bottom: var(--spacing-lg);
   color: var(--hero-title-color, #ffffff);
 }
 
@@ -247,9 +252,6 @@ body.vitrine-page {
 .section-bg-youtube {
   border: none;
 }
-
-
-
 
 /* ==========================================================================
    Éléments individuels
@@ -492,12 +494,54 @@ body.vitrine-page {
   background-color: var(--footer-bg-color, #424242);
   color: var(--footer-text-color, #e0e0e0);
 }
+.section-footer .container {
+    width: 100%;
+    margin: auto;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 20px;
+  background-color: #333;
+  color: #fff;
+}
+
+.footer-column {
+  /* flex: 1; */
+  margin: 0 10px;
+}
+
+.footer-column--nav ul {
+  list-style: none;
+  padding: 5px;
+
+}
+
+.footer-column--nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.footer-column--social a {
+  margin-right: 10px;
+  color: #fff;
+  font-size: 20px;
+}
+
+.footer-copyright {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 20px;
+}
 
 .footer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: clamp(1rem, 2vw, 3rem);
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
 }
 
 .footer-title {
@@ -527,6 +571,30 @@ body.vitrine-page {
   margin-bottom: 1rem;
 }
 
+.social-links--hero {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  grid-column-start: 11;
+  grid-column-end: span 2;
+  grid-row: 2;
+}
+
+.social-links--hero .social-link i {
+  font-size: 22px;
+  height: 22px;
+  width: 22px;
+}
+
+.social-links--footer {
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 0;
+}
+
 .social-link {
   display: inline-flex;
   align-items: center;
@@ -541,8 +609,9 @@ body.vitrine-page {
 
 .footer-bottom {
   text-align: center;
-  padding-top: 2rem;
-  border-top: 1px solid #616161;
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--color-gray-700);
+  color: var(--footer-text-color, #e0e0e0);
 }
 
 /* ==========================================================================

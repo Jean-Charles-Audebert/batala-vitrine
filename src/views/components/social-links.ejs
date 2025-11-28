@@ -1,44 +1,40 @@
 <%
-  /**
-   * Composant: Social Links
-   * Affichage des liens de réseaux sociaux
-   * Props: location ('header', 'footer', 'both'), user (pour édition)
-   */
-  const socialLocation = typeof location !== 'undefined' ? location : 'footer';
-  const showEdit = typeof user !== 'undefined' && user;
+/**
+ * Composant réutilisable pour afficher les réseaux sociaux
+ * Utilise les données de la table social_links
+ * Props: socialLinks (array), location ('hero', 'footer'), user (pour édition)
+ */
+const socialLocation = typeof location !== 'undefined' ? location : 'footer';
+const showEdit = typeof user !== 'undefined' && user;
 %>
 
-<nav class="social-links social-links--<%= socialLocation %>" aria-label="Réseaux sociaux">
-  <% if (typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
-    <% socialLinks.filter(link => link.location === socialLocation || link.location === 'both').forEach(link => { %>
+<% if (typeof socialLinks !== 'undefined' && socialLinks.length > 0) { %>
+  <div class="social-links social-links--<%= socialLocation %>">
+    <% socialLinks.forEach(link => { %>
       <a 
         href="<%= link.url %>" 
-        class="social-link social-link--<%= link.platform %>"
+        class="social-link"
         target="_blank" 
         rel="noopener noreferrer"
-        aria-label="<%= link.label || link.platform %> (ouvre dans un nouvel onglet)"
-        title="<%= link.label || link.platform %>"
+        aria-label="<%= link.label %> (ouvre dans un nouvel onglet)"
+        title="<%= link.label %>"
       >
-        <% if (link.icon_svg) { %>
-          <%- link.icon_svg %>
-        <% } else { %>
-          <span class="social-icon-placeholder"><%= link.platform %></span>
-        <% } %>
+        <i class="<%= link.icon_name %>"></i>
       </a>
-    <% }) %>
-  <% } else { %>
-    <p class="text-muted">Aucun réseau social configuré.</p>
-  <% } %>
-  
-  <% if (showEdit) { %>
-    <button 
-      class="edit-btn edit-btn-social"
-      data-action="manage-social"
-      data-location="<%= socialLocation %>"
-      aria-label="Gérer les réseaux sociaux"
-      title="Gérer les réseaux sociaux"
-    >
-      <img src="/icons/settings.svg" alt="" class="icon">
-    </button>
-  <% } %>
-</nav>
+    <% }); %>
+  </div>
+<% } else { %>
+  <p class="text-muted">Aucun réseau social configuré.</p>
+<% } %>
+
+<% if (showEdit) { %>
+  <button 
+    class="edit-btn edit-btn-social"
+    data-action="manage-social"
+    data-location="<%= socialLocation %>"
+    aria-label="Gérer les réseaux sociaux"
+    title="Gérer les réseaux sociaux"
+  >
+    <img src="/icons/settings.svg" alt="" class="icon">
+  </button>
+<% } %>

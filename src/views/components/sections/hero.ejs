@@ -5,7 +5,6 @@
 
 // Trouver les éléments pertinents
 const logoElement = section.elements?.find(el => el.type === 'media' && el.settings?.media_url?.includes('logo')) || {};
-const socialMediaElement = section.elements?.find(el => el.type === 'media' && el.settings?.social_icons) || {};
 const navElements = section.elements?.filter(el => el.type === 'link' && el.settings?.link_type === 'navigation') || [];
 
 // Positions depuis les propriétés des éléments
@@ -13,21 +12,19 @@ const logo_position_h = logoElement.settings?.align || 'left';
 const logo_position_v = logoElement.settings?.vertical_align || 'center';
 const nav_position_h = navElements.length > 0 ? navElements[0].settings?.align || 'center' : 'center';
 const nav_position_v = navElements.length > 0 ? navElements[0].settings?.vertical_align || 'bottom' : 'bottom';
-const social_position_h = socialMediaElement.settings?.align || 'right';
-const social_position_v = socialMediaElement.settings?.vertical_align || 'center';
 
 // Fonction helper pour convertir les positions en classes CSS
 function getPositionClasses(hPos, vPos) {
-  const colMap = { 
-    'left': ['col-start-1', 'col-span-4'], 
-    'center': ['col-start-6', 'col-span-4'], 
-    'right': ['col-start-11', 'col-span-4'] 
+  const colMap = {
+    'left': ['col-start-1', 'col-span-4'],
+    'center': ['col-start-5', 'col-span-4'],
+    'right': ['col-start-11', 'col-span-4']
   };
   const rowMap = { 'top': 'row-1', 'center': 'row-2', 'bottom': 'row-3' };
 
   const cols = colMap[hPos] || ['col-start-1', 'col-span-4'];
   const row = rowMap[vPos] || 'row-2';
-  
+
   return [...cols, row];
 }
 
@@ -37,10 +34,6 @@ const logoClasses = ['hero-logo', ...getPositionClasses(logo_position_h, logo_po
 
 // Configuration des liens de navigation
 const navClasses = ['hero-nav', ...getPositionClasses(nav_position_h, nav_position_v)];
-
-// Configuration des liens sociaux depuis l'élément
-const socialElements = socialMediaElement.settings?.social_icons || [];
-const socialClasses = ['hero-social', ...getPositionClasses(social_position_h, social_position_v)];
 
 // Configuration de la section depuis settings JSONB
 const sectionSettings = section.settings || {};
@@ -52,8 +45,6 @@ const {
   is_transparent = false,
   layout = 'center',
   logo_width = logoElement.settings?.width || 150,
-  social_icon_size = section.social_icon_size || 24,
-  social_icon_color = section.social_icon_color || '#ffffff',
   show_nav_links = section.show_nav_links || navElements.length > 0,
   nav_text_color = section.nav_text_color || '#ffffff',
   nav_bg_color = section.nav_bg_color || 'rgba(255,255,255,0.25)',
@@ -85,9 +76,7 @@ const headerStyle = headerStyles.length > 0 ? headerStyles.join('; ') : '';
 
 // Configuration du titre depuis les settings de section
 const titleClasses = ['hero-content', ...getPositionClasses(align, vertical_align)];
-%>
-
-<header class="<%= headerClasses.join(' ') %>" <% if (headerStyle) { %>style="<%= headerStyle %>"<% } %>>
+%><header class="<%= headerClasses.join(' ') %>" <% if (headerStyle) { %>style="<%= headerStyle %>"<% } %>>
   <% if (bg_video) { %>
     <video class="section-bg-video" autoplay muted loop playsinline>
       <source src="<%= bg_video %>" type="video/mp4">
@@ -126,44 +115,13 @@ const titleClasses = ['hero-content', ...getPositionClasses(align, vertical_alig
       </nav>
     <% } %>
 
-    <!-- Liens sociaux -->
-    <% if (socialElements && socialElements.length > 0) { %>
-      <div class="<%= socialClasses.join(' ') %>" data-social-color="<%= social_icon_color %>" data-social-size="<%= social_icon_size %>">
-        <% socialElements.forEach(socialItem => { %>
-          <a href="<%= socialItem.url || '#' %>" target="_blank" rel="noopener" title="<%= socialItem.type %>">
-            <% 
-              let faClass = '';
-              switch(socialItem.type) {
-                case 'facebook':
-                  faClass = 'fab fa-facebook-f';
-                  break;
-                case 'instagram':
-                  faClass = 'fab fa-instagram';
-                  break;
-                case 'youtube':
-                  faClass = 'fab fa-youtube';
-                  break;
-                case 'twitter':
-                  faClass = 'fab fa-twitter';
-                  break;
-                case 'linkedin':
-                  faClass = 'fab fa-linkedin-in';
-                  break;
-                default:
-                  faClass = 'fas fa-globe';
-              }
-            %>
-            <i class="<%= faClass %>" style="color: <%= sectionTitleColor || '#ffffff' %>; font-size: <%= social_icon_size || 24 %>px;"></i>
-          </a>
-        <% }); %>
-      </div>
-    <% } %>
-
     <!-- Contenu principal -->
     <div class="<%= titleClasses.join(' ') %>">
       <% if (sectionTitle) { %>
-        <h1 <% if (sectionTitleColor) { %>style="--hero-title-color: <%= sectionTitleColor %>"<% } %>><%= sectionTitle %></h1>
+        <h1 class="hero-content h1 font-title-default" <% if (sectionTitleColor) { %>style="--hero-title-color: <%= sectionTitleColor %>"<% } %>><%= sectionTitle %></h1>
       <% } %>
     </div>
+
+    <!-- Réseaux sociaux -->
+    <%- include('../social-links', { socialLinks, location: 'hero', user }) %>
   </div>
-</header>

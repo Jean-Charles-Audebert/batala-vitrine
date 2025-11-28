@@ -1,6 +1,8 @@
 <%
   // Composant Footer pour sections v2
   // Variables attendues: section, user, socialLinks
+  const navElements = section.elements?.filter(el => el.type === 'link' && el.settings?.link_type === 'navigation') || [];
+
 
   const {
     id,
@@ -12,8 +14,10 @@
     is_transparent,
     padding_top = section.settings?.padding_top || 'medium',
     padding_bottom = section.settings?.padding_bottom || 'medium',
-    content = [],
-    decorations = []
+    show_nav_links = section.show_nav_links || navElements.length > 0,
+    nav_text_color = section.nav_text_color || '#ffffff',
+    nav_bg_color = section.nav_bg_color || 'rgba(255,255,255,0.25)',
+    content = []
   } = section;
 
   const bgStyle = [];
@@ -69,99 +73,37 @@
   </video>
   <% } %>
 
-  <% if (decorations && decorations.length > 0) { %>
-    <% decorations.forEach(deco => { %>
-      <%- include('../decorations/renderer', { decoration: deco }) %>
-    <% }) %>
-  <% } %>
-
+ 
   <div class="container">
     <div class="footer-content">
-      <div class="footer-column">
-        <details>
-          <summary><%= aboutContent.title || 'À propos' %></summary>
-          <div role="region" aria-label="Informations sur l'organisation">
-            <p><%= aboutContent.description || 'Batala Paris - Groupe de percussions brésiliennes' %></p>
-          </div>
-        </details>
-      </div>
-
-      <div class="footer-column">
-        <details>
-          <summary><%= contactContent.title || 'Contact' %></summary>
-          <div role="region" aria-label="Formulaire de contact">
-            <% if (contactContent.description) { %>
-              <div class="contact-info">
-                <%= contactContent.description.replace(/\n/g, '<br>') %>
-              </div>
-            <% } %>
-            <form id="contact-form" class="contact-form">
-              <div class="form-group-inline">
-                <input
-                  type="text"
-                  id="contact-nom"
-                  name="nom"
-                  placeholder="Nom *"
-                  required
-                  aria-label="Votre nom"
-                >
-              </div>
-              <div class="form-group-inline">
-                <input
-                  type="text"
-                  id="contact-prenom"
-                  name="prenom"
-                  placeholder="Prénom *"
-                  required
-                  aria-label="Votre prénom"
-                >
-              </div>
-              <div class="form-group-inline">
-                <input
-                  type="text"
-                  id="contact-contact"
-                  name="contact"
-                  placeholder="Email ou Téléphone *"
-                  required
-                  aria-label="Votre email ou téléphone"
-                >
-              </div>
-              <div class="form-group-inline">
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  rows="3"
-                  placeholder="Votre message *"
-                  required
-                  aria-label="Votre message"
-                ></textarea>
-              </div>
-              <button type="submit" class="btn-submit-contact">Envoyer</button>
-              <div id="contact-form-status" class="contact-status"></div>
-            </form>
-          </div>
-        </details>
-      </div>
-
-      <div class="footer-column">
-        <details>
-          <summary>Suivez-nous</summary>
-          <%- include('../social-links', { location: 'footer', socialLinks }) %>
-        </details>
-      </div>
-
-      <div class="footer-column">
-        <details>
-          <summary>Liens utiles</summary>
-          <nav class="external-links" aria-label="Liens externes">
-            <p class="text-muted">Liens externes à configurer</p>
+      <!-- Liens de navigation -->
+      <div class="footer-column footer-column--nav">
+        <% if (show_nav_links && navElements && navElements.length > 0) { %>
+          <nav class="footer-nav" data-nav-bg="<%= nav_bg_color %>" data-nav-color="<%= nav_text_color %>" aria-label="Liens de navigation">
+            <% navElements.forEach(navItem => { %>
+              <a href="#section-<%= navItem.settings?.target_section_id %>"><%= navItem.settings?.label %></a>
+            <% }); %>
           </nav>
-        </details>
+        <% } %>
+      </div>
+
+      <!-- Bouton pour ouvrir la modale de contact -->
+      <div class="footer-column footer-column--contact">
+        <button class="btn-contact-modal" data-action="open-contact-modal">Contactez-nous</button>
+      </div>
+
+      <!-- Réseaux sociaux -->
+      <div class="footer-column footer-column--social">
+        <%- include('../social-links', { socialLinks, location: 'footer', user }) %>
       </div>
     </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 <a href="https://caixadev.dev" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">caixaDev</a>. Tous droits réservés.</p>
-    </div>
+      <!-- Ligne copyright -->
+      <div class="footer-copyright">
+        <p>&copy; 2025 <a href="https://caixadev.dev" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">caixaDev</a>. Tous droits réservés.</p>
+      </div>
+    
   </div>
+
+  <!-- Inclusion de la modale de contact -->
+  <%- include('../modals/contact-modal') %>
 </footer>

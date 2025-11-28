@@ -5,6 +5,7 @@ import {
   updateSection,
   deleteSection
 } from '../../../src/controllers/sectionController.js';
+import { query } from '../../../src/config/db.js';
 
 /**
  * Tests d'intégration pour sectionController
@@ -12,6 +13,17 @@ import {
  */
 
 describe('sectionController - tests d\'intégration', () => {
+  let testPageId;
+
+  beforeAll(async () => {
+    // Créer une page de test
+    const { rows } = await query(`
+      INSERT INTO page (title, contact_email, settings)
+      VALUES ($1, $2, $3)
+      RETURNING id
+    `, ['Test Page', 'test@example.com', JSON.stringify({})]);
+    testPageId = rows[0].id;
+  });
 
   describe('getAllSections', () => {
     it('doit retourner un tableau de sections', async () => {
@@ -24,7 +36,6 @@ describe('sectionController - tests d\'intégration', () => {
         const firstSection = sections[0];
         expect(firstSection).toHaveProperty('id');
         expect(firstSection).toHaveProperty('type');
-        expect(firstSection).toHaveProperty('title');
         expect(firstSection).toHaveProperty('position');
         expect(firstSection).toHaveProperty('elements');
         expect(Array.isArray(firstSection.elements)).toBe(true);
@@ -77,7 +88,8 @@ describe('sectionController - tests d\'intégration', () => {
 
     it('doit créer une nouvelle section avec des données valides', async () => {
       const sectionData = {
-        type: 'content',
+        type: 'standard',
+        page_id: testPageId,
         title: 'Test Section',
         layout: null,
         settings: { bg_color: '#ffffff' }
@@ -88,8 +100,8 @@ describe('sectionController - tests d\'intégration', () => {
 
       expect(section).toBeTruthy();
       expect(section.id).toBeDefined();
-      expect(section.title).toBe('Test Section');
-      expect(section.settings.type).toBe('content');
+      expect(section.type).toBe('standard');
+      expect(section.settings.bg_color).toBe('#ffffff');
     });
 
     afterAll(async () => {
@@ -106,9 +118,8 @@ describe('sectionController - tests d\'intégration', () => {
     beforeAll(async () => {
       // Créer une section pour les tests
       const section = await createSection({
-        type: 'content',
-        title: 'Section à modifier',
-        layout: null,
+        type: 'standard',
+        page_id: testPageId,
         settings: { bg_color: '#ffffff' }
       });
       testSectionId = section.id;
@@ -116,19 +127,19 @@ describe('sectionController - tests d\'intégration', () => {
 
     it('doit mettre à jour une section existante', async () => {
       const updates = {
-        title: 'Titre modifié',
+        type: 'hero',
         settings: { bg_color: '#000000' }
       };
 
       const section = await updateSection(testSectionId, updates);
 
       expect(section).toBeTruthy();
-      expect(section.title).toBe('Titre modifié');
+      expect(section.type).toBe('hero');
       expect(section.settings.bg_color).toBe('#000000');
     });
 
     it('doit retourner null pour un ID inexistant', async () => {
-      const section = await updateSection(99999, { title: 'Test' });
+      const section = await updateSection(99999, { type: 'standard' });
       expect(section).toBeNull();
     });
 
@@ -144,9 +155,8 @@ describe('sectionController - tests d\'intégration', () => {
     it('doit supprimer une section existante', async () => {
       // Créer une section à supprimer
       const section = await createSection({
-        type: 'content',
-        title: 'Section à supprimer',
-        layout: null,
+        type: 'standard',
+        page_id: testPageId,
         settings: { bg_color: '#ffffff' }
       });
 

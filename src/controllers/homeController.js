@@ -1,12 +1,9 @@
 import { buildPageData } from '../services/pageBuilder.js';
-import { getSocialIcon } from '../utils/socialIcons.js';
 import { logger } from '../utils/logger.js';
 import { query } from '../config/db.js';
 
 export const showHome = async (req, res) => {
   try {
-    logger.info('🏗️ Construction des données de page...');
-
     // Construire les données complètes de la page
     const pageData = await buildPageData();
 
@@ -15,16 +12,22 @@ export const showHome = async (req, res) => {
     try {
       const result = await query(`
         SELECT * FROM social_links
-        WHERE is_visible = true
         ORDER BY position ASC
       `);
       socialLinks = result.rows;
     } catch (socialError) {
       // La table social_links n'existe pas encore, c'est OK
-      logger.info('ℹ️ Table social_links non trouvée, utilisation d\'une liste vide');
     }
 
-    logger.info(`📊 Page construite avec ${pageData.sections.length} sections`);
+    // Extraire les liens de navigation depuis les sections
+    const navigationLinks = pageData.sections
+      .filter(section => section.type === 'link')
+      .map(section => ({
+        settings: {
+          target_section_id: section.id,
+          label: section.settings?.title || 'Section'
+        }
+      }));
 
     // Rendre la vue avec les données unifiées
     return res.render('pages/index-v2', {
@@ -32,7 +35,7 @@ export const showHome = async (req, res) => {
       ...pageData,
       socialLinks,
       user: req.user || null,
-      getSocialIcon
+      navigationLinks
     });
 
   } catch (error) {
@@ -45,8 +48,7 @@ export const showHome = async (req, res) => {
       sections: [],
       fonts: [],
       socialLinks: [],
-      user: req.user || null,
-      getSocialIcon
+      user: req.user || null
     });
   }
 };
