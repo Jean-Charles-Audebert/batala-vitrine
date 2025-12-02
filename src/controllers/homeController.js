@@ -1,4 +1,4 @@
-import { buildPageData } from '../services/pageBuilder.js';
+import { buildPageData, loadFonts } from '../services/pageBuilder.js';
 import { logger } from '../utils/logger.js';
 import { query } from '../config/db.js';
 
@@ -6,6 +6,9 @@ export const showHome = async (req, res) => {
   try {
     // Construire les données complètes de la page
     const pageData = await buildPageData();
+
+    // Charger les polices
+    const fonts = await loadFonts();
 
     // Charger les liens sociaux (si la table existe)
     let socialLinks = [];
@@ -33,6 +36,7 @@ export const showHome = async (req, res) => {
     return res.render('pages/index-v2', {
       title: 'Accueil',
       ...pageData,
+      fonts,
       socialLinks,
       user: req.user || null,
       navigationLinks

@@ -19,7 +19,19 @@ export const showEditor = async (req, res) => {
 
     // Charger les schémas des sections
     const schemasPath = join(dirname(__dirname), '..', 'config', 'schemas.json');
-    const sectionSchemas = JSON.parse(readFileSync(schemasPath, 'utf8'));
+    const schemas = JSON.parse(readFileSync(schemasPath, 'utf8'));
+    
+    // Séparer schémas sections et éléments
+    const sectionSchemas = {};
+    const elementSchemas = {};
+    
+    Object.keys(schemas).forEach(key => {
+      if (key.startsWith('element_')) {
+        elementSchemas[key] = schemas[key];
+      } else {
+        sectionSchemas[key] = schemas[key];
+      }
+    });
 
     logger.info(`📊 Éditeur chargé avec ${editorData.sections.length} sections`);
 
@@ -28,6 +40,7 @@ export const showEditor = async (req, res) => {
       title: 'Éditeur',
       pageData: editorData,
       sectionSchemas: sectionSchemas,
+      elementSchemas: elementSchemas,
       user: req.user
     });
 
@@ -43,6 +56,7 @@ export const showEditor = async (req, res) => {
         fonts: []
       },
       sectionSchemas: {},
+      elementSchemas: {},
       user: req.user
     });
   }

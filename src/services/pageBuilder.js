@@ -23,11 +23,14 @@ export async function buildEditorData() {
   const pageData = await loadPageData();
   const sections = await loadSectionsWithElements(false); // all sections
   const socialLinks = await loadSocialLinks();
+  const fonts = await loadFonts();
 
   return {
     page: pageData,
     sections: sections,
-    socialLinks: socialLinks
+    socialLinks: socialLinks,
+    fonts: fonts,
+    schemas: {} // TODO: implement section schemas
   };
 }
 
@@ -38,13 +41,34 @@ async function loadPageData() {
   const { rows } = await query('SELECT * FROM page LIMIT 1');
   const page = rows[0] || {};
 
-  // Retourner exactement les champs attendus par le frontend
+  // Parser les settings si c'est une string JSON
+  let settings = page.settings || {};
+  if (typeof settings === 'string') {
+    try {
+      settings = JSON.parse(settings);
+    } catch (e) {
+      settings = {};
+    }
+  }
+
+  // Retourner les données avec les settings directement accessibles
   return {
+    id: page.id,  // ID de la page pour les opérations CRUD
     title: page.title || 'Mon Site',
     default_font_title: page.default_font_title || null,
     default_font_text: page.default_font_text || null,
     contact_email: page.contact_email || null,
-    settings: page.settings || {}
+    // Exposer directement les settings pour simplifier
+    bg_color: settings.bg_color || '#f5f5f5',
+    bg_image: settings.bg_image || null,
+    bg_opacity: settings.bg_opacity || 1.0,
+    bg_position: settings.bg_position || 'center',
+    bg_video: settings.bg_video || null,
+    bg_video_youtube: settings.bg_video_youtube || null,
+    bg_transparent: settings.bg_transparent || false,
+    title_font_id: page.default_font_title || null,
+    text_font_id: page.default_font_text || null,
+    settings: settings
   };
 }
 
@@ -151,3 +175,24 @@ async function loadSocialLinks() {
     return [];
   }
 }
+
+/**
+ * Charge toutes les polices disponibles
+ */
+async function loadFonts() {
+  try {
+    const { rows } = await query(`
+      SELECT id, name, source, url, font_family, variants
+      FROM fonts
+      ORDER BY name ASC
+    `);
+    return rows;
+  } catch (error) {
+    // La table fonts n'existe pas encore, retourner un tableau vide
+    console.error('Erreur chargement fonts:', error);
+    return [];
+  }
+}
+
+// Exporter loadFonts pour utilisation externe
+export { loadFonts };

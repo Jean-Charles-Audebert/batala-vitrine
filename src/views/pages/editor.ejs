@@ -5,43 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Éditeur de site vitrine">
   <title>Éditeur - <%= title %></title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
 
   <!-- Fonts -->
-  <% if (pageData.page.title_font_id && pageData.fonts) { %>
-    <% const titleFont = pageData.fonts.find(f => f.id == pageData.page.title_font_id); %>
-    <% if (titleFont && titleFont.font_url) { %>
-      <link rel="stylesheet" href="<%= titleFont.font_url %>">
-    <% } else if (titleFont && titleFont.file_path) { %>
-      <style>
-        @font-face {
-          font-family: '<%= titleFont.name %>';
-          src: url('<%= titleFont.file_path %>');
-        }
-      </style>
+  <% if (pageData.page.default_font_title && pageData.fonts) { %>
+    <% const titleFont = pageData.fonts.find(f => f.id == pageData.page.default_font_title); %>
+    <% if (titleFont && titleFont.url) { %>
+      <link rel="stylesheet" href="<%= titleFont.url %>">
     <% } %>
   <% } %>
 
-  <% if (pageData.page.text_font_id && pageData.fonts) { %>
-    <% const textFont = pageData.fonts.find(f => f.id == pageData.page.text_font_id); %>
-    <% if (textFont && textFont.font_url) { %>
-      <link rel="stylesheet" href="<%= textFont.font_url %>">
-    <% } else if (textFont && textFont.file_path) { %>
-      <style>
-        @font-face {
-          font-family: '<%= textFont.name %>';
-          src: url('<%= textFont.file_path %>');
-        }
-      </style>
+  <% if (pageData.page.default_font_text && pageData.fonts) { %>
+    <% const textFont = pageData.fonts.find(f => f.id == pageData.page.default_font_text); %>
+    <% if (textFont && textFont.url) { %>
+      <link rel="stylesheet" href="<%= textFont.url %>">
     <% } %>
   <% } %>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/css/common.css">
-  <link rel="stylesheet" href="/css/editor.css">
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/core.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/sections.css">
   <link rel="stylesheet" href="/css/page.css">
-  <link rel="stylesheet" href="/css/buttons.css">
-  <link rel="stylesheet" href="/css/pages/editor.css">
+  <link rel="stylesheet" href="/css/editor.css">
 
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -61,6 +49,9 @@
         <a href="/" class="btn btn-outline" target="_blank">
           <i class="fas fa-external-link-alt"></i> Voir le site
         </a>
+        <a href="/auth/logout/web" class="btn btn-secondary">
+          <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
       </div>
     </header>
 
@@ -70,21 +61,6 @@
       <div class="preview-area">
         <div class="preview-header">
           <h3>Aperçu en direct</h3>
-          <div class="preview-controls">
-            <!-- Boutons responsive : actuellement cosmétiques, appliquent une classe CSS au conteneur d'aperçu
-                 pour simuler différents appareils. Pour une vraie responsivité, il faudrait :
-                 - Redimensionner l'iframe selon les breakpoints
-                 - Ou utiliser un viewport CSS media queries -->
-            <button class="device-btn active" data-device="desktop">
-              <i class="fas fa-desktop"></i>
-            </button>
-            <button class="device-btn" data-device="tablet">
-              <i class="fas fa-tablet-alt"></i>
-            </button>
-            <button class="device-btn" data-device="mobile">
-              <i class="fas fa-mobile-alt"></i>
-            </button>
-          </div>
         </div>
         <div class="preview-frame" id="preview-frame">
           <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
@@ -119,12 +95,18 @@
                 <div class="section-info">
                   <span class="section-type"><%= section.type %></span>
                   <span class="section-title"><%= section.title || 'Sans titre' %></span>
+                  <% if (section.elements && section.elements.length > 0) { %>
+                    <span class="section-element-count">(<%= section.elements.length %> élément<%= section.elements.length > 1 ? 's' : '' %>)</span>
+                  <% } %>
                 </div>
                 <div class="section-actions">
+                  <button class="action-btn add-element-btn" data-section-id="<%= section.id %>" title="Ajouter élément">
+                    <i class="fas fa-plus-circle"></i>
+                  </button>
                   <button class="action-btn edit-btn" title="Modifier">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button class="action-btn visibility-btn <%= section.is_visible ? 'visible' : 'hidden' %>" title="Visibilité">
+                  <button class="action-btn visibility-btn" data-visible="<%= section.is_visible %>" title="Visibilité">
                     <i class="fas fa-eye<%= section.is_visible ? '' : '-slash' %>"></i>
                   </button>
                   <button class="action-btn delete-btn" title="Supprimer">
@@ -166,43 +148,80 @@
             </div>
             <hr>
             <div class="form-group">
-              <label for="page-main-bg-color">Couleur de fond principale</label>
-              <input type="color" id="page-main-bg-color" value="<%= pageData.page.main_bg_color || '#f5f5f5' %>">
+              <label for="page-bg-color">Couleur de fond principale</label>
+              <input type="color" id="page-bg-color" value="<%= pageData.page.bg_color || '#f5f5f5' %>">
             </div>
             <hr>
-            <div class="form-group">
-              <label for="page-main-bg-media-url">Média de fond</label>
-              <div class="media-upload-field">
-                <input type="text" id="page-main-bg-media-url" name="main_bg_media_url" value="<%= pageData.page.main_bg_media_url || '' %>" placeholder="/uploads/... ou URL externe" readonly>
-                <button type="button" class="btn btn-sm btn-secondary select-bg-media">
-                  <i class="fas fa-image"></i> Choisir
-                </button>
-                <% if (pageData.page.main_bg_media_url) { %>
-                <button type="button" class="btn btn-sm btn-danger clear-bg-media">
-                  <i class="fas fa-trash"></i>
-                </button>
-                <% } %>
+            
+            <!-- Section Média de fond -->
+            <div class="form-section">
+              <h5 style="margin-bottom: 1rem; color: var(--color-text-secondary);">
+                <i class="fas fa-image"></i> Média de fond
+              </h5>
+              
+              <div class="form-group">
+                <label>Type de média</label>
+                <div class="radio-group">
+                  <label>
+                    <span>Aucun</span>
+                    <input type="radio" name="bg-media-type" value="none" <%= (!pageData.page.bg_image && !pageData.page.bg_video_youtube) ? 'checked' : '' %>>
+                  </label>
+                  <label>
+                    <span>Image/Vidéo</span>
+                    <input type="radio" name="bg-media-type" value="image" <%= (pageData.page.bg_image) ? 'checked' : '' %>>
+                  </label>
+                  <label>
+                    <span>YouTube</span>
+                    <input type="radio" name="bg-media-type" value="youtube" <%= (pageData.page.bg_video_youtube) ? 'checked' : '' %>>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Champ Image/Vidéo -->
+              <div class="form-group bg-media-field" id="bg-image-field" style="<%= (!pageData.page.bg_image) ? 'display: none;' : '' %>">
+                <label for="page-bg-image">
+                  <i class="fas fa-photo-video"></i> Image ou vidéo de fond
+                </label>
+                <div class="media-upload-field">
+                  <input type="text" id="page-bg-image" name="bg_image" value="<%= pageData.page.bg_image || '' %>" placeholder="/uploads/... ou URL externe" readonly>
+                  <button type="button" class="btn btn-sm btn-secondary select-bg-media">
+                    <i class="fas fa-folder-open"></i> Parcourir
+                  </button>
+                  <button type="button" class="btn btn-sm btn-danger clear-bg-media" <%= (!pageData.page.bg_image) ? 'style="display: none;"' : '' %>>
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                <small class="form-hint" style="display: block; margin-top: 0.5rem; color: #666;">
+                  Formats acceptés : Images (JPG, PNG, WebP, GIF) ou Vidéos (MP4, WebM)
+                </small>
+              </div>
+
+              <!-- Champ YouTube -->
+              <div class="form-group bg-media-field" id="bg-youtube-field" style="<%= (!pageData.page.bg_video_youtube) ? 'display: none;' : '' %>">
+                <label for="page-bg-video-youtube">
+                  <i class="fab fa-youtube"></i> URL YouTube de fond
+                </label>
+                <input type="text" id="page-bg-video-youtube" value="<%= pageData.page.bg_video_youtube || '' %>" placeholder="https://www.youtube.com/watch?v=...">
+                <small class="form-hint" style="display: block; margin-top: 0.5rem; color: #666;">
+                  Collez l'URL complète d'une vidéo YouTube
+                </small>
               </div>
             </div>
+            
             <hr>
             <div class="form-group">
-              <label for="page-main-bg-youtube-url">URL YouTube de fond</label>
-              <input type="text" id="page-main-bg-youtube-url" value="<%= pageData.page.main_bg_youtube_url || '' %>" placeholder="URL YouTube">
+              <label for="page-bg-opacity">Opacité du fond (0-1)</label>
+              <input type="number" id="page-bg-opacity" min="0" max="1" step="0.1" value="<%= pageData.page.bg_opacity || 1.0 %>">
             </div>
             <hr>
             <div class="form-group">
-              <label for="page-main-bg-opacity">Opacité du fond (0-1)</label>
-              <input type="number" id="page-main-bg-opacity" min="0" max="1" step="0.1" value="<%= pageData.page.main_bg_opacity || 1.0 %>">
-            </div>
-            <hr>
-            <div class="form-group">
-              <label for="page-main-bg-position">Position du fond</label>
-              <select id="page-main-bg-position">
-                <option value="center" <%= (pageData.page.main_bg_position === 'center') ? 'selected' : '' %>>Centre</option>
-                <option value="top" <%= (pageData.page.main_bg_position === 'top') ? 'selected' : '' %>>Haut</option>
-                <option value="bottom" <%= (pageData.page.main_bg_position === 'bottom') ? 'selected' : '' %>>Bas</option>
-                <option value="left" <%= (pageData.page.main_bg_position === 'left') ? 'selected' : '' %>>Gauche</option>
-                <option value="right" <%= (pageData.page.main_bg_position === 'right') ? 'selected' : '' %>>Droite</option>
+              <label for="page-bg-position">Position du fond</label>
+              <select id="page-bg-position">
+                <option value="center" <%= (pageData.page.bg_position === 'center') ? 'selected' : '' %>>Centre</option>
+                <option value="top" <%= (pageData.page.bg_position === 'top') ? 'selected' : '' %>>Haut</option>
+                <option value="bottom" <%= (pageData.page.bg_position === 'bottom') ? 'selected' : '' %>>Bas</option>
+                <option value="left" <%= (pageData.page.bg_position === 'left') ? 'selected' : '' %>>Gauche</option>
+                <option value="right" <%= (pageData.page.bg_position === 'right') ? 'selected' : '' %>>Droite</option>
               </select>
             </div>
             <hr>
@@ -212,7 +231,7 @@
                 <option value="">Aucune</option>
                 <% if (pageData.fonts) { %>
                   <% pageData.fonts.forEach(font => { %>
-                    <option value="<%= font.id %>" <%= (pageData.page.title_font_id == font.id) ? 'selected' : '' %>><%= font.name %> (<%= font.source %>)</option>
+                    <option value="<%= font.id %>" <%= (pageData.page.title_font_id == font.id) ? 'selected' : '' %>><%= font.font_family %> (<%= font.source %>)</option>
                   <% }); %>
                 <% } %>
               </select>
@@ -224,7 +243,7 @@
                 <option value="">Aucune</option>
                 <% if (pageData.fonts) { %>
                   <% pageData.fonts.forEach(font => { %>
-                    <option value="<%= font.id %>" <%= (pageData.page.text_font_id == font.id) ? 'selected' : '' %>><%= font.name %> (<%= font.source %>)</option>
+                    <option value="<%= font.id %>" <%= (pageData.page.text_font_id == font.id) ? 'selected' : '' %>><%= font.font_family %> (<%= font.source %>)</option>
                   <% }); %>
                 <% } %>
               </select>
@@ -235,6 +254,49 @@
                 <i class="fas fa-font"></i> Gérer les polices
               </button>
             </div>
+
+            <hr>
+
+            <!-- Section Favicon -->
+            <div class="form-section">
+              <h5 style="margin-bottom: 1rem; color: var(--color-text-secondary);">
+                <i class="fas fa-star"></i> Favicon
+              </h5>
+              
+              <div class="form-group">
+                <label for="favicon-upload">
+                  <i class="fas fa-image"></i> Icône du site (favicon)
+                </label>
+                <div class="favicon-preview-container" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                  <img id="favicon-preview" src="/icons/favicon.ico?t=<%= Date.now() %>" alt="Favicon actuel" style="width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 4px;">
+                  <span style="font-size: 0.85rem; color: #666;">Favicon actuel</span>
+                </div>
+                <input type="file" id="favicon-upload" accept="image/x-icon,image/png,image/jpeg,image/svg+xml" style="margin-bottom: 0.5rem;">
+                <small class="form-hint">
+                  Formats acceptés : ICO, PNG, JPG, SVG. Taille recommandée : 32x32px ou 64x64px
+                </small>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Section Administrateurs -->
+            <div class="form-section">
+              <h5 style="margin-bottom: 1rem; color: var(--color-text-secondary);">
+                <i class="fas fa-users-cog"></i> Administrateurs
+              </h5>
+              
+              <div id="admins-list-container" style="margin-bottom: 1rem;">
+                <!-- Chargé dynamiquement -->
+                <div style="text-align: center; padding: 1rem; color: #999;">
+                  <i class="fas fa-spinner fa-spin"></i> Chargement...
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary" id="add-admin-btn">
+                <i class="fas fa-user-plus"></i> Ajouter un administrateur
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -242,8 +304,8 @@
   </div>
 
   <!-- Modales -->
-  <!-- Modale d'ajout/édition de section -->
-  <div class="modal" id="section-modal">
+  <!-- Modale d'édition de section -->
+  <div class="modal hidden" id="section-modal">
     <div class="modal-content large-modal">
       <div class="modal-header">
         <h3 id="section-modal-title">Ajouter une section</h3>
@@ -275,62 +337,148 @@
   </div>
 
   <!-- Modale d'édition d'élément -->
-  <div class="modal" id="element-edit-modal">
-    <div class="modal-content">
+  <div class="modal hidden" id="element-modal">
+    <div class="modal-content large-modal">
       <div class="modal-header">
-        <h3 id="element-modal-title">Modifier l'élément</h3>
+        <h3 id="element-modal-title">Ajouter un élément</h3>
         <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="element-edit-form">
-          <input type="hidden" id="element-id" name="id">
-          
-          <div class="form-group">
-            <label for="element-title">Titre</label>
-            <input type="text" id="element-title" name="title" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="element-font-id">Police</label>
-            <select id="element-font-id" name="font_id">
-              <option value="">Police par défaut</option>
-              <% if (pageData.fonts) { %>
-                <% pageData.fonts.forEach(font => { %>
-                  <option value="<%= font.id %>"><%= font.name %> (<%= font.source %>)</option>
-                <% }); %>
-              <% } %>
+        <div class="element-form-container">
+          <!-- Sélecteur de type d'élément (uniquement pour ajout) -->
+          <div class="form-group" id="element-type-selector">
+            <label for="element-type">Type d'élément</label>
+            <select id="element-type" required>
+              <option value="text">📝 Texte</option>
+              <option value="media">🖼️ Image/Vidéo</option>
+              <option value="youtube">🎬 YouTube</option>
+              <option value="card">🎴 Carte</option>
+              <option value="gallery">🖼️ Galerie</option>
+              <option value="contact">📧 Contact</option>
+              <option value="link">🔗 Lien</option>
             </select>
           </div>
-          
-          <!-- Champs spécifiques selon le type d'élément -->
-          <div id="element-specific-fields">
-            <!-- Les champs spécifiques seront ajoutés dynamiquement par JavaScript -->
+
+          <!-- Formulaire dynamique généré selon le schéma -->
+          <div id="element-dynamic-form">
+            <!-- Les champs seront générés dynamiquement ici -->
           </div>
-          
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" id="element-cancel-btn">Annuler</button>
-            <button type="button" class="btn btn-primary" id="element-save-btn">Sauvegarder</button>
-          </div>
-        </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="element-cancel-btn">Annuler</button>
+        <button class="btn btn-primary" id="element-save-btn">Sauvegarder</button>
       </div>
     </div>
   </div>
 
-  <!-- CSS Variables pour les polices (nécessaires pour l'injection dans l'iframe) -->
-  <link rel="stylesheet" href="/editor/css/pages/dynamic-variables.css">
-  <script src="/js/media-picker.js"></script>
+  <!-- Modale de gestion des polices -->
+  <div class="modal hidden" id="fonts-modal">
+    <div class="modal-content large-modal">
+      <div class="modal-header">
+        <h3>Gérer les polices</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="fonts-manager">
+          <!-- Onglets pour les types de polices -->
+          <div class="font-tabs">
+            <button class="font-tab-btn active" data-font-type="google">
+              <i class="fab fa-google"></i> Google Fonts
+            </button>
+            <button class="font-tab-btn" data-font-type="upload">
+              <i class="fas fa-upload"></i> Importer
+            </button>
+          </div>
+
+          <!-- Contenu Google Fonts -->
+          <div class="font-tab-content active" id="google-fonts-tab">
+            <div class="form-help">
+              <p><i class="fas fa-info-circle"></i> <strong>Comment ajouter une police Google Fonts :</strong></p>
+              <ol>
+                <li>Allez sur <a href="https://fonts.google.com" target="_blank" rel="noopener">Google Fonts</a> et choisissez une police</li>
+                <li>Sur la page de la police, cliquez sur "Get font" puis "Get embed code"</li>
+                <li>Copiez l'URL complète qui commence par <code>https://fonts.googleapis.com/css2?family=</code></li>
+                <li>Revenez ici et collez cette URL dans le champ ci-dessous</li>
+              </ol>
+              <p><em>Exemple :</em> <code>https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap</code></p>
+            </div>
+            <div class="form-group">
+              <label for="google-font-url">URL Google Fonts</label>
+              <input type="url" id="google-font-url" placeholder="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" required>
+              <small class="form-help-text">Collez ici l'URL complète obtenue depuis Google Fonts</small>
+            </div>
+
+            <div class="form-group">
+              <label for="google-font-name">Nom de la police</label>
+              <input type="text" id="google-font-name" placeholder="Roboto" required>
+              <small class="form-help-text">Le nom affiché dans l'interface (ex: Roboto, Open Sans)</small>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="add-google-font-btn">
+                <i class="fas fa-plus"></i> Ajouter la police Google
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenu Upload -->
+          <div class="font-tab-content" id="upload-fonts-tab">
+            <div class="form-help">
+              <p><i class="fas fa-upload"></i> Importez vos propres fichiers de polices. Formats supportés: TTF, OTF, WOFF, WOFF2. Donnez un nom à votre police et indiquez le nom de famille CSS à utiliser dans vos styles.</p>
+            </div>
+            <div class="form-group">
+              <label for="font-name">Nom de la police</label>
+              <input type="text" id="font-name" placeholder="Ex: Ma Police Personnelle">
+            </div>
+
+            <div class="form-group">
+              <label for="font-family">Nom de famille CSS</label>
+              <input type="text" id="font-family" placeholder="Ex: MaPolice">
+            </div>
+
+            <div class="form-group">
+              <label for="font-file">Fichier de police</label>
+              <input type="file" id="font-file" accept=".ttf,.otf,.woff,.woff2">
+              <small class="form-help">Formats supportés: TTF, OTF, WOFF, WOFF2</small>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="upload-font-btn">
+                <i class="fas fa-upload"></i> Importer la police
+              </button>
+            </div>
+          </div>
+
+          <!-- Liste des polices actuelles -->
+          <div class="current-fonts">
+            <h4>Polices installées</h4>
+            <div id="current-fonts-list" class="current-fonts-list">
+              <!-- Chargement dynamique via JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Scripts des classes de l'éditeur -->
+  <script src="/js/media-picker.js"></script>
+  <script src="/js/components/MediaSelector.js"></script>
   <script src="/js/editor/PreviewManager.js"></script>
   <script src="/js/editor/FormGenerator.js"></script>
   <script src="/js/editor/SectionManager.js"></script>
+  <script src="/js/editor/ElementManager.js"></script>
+  <script src="/js/editor/EditorApp.js"></script>
   <script>
     // Données des polices disponibles pour l'aperçu dynamique
-    window.fontsData = <%- JSON.stringify(pageData.fonts || []) %>;
+    window.fontsData = <%- JSON.stringify((pageData && pageData.fonts) || []) %>;
     // Schéma des sections pour la génération dynamique des formulaires
-    window.sectionSchemas = <%- JSON.stringify(pageData.schemas) %>;
+    window.sectionSchemas = <%- JSON.stringify(sectionSchemas || {}) %>;
+    // Schémas des éléments
+    window.elementSchemas = <%- JSON.stringify(elementSchemas || {}) %>;
     // Données complètes de la page pour l'éditeur
-    window.pageData = <%- JSON.stringify(pageData) %>;
+    window.pageData = <%- JSON.stringify(pageData || {}) %>;
   </script>
-  <script src="/js/pages/editor.js"></script>
+  <script src="/js/editor.js"></script>
 </body>
 </html>

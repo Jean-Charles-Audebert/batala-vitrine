@@ -4,7 +4,9 @@
  */
 
 class SectionManager {
-  constructor() {
+  constructor(previewManager, editorApp = null) {
+    this.previewManager = previewManager;
+    this.editorApp = editorApp;
     this.currentSectionId = null;
     this.pageData = window.pageData || {};
   }
@@ -42,6 +44,10 @@ class SectionManager {
 
       if (target.classList.contains('edit-btn')) {
         this.editSection(sectionId);
+      } else if (target.classList.contains('add-element-btn')) {
+        if (window.elementManager) {
+          window.elementManager.showAddElementModal(sectionId);
+        }
       } else if (target.classList.contains('visibility-btn')) {
         this.toggleSectionVisibility(sectionId);
       } else if (target.classList.contains('delete-btn')) {
@@ -78,13 +84,16 @@ class SectionManager {
       }
     }
 
-    modal.style.display = 'block';
+    // Afficher la modale
+    modal.classList.remove('hidden');
+    modal.classList.add('show');
   }
 
   closeSectionModal() {
     const modal = document.getElementById('section-modal');
     if (modal) {
-      modal.style.display = 'none';
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
     }
   }
 
@@ -108,14 +117,14 @@ class SectionManager {
       return;
     }
 
-    const sectionType = document.getElementById('section-type').value;
     const formData = window.formGenerator.collectFormData();
+    
+    console.log('📤 Données du formulaire collectées:', formData);
 
     const sectionData = {
-      type: sectionType,
       settings: formData,
       is_visible: true,
-      order: 0
+      page_id: window.pageData?.page?.id || 1  // ID de la page actuelle
     };
 
     let url = '/api/sections';
@@ -125,7 +134,15 @@ class SectionManager {
       url += `/${this.currentSectionId}`;
       method = 'PUT';
       sectionData.id = this.currentSectionId;
+      console.log(`🔄 Mise à jour de la section ${this.currentSectionId}`);
+    } else {
+      // Type uniquement pour la création
+      const sectionType = document.getElementById('section-type').value;
+      sectionData.type = sectionType;
+      console.log('➕ Création d\'une nouvelle section');
     }
+
+    console.log(`📡 ${method} ${url}`, sectionData);
 
     try {
       const response = await fetch(url, {
@@ -144,8 +161,11 @@ class SectionManager {
       console.log('Section sauvegardée:', data);
       alert('Section sauvegardée avec succès!');
       this.closeSectionModal();
-      // Recharger la page pour voir les changements
-      location.reload();
+      
+      // Rafraîchir l'aperçu au lieu de recharger la page entière
+      if (this.previewManager) {
+        this.previewManager.refresh();
+      }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       alert('Erreur lors de la sauvegarde');
@@ -188,9 +208,9 @@ class SectionManager {
         visibilityText.textContent = 'Masqué';
       }
 
-      // Recharger l'aperçu
-      if (window.previewManager) {
-        window.previewManager.loadPreview();
+      // Rafraîchir l'aperçu
+      if (this.previewManager) {
+        this.previewManager.refresh();
       }
     } catch (error) {
       console.error('Erreur toggle visibility:', error);
@@ -215,13 +235,23 @@ class SectionManager {
       if (sectionElement) {
         sectionElement.remove();
       }
-      // Recharger l'aperçu
-      if (window.previewManager) {
-        window.previewManager.loadPreview();
+      
+      // Rafraîchir l'aperçu
+      if (this.previewManager) {
+        this.previewManager.refresh();
       }
     } catch (error) {
       console.error('Erreur delete section:', error);
       alert('Erreur lors de la suppression');
+    }
+  }
+
+  // Méthode pour faire des appels API via EditorApp
+  async apiCall(endpoint, method = 'GET', data = null, isFormData = false) {
+    if (this.editorApp && this.editorApp.apiCall) {
+      return this.editorApp.apiCall(endpoint, method, data, isFormData);
+    } else {
+      throw new Error('EditorApp non disponible pour les appels API');
     }
   }
 }

@@ -80,9 +80,12 @@ export const sendContactEmail = async (req, res) => {
       return text.replace(/[&<>"']/g, (m) => map[m]);
     };
 
-    // Contenu de l'email
+    // Contenu de l'email avec le nom du site depuis la BDD
+    const { rows: pageRows } = await query('SELECT title FROM page LIMIT 1');
+    const siteTitle = pageRows[0]?.title || 'Mon Site';
+    
     const mailOptions = {
-      from: `"Formulaire Contact" <${contactEmail}>`,
+      from: `"${siteTitle} - Contact" <${contactEmail}>`,
       to: contactEmail,
       replyTo: `"${nom} ${prenom}" <${contact}>`,
       subject: `Nouveau message de contact de ${nom} ${prenom}`,

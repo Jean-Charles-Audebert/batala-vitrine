@@ -37,12 +37,12 @@ function applyPreviewSettings() {
     console.log('Application des paramètres d\'aperçu:', previewData);
 
     // Appliquer la couleur de fond
-    if (previewData.main_bg_color) {
-      document.documentElement.style.setProperty('--main-bg-color', previewData.main_bg_color);
+    if (previewData.bg_color) {
+      document.documentElement.style.setProperty('--main-bg-color', previewData.bg_color);
     }
 
     // Appliquer l'image de fond
-    if (previewData.main_bg_image) {
+    if (previewData.bg_image) {
       // Supprimer l'ancien fond s'il existe
       const existingBg = document.querySelector('.global-bg-image');
       if (existingBg) existingBg.remove();
@@ -50,12 +50,12 @@ function applyPreviewSettings() {
       // Créer le nouveau fond
       const bgDiv = document.createElement('div');
       bgDiv.className = 'global-bg-image preview-bg';
-      bgDiv.style.cssText = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${previewData.main_bg_image}');background-repeat:${previewData.main_bg_image_repeat || 'no-repeat'};background-size:${previewData.main_bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
+      bgDiv.style.cssText = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${previewData.bg_image}');background-repeat:${previewData.bg_image_repeat || 'no-repeat'};background-size:${previewData.bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
       document.body.insertBefore(bgDiv, document.body.firstChild);
     }
 
     // Appliquer la vidéo de fond
-    if (previewData.main_bg_video) {
+    if (previewData.bg_video) {
       // Supprimer l'ancienne vidéo s'il existe
       const existingVideo = document.querySelector('.global-bg-video');
       if (existingVideo) existingVideo.remove();
@@ -68,12 +68,12 @@ function applyPreviewSettings() {
       video.loop = true;
       video.playsInline = true;
       video.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;';
-      video.innerHTML = `<source src="${previewData.main_bg_video}" type="video/mp4">`;
+      video.innerHTML = `<source src="${previewData.bg_video}" type="video/mp4">`;
       document.body.insertBefore(video, document.body.firstChild);
     }
 
     // Appliquer la vidéo YouTube
-    if (previewData.main_bg_youtube) {
+    if (previewData.bg_video_youtube) {
       // Supprimer l'ancienne iframe YouTube s'il existe
       const existingYoutube = document.querySelector('.global-bg-youtube');
       if (existingYoutube) existingYoutube.remove();
@@ -81,10 +81,10 @@ function applyPreviewSettings() {
       // Extraire l'ID de la vidéo YouTube
       let videoId = '';
       try {
-        if (previewData.main_bg_youtube.includes('youtu.be/')) {
-          videoId = previewData.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (previewData.main_bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(previewData.main_bg_youtube);
+        if (previewData.bg_video_youtube.includes('youtu.be/')) {
+          videoId = previewData.bg_video_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (previewData.bg_video_youtube.includes('youtube.com/watch')) {
+          const url = new URL(previewData.bg_video_youtube);
           videoId = url.searchParams.get('v');
         }
       } catch (e) {}

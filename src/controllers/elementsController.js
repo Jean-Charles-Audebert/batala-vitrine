@@ -72,18 +72,18 @@ export const getElement = async (req, res) => {
  */
 export const createElement = async (req, res) => {
   try {
-    const validatedData = createElementSchema.parse(req.body);
+    const { section_id, type, col_start, col_end, settings } = req.body;
 
     const { rows } = await query(`
-      INSERT INTO elements (section_id, type, title, position, settings)
+      INSERT INTO elements (section_id, type, col_start, col_end, settings)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `, [
-      validatedData.section_id,
-      validatedData.type,
-      validatedData.title,
-      validatedData.position ?? 0,
-      validatedData.settings
+      section_id,
+      type,
+      col_start || 1,
+      col_end || 12,
+      JSON.stringify(settings || {})
     ]);
 
     res.status(201).json({
@@ -91,18 +91,11 @@ export const createElement = async (req, res) => {
       data: rows[0]
     });
   } catch (error) {
-    if (error.name === 'ZodError') {
-      return res.status(400).json({
-        success: false,
-        error: 'Données invalides',
-        details: error.errors
-      });
-    }
-
     logger.error('Erreur création élément:', error);
     res.status(500).json({
       success: false,
-      error: 'Erreur serveur'
+      error: 'Erreur serveur',
+      details: error.message
     });
   }
 };
@@ -114,19 +107,28 @@ export const createElement = async (req, res) => {
 export const updateElement = async (req, res) => {
   try {
     const { id } = req.params;
-    const validatedData = updateElementSchema.parse(req.body);
+    const { type, col_start, col_end, settings } = req.body;
 
     const updateFields = [];
     const values = [];
     let paramIndex = 1;
 
-    Object.keys(validatedData).forEach(key => {
-      if (validatedData[key] !== undefined) {
-        updateFields.push(`${key} = $${paramIndex}`);
-        values.push(validatedData[key]);
-        paramIndex++;
-      }
-    });
+    if (type !== undefined) {
+      updateFields.push(`type = $${paramIndex++}`);
+      values.push(type);
+    }
+    if (col_start !== undefined) {
+      updateFields.push(`col_start = $${paramIndex++}`);
+      values.push(col_start);
+    }
+    if (col_end !== undefined) {
+      updateFields.push(`col_end = $${paramIndex++}`);
+      values.push(col_end);
+    }
+    if (settings !== undefined) {
+      updateFields.push(`settings = $${paramIndex++}`);
+      values.push(JSON.stringify(settings));
+    }
 
     if (updateFields.length === 0) {
       return res.status(400).json({
@@ -156,18 +158,11 @@ export const updateElement = async (req, res) => {
       data: rows[0]
     });
   } catch (error) {
-    if (error.name === 'ZodError') {
-      return res.status(400).json({
-        success: false,
-        error: 'Données invalides',
-        details: error.errors
-      });
-    }
-
     logger.error('Erreur mise à jour élément:', error);
     res.status(500).json({
       success: false,
-      error: 'Erreur serveur'
+      error: 'Erreur serveur',
+      details: error.message
     });
   }
 };

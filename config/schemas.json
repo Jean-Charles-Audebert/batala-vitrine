@@ -1,0 +1,582 @@
+{
+  "_common": {
+    "label": "Paramètres communs",
+    "fields": {
+      "background": {
+        "type": "group",
+        "label": "Arrière-plan",
+        "fields": {
+          "bg_type": {
+            "type": "select",
+            "label": "Type de fond",
+            "options": [
+              {"value": "color", "label": "Couleur unie"},
+              {"value": "media", "label": "Image/Vidéo"},
+              {"value": "youtube", "label": "Vidéo YouTube"}
+            ],
+            "default": "color"
+          },
+          "bg_color": {
+            "type": "color",
+            "label": "Couleur de fond",
+            "default": "#ffffff",
+            "showIf": {"field": "bg_type", "value": "color"}
+          },
+          "bg_image": {
+            "type": "media",
+            "label": "Image de fond",
+            "showIf": {"field": "bg_type", "value": "media"}
+          },
+          "bg_video": {
+            "type": "media",
+            "label": "Vidéo de fond (MP4)",
+            "showIf": {"field": "bg_type", "value": "media"}
+          },
+          "bg_youtube": {
+            "type": "text",
+            "label": "URL YouTube",
+            "placeholder": "https://youtube.com/watch?v=...",
+            "showIf": {"field": "bg_type", "value": "youtube"}
+          }
+        }
+      },
+      "transparency": {
+        "type": "group",
+        "label": "Transparence",
+        "fields": {
+          "bg_transparent": {
+            "type": "checkbox",
+            "label": "Section transparente (laisse voir l'arrière-plan de la page)",
+            "default": false
+          }
+        }
+      },
+      "title": {
+        "type": "group",
+        "label": "Titre de la section",
+        "fields": {
+          "show_title": {
+            "type": "checkbox",
+            "label": "Afficher le titre",
+            "default": true
+          },
+          "title": {
+            "type": "text",
+            "label": "Texte du titre",
+            "placeholder": "Titre de la section",
+            "showIf": {"field": "show_title", "value": true}
+          },
+          "title_font": {
+            "type": "font-select",
+            "label": "Police du titre",
+            "default": null,
+            "showIf": {"field": "show_title", "value": true}
+          },
+          "title_size": {
+            "type": "number",
+            "label": "Taille du titre (px)",
+            "default": 32,
+            "min": 12,
+            "max": 120,
+            "showIf": {"field": "show_title", "value": true}
+          },
+          "title_color": {
+            "type": "color",
+            "label": "Couleur du titre",
+            "default": "#000000",
+            "showIf": {"field": "show_title", "value": true}
+          },
+          "align": {
+            "type": "select",
+            "label": "Alignement horizontal",
+            "options": [
+              {"value": "left", "label": "Gauche"},
+              {"value": "center", "label": "Centré"},
+              {"value": "right", "label": "Droite"}
+            ],
+            "default": "center"
+          },
+          "vertical_align": {
+            "type": "select",
+            "label": "Alignement vertical",
+            "options": [
+              {"value": "top", "label": "Haut"},
+              {"value": "center", "label": "Centre"},
+              {"value": "bottom", "label": "Bas"}
+            ],
+            "default": "center"
+          }
+        }
+      }
+    }
+  },
+  "hero": {
+    "label": "Section Hero",
+    "extends": "_common",
+    "fields": {
+      "logo": {
+        "type": "group",
+        "label": "Logo",
+        "fields": {
+          "logo_visible": {
+            "type": "checkbox",
+            "label": "Afficher le logo",
+            "default": true
+          },
+          "logo_align": {
+            "type": "select",
+            "label": "Alignement horizontal",
+            "options": [
+              {"value": "left", "label": "Gauche"},
+              {"value": "center", "label": "Centré"},
+              {"value": "right", "label": "Droite"}
+            ],
+            "default": "left",
+            "showIf": {"field": "logo_visible", "value": true}
+          },
+          "logo_vertical_align": {
+            "type": "select",
+            "label": "Alignement vertical",
+            "options": [
+              {"value": "top", "label": "Haut"},
+              {"value": "center", "label": "Centre"},
+              {"value": "bottom", "label": "Bas"}
+            ],
+            "default": "center",
+            "showIf": {"field": "logo_visible", "value": true}
+          },
+          "logo_width": {
+            "type": "number",
+            "label": "Largeur du logo (px)",
+            "default": 150,
+            "min": 50,
+            "max": 400,
+            "showIf": {"field": "logo_visible", "value": true}
+          }
+        }
+      },
+
+      "navigation": {
+        "type": "group",
+        "label": "Navigation",
+        "fields": {
+          "nav_align": {
+            "type": "select",
+            "label": "Alignement horizontal",
+            "options": [
+              {"value": "left", "label": "Gauche"},
+              {"value": "center", "label": "Centré"},
+              {"value": "right", "label": "Droite"}
+            ],
+            "default": "center"
+          },
+          "nav_vertical_align": {
+            "type": "select",
+            "label": "Alignement vertical",
+            "options": [
+              {"value": "top", "label": "Haut"},
+              {"value": "center", "label": "Centre"},
+              {"value": "bottom", "label": "Bas"}
+            ],
+            "default": "bottom"
+          },
+          "nav_text_color": {
+            "type": "color",
+            "label": "Couleur du texte",
+            "default": "#ffffff"
+          },
+          "nav_bg_color": {
+            "type": "color",
+            "label": "Couleur de fond",
+            "default": "rgba(255,255,255,0.25)"
+          }
+        }
+      },
+      "social": {
+        "type": "group",
+        "label": "Réseaux sociaux",
+        "fields": {
+          "social_align": {
+            "type": "select",
+            "label": "Alignement horizontal",
+            "options": [
+              {"value": "left", "label": "Gauche"},
+              {"value": "center", "label": "Centré"},
+              {"value": "right", "label": "Droite"}
+            ],
+            "default": "right"
+          },
+          "social_vertical_align": {
+            "type": "select",
+            "label": "Alignement vertical",
+            "options": [
+              {"value": "top", "label": "Haut"},
+              {"value": "center", "label": "Centre"},
+              {"value": "bottom", "label": "Bas"}
+            ],
+            "default": "top"
+          },
+          "social_icon_size": {
+            "type": "number",
+            "label": "Taille des icônes (px)",
+            "default": 24,
+            "min": 16,
+            "max": 48
+          },
+          "social_icon_color": {
+            "type": "color",
+            "label": "Couleur des icônes",
+            "default": "#ffffff"
+          }
+        }
+      }
+    }
+  },
+  "standard": {
+    "label": "Section Standard",
+    "extends": "_common",
+    "fields": {}
+  },
+  "footer": {
+    "label": "Section Footer",
+    "extends": "_common",
+    "fields": {
+      "footer_content": {
+        "type": "group",
+        "label": "Contenu Footer",
+        "fields": {
+          "footer_content_bg": {
+            "type": "color",
+            "label": "Couleur de fond du contenu",
+            "default": "#2c2c2c"
+          },
+          "footer_content_color": {
+            "type": "color",
+            "label": "Couleur du texte",
+            "default": "#ffffff"
+          }
+        }
+      }
+    }
+  },
+  "element_text": {
+    "label": "Élément Texte",
+    "fields": {
+      "content": {
+        "type": "group",
+        "label": "Contenu",
+        "fields": {
+          "text": {
+            "type": "textarea",
+            "label": "Texte",
+            "placeholder": "Entrez votre texte...",
+            "default": ""
+          },
+          "font": {
+            "type": "font-select",
+            "label": "Police",
+            "default": null
+          },
+          "font_size": {
+            "type": "number",
+            "label": "Taille (px)",
+            "default": 16,
+            "min": 12,
+            "max": 72
+          },
+          "text_color": {
+            "type": "color",
+            "label": "Couleur du texte",
+            "default": "#000000"
+          },
+          "text_align": {
+            "type": "select",
+            "label": "Alignement",
+            "options": [
+              {"value": "left", "label": "Gauche"},
+              {"value": "center", "label": "Centré"},
+              {"value": "right", "label": "Droite"}
+            ],
+            "default": "left"
+          }
+        }
+      }
+    }
+  },
+  "element_media": {
+    "label": "Élément Média",
+    "fields": {
+      "media": {
+        "type": "group",
+        "label": "Média",
+        "fields": {
+          "media_url": {
+            "type": "media",
+            "label": "Image ou Vidéo",
+            "required": true
+          },
+          "alt_text": {
+            "type": "text",
+            "label": "Texte alternatif",
+            "placeholder": "Description de l'image",
+            "default": ""
+          },
+          "width": {
+            "type": "number",
+            "label": "Largeur (px)",
+            "default": null,
+            "min": 50,
+            "max": 2000
+          },
+          "height": {
+            "type": "number",
+            "label": "Hauteur (px)",
+            "default": null,
+            "min": 50,
+            "max": 2000
+          },
+          "object_fit": {
+            "type": "select",
+            "label": "Ajustement",
+            "options": [
+              {"value": "cover", "label": "Couvrir"},
+              {"value": "contain", "label": "Contenir"},
+              {"value": "fill", "label": "Remplir"},
+              {"value": "none", "label": "Aucun"}
+            ],
+            "default": "cover"
+          }
+        }
+      }
+    }
+  },
+  "element_youtube": {
+    "label": "Élément YouTube",
+    "fields": {
+      "video": {
+        "type": "group",
+        "label": "Vidéo YouTube",
+        "fields": {
+          "youtube_url": {
+            "type": "text",
+            "label": "URL YouTube",
+            "placeholder": "https://youtube.com/watch?v=...",
+            "required": true
+          },
+          "width": {
+            "type": "number",
+            "label": "Largeur (px)",
+            "default": 560,
+            "min": 200,
+            "max": 1920
+          },
+          "height": {
+            "type": "number",
+            "label": "Hauteur (px)",
+            "default": 315,
+            "min": 150,
+            "max": 1080
+          },
+          "autoplay": {
+            "type": "checkbox",
+            "label": "Lecture automatique",
+            "default": false
+          }
+        }
+      }
+    }
+  },
+  "element_card": {
+    "label": "Élément Carte",
+    "fields": {
+      "media": {
+        "type": "group",
+        "label": "Image/Icône",
+        "fields": {
+          "media_url": {
+            "type": "media",
+            "label": "Image ou Icône",
+            "required": false
+          },
+          "height": {
+            "type": "number",
+            "label": "Hauteur (px)",
+            "default": 60,
+            "min": 30,
+            "max": 200
+          }
+        }
+      },
+      "title": {
+        "type": "group",
+        "label": "Titre de la carte",
+        "fields": {
+          "title_text": {
+            "type": "text",
+            "label": "Titre",
+            "placeholder": "Titre de la carte",
+            "required": true
+          },
+          "title_font": {
+            "type": "font-select",
+            "label": "Police du titre",
+            "default": null
+          },
+          "title_size": {
+            "type": "number",
+            "label": "Taille du titre (px)",
+            "default": 20,
+            "min": 12,
+            "max": 48
+          },
+          "title_color": {
+            "type": "color",
+            "label": "Couleur du titre",
+            "default": "#333333"
+          }
+        }
+      },
+      "description": {
+        "type": "group",
+        "label": "Description",
+        "fields": {
+          "description_text": {
+            "type": "textarea",
+            "label": "Texte de description",
+            "placeholder": "Description de la carte",
+            "default": ""
+          },
+          "description_font": {
+            "type": "font-select",
+            "label": "Police de la description",
+            "default": null
+          },
+          "description_size": {
+            "type": "number",
+            "label": "Taille (px)",
+            "default": 16,
+            "min": 12,
+            "max": 32
+          },
+          "description_color": {
+            "type": "color",
+            "label": "Couleur de la description",
+            "default": "#666666"
+          }
+        }
+      }
+    }
+  },
+  "element_gallery": {
+    "label": "Élément Galerie",
+    "fields": {
+      "media": {
+        "type": "group",
+        "label": "Image de galerie",
+        "fields": {
+          "media_url": {
+            "type": "media",
+            "label": "Image",
+            "required": true
+          },
+          "alt_text": {
+            "type": "text",
+            "label": "Texte alternatif",
+            "placeholder": "Description de l'image",
+            "default": ""
+          },
+          "width": {
+            "type": "number",
+            "label": "Largeur (px)",
+            "default": null,
+            "min": 50,
+            "max": 2000
+          },
+          "height": {
+            "type": "number",
+            "label": "Hauteur (px)",
+            "default": null,
+            "min": 50,
+            "max": 2000
+          }
+        }
+      }
+    }
+  },
+  "element_contact": {
+    "label": "Élément Contact",
+    "fields": {
+      "contact": {
+        "type": "group",
+        "label": "Configuration",
+        "fields": {
+          "button_text": {
+            "type": "text",
+            "label": "Texte du bouton",
+            "default": "Contactez-nous",
+            "required": true
+          },
+          "button_color": {
+            "type": "color",
+            "label": "Couleur du bouton",
+            "default": "#007bff"
+          },
+          "text_color": {
+            "type": "color",
+            "label": "Couleur du texte",
+            "default": "#ffffff"
+          }
+        }
+      }
+    }
+  },
+  "element_link": {
+    "label": "Élément Lien",
+    "fields": {
+      "link": {
+        "type": "group",
+        "label": "Configuration du lien",
+        "fields": {
+          "link_type": {
+            "type": "select",
+            "label": "Type de lien",
+            "options": [
+              {"value": "navigation", "label": "Navigation interne"},
+              {"value": "social", "label": "Réseau social"},
+              {"value": "external", "label": "Lien externe"}
+            ],
+            "default": "navigation"
+          },
+          "label": {
+            "type": "text",
+            "label": "Libellé",
+            "placeholder": "Texte du lien",
+            "required": true
+          },
+          "url": {
+            "type": "text",
+            "label": "URL",
+            "placeholder": "https://... ou #section-id",
+            "showIf": {"field": "link_type", "value": "external"}
+          },
+          "target_section_id": {
+            "type": "number",
+            "label": "ID de la section cible",
+            "placeholder": "123",
+            "showIf": {"field": "link_type", "value": "navigation"}
+          },
+          "text_color": {
+            "type": "color",
+            "label": "Couleur du texte",
+            "default": "#ffffff"
+          },
+          "bg_color": {
+            "type": "color",
+            "label": "Couleur de fond",
+            "default": "rgba(255,255,255,0.25)"
+          }
+        }
+      }
+    }
+  }
+}

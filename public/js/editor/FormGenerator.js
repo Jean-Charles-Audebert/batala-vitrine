@@ -7,14 +7,41 @@ class FormGenerator {
   constructor() {
     this.sectionSchemas = window.sectionSchemas || {};
     this.fontsData = window.fontsData || [];
+    this.mediaSelectors = new Map(); // Track MediaSelector instances
+  }
+
+  // Résoudre l'héritage de schémas (_common extends)
+  resolveSchema(schemaType) {
+    const schema = this.sectionSchemas[schemaType];
+    if (!schema) return null;
+
+    // Si le schéma hérite de _common
+    if (schema.extends === '_common') {
+      const baseSchema = this.sectionSchemas._common;
+      if (!baseSchema) return schema;
+
+      // Fusionner les fields de _common avec les fields spécifiques
+      return {
+        ...schema,
+        fields: {
+          ...baseSchema.fields,
+          ...schema.fields
+        }
+      };
+    }
+
+    return schema;
   }
 
   generateSectionForm(sectionType, sectionData = {}) {
-    const schema = this.sectionSchemas[sectionType];
+    const schema = this.resolveSchema(sectionType);
     if (!schema) {
       console.error('Schéma non trouvé pour le type:', sectionType);
       return;
     }
+
+    // Clear previous MediaSelector instances
+    this.mediaSelectors.clear();
 
     const dynamicForm = document.getElementById('section-dynamic-form');
     dynamicForm.innerHTML = '';
@@ -23,13 +50,17 @@ class FormGenerator {
     Object.keys(schema.fields).forEach(groupKey => {
       const group = schema.fields[groupKey];
       if (group.type === 'group') {
-        const groupElement = this.createFormGroup(groupKey, group, sectionData[groupKey] || {});
+        // Passer toutes les sectionData, pas juste sectionData[groupKey]
+        const groupElement = this.createFormGroup(groupKey, group, sectionData);
         dynamicForm.appendChild(groupElement);
       } else if (group.type === 'array') {
         const arrayElement = this.createFormArray(groupKey, group, sectionData[groupKey] || []);
         dynamicForm.appendChild(arrayElement);
       }
     });
+
+    // Attacher la logique conditionnelle après génération du formulaire
+    this.attachConditionalLogic();
   }
 
   createFormGroup(groupKey, groupSchema, groupData) {
@@ -58,6 +89,13 @@ class FormGenerator {
     const fieldDiv = document.createElement('div');
     fieldDiv.className = `form-group ${fieldSchema.type === 'textarea' || fieldSchema.type === 'array' ? 'full-width' : ''}`;
 
+    // Gestion showIf : rendre invisible si condition non remplie
+    if (fieldSchema.showIf) {
+      fieldDiv.dataset.showIfField = fieldSchema.showIf.field;
+      fieldDiv.dataset.showIfValue = fieldSchema.showIf.value;
+      fieldDiv.style.display = 'none'; // Masqué par défaut
+    }
+
     // Label
     if (fieldSchema.label) {
       const label = document.createElement('label');
@@ -67,9 +105,14 @@ class FormGenerator {
       fieldDiv.appendChild(label);
     }
 
+    // Normaliser les types : checkbox → boolean, font-select → font
+    const normalizedType = fieldSchema.type === 'checkbox' ? 'boolean' 
+                          : fieldSchema.type === 'font-select' ? 'font'
+                          : fieldSchema.type;
+
     // Champ selon le type
     let input;
-    switch (fieldSchema.type) {
+    switch (normalizedType) {
       case 'text':
       case 'url':
         input = document.createElement('input');
@@ -167,6 +210,16 @@ class FormGenerator {
         fieldDiv.appendChild(input);
         return fieldDiv;
 
+      case 'media-selector':
+        input = this.createMediaSelectorField(fieldKey, fieldSchema, fieldValue);
+        fieldDiv.appendChild(input);
+        return fieldDiv;
+
+      case 'range':
+        input = this.createRangeField(fieldKey, fieldSchema, fieldValue);
+        fieldDiv.appendChild(input);
+        return fieldDiv;
+
       default:
         input = document.createElement('input');
         input.type = 'text';
@@ -219,6 +272,108 @@ class FormGenerator {
     }
 
     return mediaField;
+  }
+
+  createMediaSelectorField(fieldKey, fieldSchema, fieldValue) {
+    const container = document.createElement('div');
+    container.id = `media-selector-${fieldKey}`;
+    container.className = 'media-selector-container';
+
+    // Radio buttons pour le type
+    const radioGroup = document.createElement('div');
+    radioGroup.className = 'radio-group';
+
+    const types = [
+      { value: 'none', label: 'Aucun' },
+      { value: 'media', label: 'Image/Vidéo' },
+      { value: 'youtube', label: 'YouTube' }
+    ];
+
+    types.forEach(type => {
+      const radioLabel = document.createElement('label');
+      radioLabel.className = 'radio-label';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `${fieldKey}_type`;
+      radio.value = type.value;
+      radio.dataset.fieldKey = fieldKey;
+
+      radioLabel.appendChild(radio);
+      radioLabel.appendChild(document.createTextNode(' ' + type.label));
+      radioGroup.appendChild(radioLabel);
+    });
+
+    container.appendChild(radioGroup);
+
+    // Champs pour media et youtube (masqués par défaut)
+    const mediaInput = document.createElement('input');
+    mediaInput.type = 'text';
+    mediaInput.id = `${fieldKey}_media`;
+    mediaInput.name = `${fieldKey}_media`;
+    mediaInput.placeholder = 'URL de l\'image ou vidéo';
+    mediaInput.style.display = 'none';
+    mediaInput.className = 'media-input';
+
+    const youtubeInput = document.createElement('input');
+    youtubeInput.type = 'text';
+    youtubeInput.id = `${fieldKey}_youtube`;
+    youtubeInput.name = `${fieldKey}_youtube`;
+    youtubeInput.placeholder = 'URL YouTube';
+    youtubeInput.style.display = 'none';
+    youtubeInput.className = 'youtube-input';
+
+    container.appendChild(mediaInput);
+    container.appendChild(youtubeInput);
+
+    // Initialiser MediaSelector avec ce conteneur
+    const selector = new MediaSelector(
+      `media-selector-${fieldKey}`,
+      `${fieldKey}_media`,
+      `${fieldKey}_youtube`,
+      `${fieldKey}_type`,
+      () => {} // onChange vide pour l'instant
+    );
+
+    selector.init();
+
+    // Set initial values si présentes
+    if (fieldValue) {
+      if (fieldValue.type) {
+        selector.setValues(fieldValue);
+      }
+    }
+
+    this.mediaSelectors.set(fieldKey, selector);
+
+    return container;
+  }
+
+  createRangeField(fieldKey, fieldSchema, fieldValue) {
+    const rangeContainer = document.createElement('div');
+    rangeContainer.className = 'range-field';
+
+    const input = document.createElement('input');
+    input.type = 'range';
+    input.id = `field-${fieldKey}`;
+    input.name = fieldKey;
+    input.min = fieldSchema.min !== undefined ? fieldSchema.min : 0;
+    input.max = fieldSchema.max !== undefined ? fieldSchema.max : 1;
+    input.step = fieldSchema.step !== undefined ? fieldSchema.step : 0.1;
+    input.value = fieldValue !== undefined ? fieldValue : (fieldSchema.default || 0.5);
+
+    const valueDisplay = document.createElement('span');
+    valueDisplay.className = 'range-value';
+    valueDisplay.textContent = input.value;
+
+    input.addEventListener('input', () => {
+      valueDisplay.textContent = input.value;
+    });
+
+    rangeContainer.appendChild(input);
+    rangeContainer.appendChild(valueDisplay);
+
+    return rangeContainer;
   }
 
   createFormArray(arrayKey, arraySchema, arrayData) {
@@ -314,6 +469,48 @@ class FormGenerator {
     }
   }
 
+  // Logique conditionnelle pour showIf
+  attachConditionalLogic() {
+    const fieldsWithConditions = document.querySelectorAll('[data-show-if-field]');
+
+    fieldsWithConditions.forEach(conditionalField => {
+      const dependencyFieldName = conditionalField.dataset.showIfField;
+      const dependencyValue = conditionalField.dataset.showIfValue;
+
+      // Trouver le champ dont dépend l'affichage
+      const dependencyField = document.querySelector(`[name="${dependencyFieldName}"]`);
+      
+      if (dependencyField) {
+        const checkVisibility = () => {
+          let currentValue;
+          if (dependencyField.type === 'checkbox') {
+            currentValue = dependencyField.checked ? 'true' : 'false';
+          } else if (dependencyField.type === 'radio') {
+            const checked = document.querySelector(`[name="${dependencyFieldName}"]:checked`);
+            currentValue = checked ? checked.value : '';
+          } else {
+            currentValue = dependencyField.value;
+          }
+
+          conditionalField.style.display = currentValue === dependencyValue ? '' : 'none';
+        };
+
+        // Vérifier au chargement
+        checkVisibility();
+
+        // Vérifier à chaque changement
+        if (dependencyField.type === 'radio') {
+          document.querySelectorAll(`[name="${dependencyFieldName}"]`).forEach(radio => {
+            radio.addEventListener('change', checkVisibility);
+          });
+        } else {
+          dependencyField.addEventListener('change', checkVisibility);
+          dependencyField.addEventListener('input', checkVisibility);
+        }
+      }
+    });
+  }
+
   collectFormData() {
     const formData = {};
     const fields = document.querySelectorAll('#section-dynamic-form input, #section-dynamic-form select, #section-dynamic-form textarea');
@@ -340,10 +537,24 @@ class FormGenerator {
             value = parseFloat(value);
           } else if (field.type === 'checkbox') {
             value = field.checked;
+          } else if (field.type === 'range') {
+            value = parseFloat(value);
           }
 
           formData[field.name] = value;
         }
+      }
+    });
+
+    // Récupérer les valeurs des MediaSelectors
+    this.mediaSelectors.forEach((selector, fieldKey) => {
+      const values = selector.getValues();
+      // Stocker le type et la valeur appropriée
+      formData[fieldKey] = values.type;
+      if (values.type === 'media') {
+        formData[`${fieldKey}_media`] = values.image;
+      } else if (values.type === 'youtube') {
+        formData[`${fieldKey}_youtube`] = values.youtube;
       }
     });
 

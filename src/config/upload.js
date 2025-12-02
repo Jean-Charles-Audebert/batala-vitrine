@@ -32,6 +32,8 @@ const fileFilter = (req, file, cb) => {
     "image/webp",
     "image/gif",
     "image/svg+xml",
+    "image/x-icon",
+    "image/vnd.microsoft.icon",
     // Vidéos
     "video/mp4",
     "video/webm",

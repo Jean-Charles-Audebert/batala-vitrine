@@ -1,5 +1,11 @@
 import { buildPageData, buildEditorData } from '../services/pageBuilder.js';
 import { logger } from '../utils/logger.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * GET /
@@ -46,12 +52,30 @@ export const showEditorPage = async (req, res) => {
     // Récupérer les données depuis la BDD uniquement
     const pageData = await buildEditorData();
 
+    // Charger les schémas des sections et éléments
+    const schemasPath = join(dirname(__dirname), '..', 'config', 'schemas.json');
+    const schemas = JSON.parse(readFileSync(schemasPath, 'utf8'));
+    
+    // Séparer schémas sections et éléments
+    const sectionSchemas = {};
+    const elementSchemas = {};
+    
+    Object.keys(schemas).forEach(key => {
+      if (key.startsWith('element_')) {
+        elementSchemas[key] = schemas[key];
+      } else {
+        sectionSchemas[key] = schemas[key];
+      }
+    });
+
     logger.info(`📝 Éditeur avec ${pageData.sections.length} sections totales`);
 
     // Rendre la vue d'édition
     return res.render('pages/editor', {
       title: 'Éditeur - ' + (pageData.page.title || 'Mon Site'),
       pageData,
+      sectionSchemas,
+      elementSchemas,
       user: req.user
     });
 

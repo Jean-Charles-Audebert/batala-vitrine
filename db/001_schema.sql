@@ -4,13 +4,13 @@
 -- ======================================
 
 -- Drops (en dev)
+DROP TABLE IF EXISTS hero_nav_links CASCADE; -- obsolète, remplacé par elements de type 'link'
 DROP TABLE IF EXISTS elements CASCADE;
 DROP TABLE IF EXISTS sections CASCADE;
 DROP TABLE IF EXISTS page CASCADE;
 DROP TABLE IF EXISTS fonts CASCADE;
 DROP TABLE IF EXISTS admins CASCADE;
 DROP TABLE IF EXISTS refresh_tokens CASCADE;
-DROP TABLE IF EXISTS fonts CASCADE;
 DROP TABLE IF EXISTS social_links CASCADE;
 DROP TABLE IF EXISTS nav_links CASCADE;
 

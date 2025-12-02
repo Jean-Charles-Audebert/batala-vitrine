@@ -6,80 +6,78 @@
   <meta name="description" content="<%= page.title || 'Mon Site' %>">
   <title><%= title %> | <%= page.title || 'Mon Site' %></title>
   
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+  
   <!-- Fonts -->
-  <% if (page.title_font_id && fonts) { %>
-    <% const titleFont = fonts.find(f => f.id == page.title_font_id); %>
-    <% if (titleFont && titleFont.font_url) { %>
-      <link rel="stylesheet" href="<%= titleFont.font_url %>">
-    <% } else if (titleFont && titleFont.file_path) { %>
-      <style>
-        @font-face {
-          font-family: '<%= titleFont.name %>';
-          src: url('<%= titleFont.file_path %>');
-        }
-      </style>
-    <% } %>
+  <%
+    const titleFont = (page.default_font_title && fonts) ? fonts.find(f => f.id == page.default_font_title) : null;
+    const textFont = (page.default_font_text && fonts) ? fonts.find(f => f.id == page.default_font_text) : null;
+  %>
+  
+  <% if (titleFont && titleFont.url) { %>
+    <link rel="stylesheet" href="<%= titleFont.url %>">
   <% } %>
 
-  <% if (page.text_font_id && fonts) { %>
-    <% const textFont = fonts.find(f => f.id == page.text_font_id); %>
-    <% if (textFont && textFont.font_url) { %>
-      <link rel="stylesheet" href="<%= textFont.font_url %>">
-    <% } else if (textFont && textFont.file_path) { %>
-      <style>
-        @font-face {
-          font-family: '<%= textFont.name %>';
-          src: url('<%= textFont.file_path %>');
-        }
-      </style>
-    <% } %>
+  <% if (textFont && textFont.url) { %>
+    <link rel="stylesheet" href="<%= textFont.url %>">
   <% } %>
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/css/index.css">
+  <link rel="stylesheet" href="/css/core.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/sections.css">
   <link rel="stylesheet" href="/css/page.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- CSS Variables pour thème global -->
-
   <style>
     :root {
-      <% if (page.default_font_title) { %>
-        --default-font-title: var(--font-<%= page.default_font_title %>);
+      <% if (titleFont && titleFont.font_family) { %>
+        --default-font-title: '<%= titleFont.font_family %>', sans-serif;
+      <% } else { %>
+        --default-font-title: Arial, sans-serif;
       <% } %>
-      <% if (page.default_font_text) { %>
-        --default-font-text: var(--font-<%= page.default_font_text %>);
+      
+      <% if (textFont && textFont.font_family) { %>
+        --default-font-text: '<%= textFont.font_family %>', sans-serif;
+      <% } else { %>
+        --default-font-text: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       <% } %>
+    }
+    
+    body {
+      background-color: <%= page.settings?.bg_color || page.bg_color || '#f5f5f5' %>;
     }
   </style>
 </head>
 <body class="vitrine-page">
   <%
     let bgImageStyle = '';
-    if (page.main_bg_image) {
-      bgImageStyle = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${page.main_bg_image}');background-repeat:${page.main_bg_image_repeat || 'no-repeat'};background-size:${page.main_bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
+    if (page.bg_image) {
+      bgImageStyle = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${page.bg_image}');background-repeat:${page.bg_image_repeat || 'no-repeat'};background-size:${page.bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
     }
   %>
   <% if (bgImageStyle) { %>
     <div class="global-bg-image" style="<%= bgImageStyle %>"></div>
   <% } %>
-  <% if (page.main_bg_video) { %>
+  <% if (page.bg_video) { %>
     <video class="section-bg-video global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
-      <source src="<%= page.main_bg_video %>" type="video/mp4">
+      <source src="<%= page.bg_video %>" type="video/mp4">
     </video>
-  <% } else if (page.main_bg_youtube) { %>
+  <% } else if (page.bg_video_youtube) { %>
     <% /* Extraction ID YouTube */ %>
     <% let videoId = '';
       try {
-        if (page.main_bg_youtube.includes('youtu.be/')) {
-          videoId = page.main_bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (page.main_bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(page.main_bg_youtube);
+        if (page.bg_video_youtube.includes('youtu.be/')) {
+          videoId = page.bg_video_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (page.bg_video_youtube.includes('youtube.com/watch')) {
+          const url = new URL(page.bg_video_youtube);
           videoId = url.searchParams.get('v');
-        } else if (page.main_bg_youtube.includes('youtube.com/embed/')) {
-          videoId = page.main_bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-        } else if (page.main_bg_youtube.includes('youtube.com/shorts/')) {
-          videoId = page.main_bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+        } else if (page.bg_video_youtube.includes('youtube.com/embed/')) {
+          videoId = page.bg_video_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+        } else if (page.bg_video_youtube.includes('youtube.com/shorts/')) {
+          videoId = page.bg_video_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
         }
       } catch (e) {}
     %>
@@ -152,17 +150,8 @@
   </script>
   
   <% if (user) { %>
-    <!-- FAB Add Section -->
-    <button id="fabAddSection" class="fab-add-section" aria-label="Ajouter une section" title="Ajouter une section">
-      ➕
-    </button>
     <!-- Indique au JS que l'utilisateur est connecté (admin unique) -->
     <script>window.userIsAdmin = true;</script>
-    <script type="module" src="/js/sections-edit.js"></script>
-    <script>
-      console.log('✅ Mode admin activé - sections v2');
-      console.log('💡 Cliquez sur les boutons ✏️ pour éditer');
-    </script>
   <% } %>
 </body>
 </html>

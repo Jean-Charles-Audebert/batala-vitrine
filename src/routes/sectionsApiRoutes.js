@@ -65,6 +65,19 @@ router.put('/sections/:id', async (req, res) => {
   }
 });
 
+// PATCH /api/sections/:id - Mise à jour partielle (pour toggle visibility, etc.)
+router.patch('/sections/:id', async (req, res) => {
+  try {
+    const section = await updateSection(parseInt(req.params.id, 10), req.body);
+    if (!section) {
+      return res.status(404).json({ error: 'Section non trouvée' });
+    }
+    res.json(section);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // DELETE /api/sections/:id - Supprimer une section
 router.delete('/sections/:id', async (req, res) => {
   try {

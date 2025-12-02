@@ -26,15 +26,3 @@ const showEdit = typeof user !== 'undefined' && user;
 <% } else { %>
   <p class="text-muted">Aucun réseau social configuré.</p>
 <% } %>
-
-<% if (showEdit) { %>
-  <button 
-    class="edit-btn edit-btn-social"
-    data-action="manage-social"
-    data-location="<%= socialLocation %>"
-    aria-label="Gérer les réseaux sociaux"
-    title="Gérer les réseaux sociaux"
-  >
-    <img src="/icons/settings.svg" alt="" class="icon">
-  </button>
-<% } %>

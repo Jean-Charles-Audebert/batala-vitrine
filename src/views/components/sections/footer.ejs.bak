@@ -1,0 +1,82 @@
+<%
+// Footer Section - Lit uniquement section.settings
+const s = section.settings || {};
+const bg = s.background || {};
+const title = s.title || {};
+const footerContent = s.footer_content || {};
+
+// Style simple
+let bgStyle = '';
+if (bg.bg_type === 'color') bgStyle = `background-color: ${bg.bg_color || '#333'}`;
+if (s.transparency?.is_transparent) bgStyle = 'background: transparent';
+%>
+<footer class="section section-footer" data-section-id="<%= section.id %>" style="<%= bgStyle %>">
+  <!-- Arrière-plan média -->
+  <% if (bg.bg_type === 'media' && bg.bg_media) { %>
+    <% if (bg.bg_media.match(/\.(mp4|webm)$/i)) { %>
+      <video class="section-bg-video" autoplay muted loop playsinline style="opacity: <%= bg.bg_opacity || 1 %>">
+        <source src="<%= bg.bg_media %>" type="video/mp4">
+      </video>
+    <% } else { %>
+      <div class="section-bg-image" style="background-image: url(<%= bg.bg_media %>); opacity: <%= bg.bg_opacity || 1 %>"></div>
+    <% } %>
+  <% } %>
+        videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
+      } else if (bg_youtube.includes('youtube.com/shorts/')) {
+        videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
+      }
+    } catch (e) {
+      console.error('Erreur extraction ID YouTube:', e);
+    }
+  %>
+  <% if (videoId) { %>
+  <iframe
+    class="section-bg-youtube"
+    src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+    style="pointer-events: none;">
+  </iframe>
+  <% } %>
+  <% } else if (bg_video) { %>
+  <video class="section-bg-video" autoplay muted loop playsinline>
+    <source src="<%= bg_video %>" type="video/mp4">
+  </video>
+  <% } %>
+
+ 
+  <div class="container">
+    <div class="footer-content">
+      <!-- Liens de navigation -->
+      <div class="footer-column footer-column--nav">
+        <% if (show_nav_links && navElements && navElements.length > 0) { %>
+          <nav class="footer-nav" data-nav-bg="<%= nav_bg_color %>" data-nav-color="<%= nav_text_color %>" aria-label="Liens de navigation">
+            <% navElements.forEach(navItem => { %>
+              <a href="#section-<%= navItem.settings?.target_section_id %>"><%= navItem.settings?.label %></a>
+            <% }); %>
+          </nav>
+        <% } %>
+      </div>
+
+      <!-- Bouton pour ouvrir la modale de contact -->
+      <div class="footer-column footer-column--contact">
+        <button class="btn-contact-modal" data-action="open-contact-modal">Contactez-nous</button>
+      </div>
+
+      <!-- Réseaux sociaux -->
+      <div class="footer-column footer-column--social">
+        <%- include('../social-links', { socialLinks, location: 'footer', user }) %>
+      </div>
+    </div>
+      <!-- Ligne copyright -->
+      <div class="footer-copyright">
+        <p>&copy; 2025 <a href="https://caixadev.dev" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">caixaDev</a>. Tous droits réservés.</p>
+      </div>
+    
+  </div>
+
+  <!-- Inclusion de la modale de contact -->
+  <%- include('../modals/contact-modal') %>
+</footer>

@@ -1,11 +1,77 @@
 import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
+import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
 import { createOptimizedVersion } from "../utils/imageOptimizer.js";
-import { query } from "../config/db.js";
 import { buildPageData, buildEditorData } from "../services/pageBuilder.js";
 import { getSocialIcon } from "../utils/socialIcons.js";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+
+// Fonction pour générer un mot de passe aléatoire sécurisé
+function generateSecurePassword() {
+  const length = 16;
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  let password = '';
+  const randomBytes = crypto.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    password += charset[randomBytes[i] % charset.length];
+  }
+  return password;
+}
+
+// Fonction pour envoyer l'email avec le mot de passe
+async function sendAdminPasswordEmail(email, password) {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpPort = process.env.SMTP_PORT || 587;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (!smtpHost || !smtpUser || !smtpPass) {
+    logger.warn('Configuration SMTP manquante, impossible d\'envoyer l\'email');
+    return false;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: parseInt(smtpPort),
+    secure: parseInt(smtpPort) === 465,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+  });
+
+  const { rows } = await query('SELECT contact_email, title FROM page LIMIT 1');
+  const contactEmail = rows[0]?.contact_email || smtpUser;
+  const siteTitle = rows[0]?.title || 'Le site';
+
+  const mailOptions = {
+    from: `"${siteTitle} - Administration" <${contactEmail}>`,
+    to: email,
+    replyTo: contactEmail,
+    subject: `Votre compte administrateur - ${siteTitle}`,
+    text: `Bonjour,\n\nVotre compte administrateur a été créé pour le site "${siteTitle}".\n\nEmail: ${email}\nMot de passe: ${password}\n\nVous pouvez vous connecter à l'adresse: ${process.env.BASE_URL || 'http://localhost:3000'}/auth/login\n\nCordialement,\nL'équipe ${siteTitle}`,
+    html: `
+      <h2>Votre compte administrateur a été créé</h2>
+      <p>Bonjour,</p>
+      <p>Votre compte administrateur a été créé avec succès pour le site <strong>${siteTitle}</strong>.</p>
+      <p><strong>Email :</strong> ${email}<br>
+      <strong>Mot de passe :</strong> <code>${password}</code></p>
+      <p><a href="${process.env.BASE_URL || 'http://localhost:3000'}/auth/login" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">Se connecter</a></p>
+      <p style="margin-top: 2rem; color: #666; font-size: 0.9rem;">Cordialement,<br>L'équipe ${siteTitle}</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    logger.error('Erreur envoi email admin:', error);
+    return false;
+  }
+}
 
 const router = express.Router();
 
@@ -76,7 +142,7 @@ router.get("/page", requireAuth, async (req, res) => {
 
 router.put("/page/theme", requireAuth, async (req, res) => {
   try {
-    const { title_font_id, main_bg_color, main_bg_image, main_bg_video } = req.body;
+    const { title_font_id, bg_color, bg_image, bg_video } = req.body;
 
     // Récupérer les settings actuels
     const { rows } = await query('SELECT settings FROM page WHERE id = 1');
@@ -85,9 +151,9 @@ router.put("/page/theme", requireAuth, async (req, res) => {
     // Mettre à jour les settings
     const updatedSettings = {
       ...currentSettings,
-      bg_color: main_bg_color || currentSettings.bg_color,
-      bg_image: main_bg_image || currentSettings.bg_image,
-      bg_video: main_bg_video || currentSettings.bg_video
+      bg_color: bg_color || currentSettings.bg_color,
+      bg_image: bg_image || currentSettings.bg_image,
+      bg_video: bg_video || currentSettings.bg_video
     };
 
     await query(
@@ -202,6 +268,148 @@ router.post(
         message: "Erreur lors de l'upload de l'image.",
       });
     }
+  }
+);
+
+// Route API pour récupérer la liste des admins (JSON)
+router.get("/admins", requireAuth, async (req, res) => {
+  try {
+    const { rows: admins } = await query(
+      "SELECT id, email, is_active, is_super_admin, created_at FROM admins WHERE is_super_admin = FALSE ORDER BY created_at DESC"
+    );
+    res.json({ admins });
+  } catch (error) {
+    logger.error("Erreur récupération admins:", error);
+    res.status(500).json({ error: "Erreur lors du chargement des admins" });
+  }
+});
+
+// Route API pour créer un admin
+router.post("/admins", requireAuth, async (req, res) => {
+  try {
+    const { email, is_active } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email requis' });
+    }
+
+    // Vérifier si l'email existe déjà
+    const { rows: existing } = await query('SELECT id FROM admins WHERE email = $1', [email]);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Cet email est déjà utilisé' });
+    }
+
+    // Générer un mot de passe aléatoire sécurisé
+    const generatedPassword = generateSecurePassword();
+    
+    const { hashPassword } = await import('../utils/password.js');
+    const passwordHash = await hashPassword(generatedPassword);
+    
+    // Convertir is_active en booléen (par défaut true si non spécifié)
+    const isActiveValue = is_active !== false && is_active !== 'false';
+    
+    logger.info(`Création admin: email=${email}, is_active reçu=${is_active}, is_active final=${isActiveValue}`);
+    
+    await query(
+      "INSERT INTO admins (email, password_hash, is_active, created_by) VALUES ($1, $2, $3, $4)",
+      [email, passwordHash, isActiveValue, req.user?.sub || 1]
+    );
+
+    // Envoyer l'email avec le mot de passe
+    const emailSent = await sendAdminPasswordEmail(email, generatedPassword);
+    
+    if (emailSent) {
+      logger.info(`Admin créé: ${email}, email envoyé avec succès`);
+      res.json({ success: true, message: `Admin créé avec succès. Un email a été envoyé à ${email} avec le mot de passe.` });
+    } else {
+      logger.warn(`Admin créé: ${email}, mais email non envoyé (config SMTP manquante)`);
+      res.json({ success: true, message: `Admin créé avec succès. Mot de passe temporaire: ${generatedPassword}`, password: generatedPassword });
+    }
+  } catch (error) {
+    logger.error('Erreur création admin:', error);
+    res.status(500).json({ error: 'Erreur lors de la création de l\'admin' });
+  }
+});
+
+// Route API pour mettre à jour un admin (seulement activer/désactiver)
+router.put("/admins/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_active } = req.body;
+
+    await query(
+      "UPDATE admins SET is_active=$1 WHERE id=$2 AND is_super_admin=FALSE",
+      [is_active === true || is_active === 'on', id]
+    );
+
+    res.json({ success: true, message: is_active ? 'Admin activé' : 'Admin désactivé' });
+  } catch (error) {
+    logger.error('Erreur modification admin:', error);
+    res.status(500).json({ error: 'Erreur lors de la modification de l\'admin' });
+  }
+});
+
+// Route API pour supprimer un admin
+router.delete("/admins/:id", requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await query("DELETE FROM admins WHERE id=$1", [id]);
+    res.json({ success: true, message: 'Admin supprimé avec succès' });
+  } catch (error) {
+    logger.error('Erreur suppression admin:', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de l\'admin' });
+  }
+});
+
+// Route API pour l'upload du favicon
+router.post(
+  "/upload/favicon",
+  requireAuth,
+  async (req, res, next) => {
+    // Multer avec gestion d'erreur inline
+    upload.single("favicon")(req, res, async (err) => {
+      if (err) {
+        logger.error("Erreur multer favicon:", err);
+        return res.status(400).json({
+          success: false,
+          message: err.message || "Erreur lors de l'upload"
+        });
+      }
+
+      try {
+        if (!req.file) {
+          return res.status(400).json({
+            success: false,
+            message: "Aucun fichier fourni.",
+          });
+        }
+
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        
+        const uploadedFile = path.join(process.cwd(), 'public/uploads', req.file.filename);
+        const faviconPath = path.join(process.cwd(), 'public/icons/favicon.ico');
+
+        // Copier le fichier vers favicon.ico
+        await fs.copyFile(uploadedFile, faviconPath);
+        
+        // Supprimer le fichier temporaire
+        await fs.unlink(uploadedFile);
+
+        logger.info(`Favicon mis à jour: ${req.file.filename}`);
+
+        res.json({
+          success: true,
+          message: "Favicon mis à jour avec succès",
+          url: "/icons/favicon.ico"
+        });
+      } catch (error) {
+        logger.error("Erreur upload favicon:", error);
+        res.status(500).json({
+          success: false,
+          message: "Erreur lors de l'upload du favicon.",
+        });
+      }
+    });
   }
 );
 
@@ -487,24 +695,8 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
       ]);
     }
 
-    // 3. Gérer les liens de navigation (hero_nav_links)
-    // Supprimer les anciens liens
-    await query(`DELETE FROM hero_nav_links WHERE section_id = $1`, [sectionId]);
-    
-    // Insérer les nouveaux liens
-    if (nav_sections && nav_sections.length > 0) {
-      for (let i = 0; i < nav_sections.length; i++) {
-        const targetId = nav_sections[i];
-        const targetSection = await query(`SELECT title, type FROM sections WHERE id = $1`, [targetId]);
-        const label = targetSection.rows[0]?.title || targetSection.rows[0]?.type || `Section ${targetId}`;
-        
-        await query(
-          `INSERT INTO hero_nav_links (section_id, target_section_id, label, position, is_visible)
-           VALUES ($1, $2, $3, $4, TRUE)`,
-          [sectionId, targetId, label, i]
-        );
-      }
-    }
+    // Note: Les liens de navigation sont maintenant gérés via des éléments de type 'link'
+    // dans la table elements, plus besoin de hero_nav_links
 
     res.json({ success: true, message: "Contenu hero mis à jour avec succès" });
   } catch (error) {
@@ -513,6 +705,80 @@ router.put("/sections/:id/hero-content", requireAuth, async (req, res) => {
       success: false,
       message: "Erreur lors de la mise à jour du contenu hero"
     });
+  }
+});
+
+// === ROUTES POUR LA GESTION DES POLICES ===
+router.get('/fonts', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await query('SELECT * FROM fonts ORDER BY name ASC');
+    res.json(rows);
+  } catch (error) {
+    logger.error('Erreur récupération polices:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des polices' });
+  }
+});
+
+router.post('/fonts', requireAuth, async (req, res) => {
+  const { name, source, font_family, url, variants } = req.body;
+
+  try {
+    const { rows } = await query(`
+      INSERT INTO fonts (name, source, font_family, url, variants)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `, [name, source, font_family, url, JSON.stringify(variants || [])]);
+
+    res.json(rows[0]);
+  } catch (error) {
+    logger.error('Erreur création police:', error);
+    res.status(500).json({ error: 'Erreur lors de la création de la police' });
+  }
+});
+
+router.post('/fonts/upload', requireAuth, upload.single('file'), async (req, res) => {
+  const { name, font_family, source } = req.body;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ error: 'Aucun fichier fourni' });
+  }
+
+  try {
+    // Le fichier est déjà uploadé dans public/uploads/, créer le chemin relatif
+    const filePath = `/uploads/${file.filename}`;
+
+    const { rows } = await query(`
+      INSERT INTO fonts (name, source, font_family, url)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `, [name, source, font_family, filePath]);
+
+    res.json(rows[0]);
+  } catch (error) {
+    logger.error('Erreur upload police:', error);
+    res.status(500).json({ error: 'Erreur lors de l\'upload de la police' });
+  }
+});
+
+router.delete('/fonts/:id', requireAuth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Vérifier que la police n'est pas utilisée
+    const { rows: usageCheck } = await query(`
+      SELECT COUNT(*) as count FROM page WHERE default_font_title = $1 OR default_font_text = $1
+    `, [id]);
+
+    if (usageCheck[0].count > 0) {
+      return res.status(400).json({ error: 'Cette police est utilisée et ne peut pas être supprimée' });
+    }
+
+    await query('DELETE FROM fonts WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('Erreur suppression police:', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de la police' });
   }
 });
 

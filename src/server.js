@@ -35,14 +35,8 @@ import { sendContactEmail } from "./controllers/contactController.js";
 import { logger } from "./utils/logger.js";
 import { query } from "./config/db.js";
 
-/**
- * Initialisation des sections par défaut (legacy - maintenant géré par seed-database.js)
- * Cette fonction n'est plus utilisée car nous utilisons le seeding explicite
- */
-async function initializeDefaultSections() {
-  // Code legacy supprimé - maintenant géré par scripts/seed-database.js
-  // La seule source de vérité est la base PostgreSQL seedée par seed-database.js
-}
+// Fonction legacy supprimée - seeding géré par scripts/seed-database.js
+// La seule source de vérité est la base PostgreSQL
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -165,6 +159,5 @@ app.listen(PORT, async () => {
     })();
   }
 
-  // Initialiser les sections par défaut
-  await initializeDefaultSections();
+  // Sections initialisées par seed-database.js - pas d'init automatique
 });

@@ -1,0 +1,64 @@
+<%
+// Hero Section - Lit uniquement section.settings
+const s = section.settings || {};
+const bg = s.background || {};
+const title = s.title || {};
+const logo = s.logo || {};
+const heroTitle = s.hero_title || {};
+const nav = s.navigation || {};
+const social = s.social || {};
+
+// Styles inline simples
+let bgStyle = '';
+if (bg.bg_type === 'color') bgStyle = `background-color: ${bg.bg_color || '#1a1a1a'}`;
+if (s.transparency?.is_transparent) bgStyle = 'background: transparent';
+%>
+<header class="hero-section" style="<%= bgStyle %>">
+  <% if (bg_video) { %>
+    <video class="section-bg-video" autoplay muted loop playsinline>
+      <source src="<%= bg_video %>" type="video/mp4">
+    </video>
+  <% } else if (bg_youtube) { %>
+    <%
+      let videoId = '';
+      try {
+        if (bg_youtube.includes('youtu.be/')) {
+          videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (bg_youtube.includes('youtube.com/watch')) {
+          const url = new URL(bg_youtube);
+          videoId = url.searchParams.get('v');
+        }
+      } catch (e) {}
+    %>
+    <% if (videoId) { %>
+      <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <% } %>
+  <% } %>
+
+  <div class="hero-grid">
+    <!-- Logo -->
+    <% if (logo_url) { %>
+      <div class="<%= logoClasses.join(' ') %>" data-logo-width="<%= logo_width %>">
+        <img src="<%= logo_url %>" alt="Logo">
+      </div>
+    <% } %>
+
+    <!-- Liens de navigation -->
+    <% if (show_nav_links && navElements && navElements.length > 0) { %>
+      <nav class="<%= navClasses.join(' ') %>" data-nav-bg="<%= nav_bg_color %>" data-nav-color="<%= nav_text_color %>">
+        <% navElements.forEach(navItem => { %>
+          <a href="#section-<%= navItem.settings?.target_section_id %>"><%= navItem.settings?.label %></a>
+        <% }); %>
+      </nav>
+    <% } %>
+
+    <!-- Contenu principal -->
+    <div class="<%= titleClasses.join(' ') %>">
+      <% if (sectionTitle) { %>
+        <h1 class="hero-content h1 font-title-default" <% if (sectionTitleColor) { %>style="--hero-title-color: <%= sectionTitleColor %>"<% } %>><%= sectionTitle %></h1>
+      <% } %>
+    </div>
+
+    <!-- Réseaux sociaux -->
+    <%- include('../social-links', { socialLinks, location: 'hero', user }) %>
+  </div>

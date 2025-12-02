@@ -48,32 +48,8 @@ async function inspectAndMigrateDatabase() {
       }
     }
 
-    // 2. Créer la table hero_nav_links si elle n'existe pas
-    console.log('\n🔍 Vérification de la table hero_nav_links...');
-    try {
-      await query(`
-        CREATE TABLE IF NOT EXISTS hero_nav_links (
-          id SERIAL PRIMARY KEY,
-          section_id INT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
-          target_section_id INT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
-          label VARCHAR(255) NOT NULL,
-          position INT DEFAULT 0,
-          is_visible BOOLEAN DEFAULT TRUE,
-          created_at TIMESTAMP DEFAULT NOW()
-        )
-      `);
-      console.log('✅ Table hero_nav_links créée/vérifiée');
-
-      // Créer un index si nécessaire
-      try {
-        await query(`CREATE INDEX IF NOT EXISTS idx_hero_nav_links_section_id ON hero_nav_links(section_id)`);
-        console.log('✅ Index hero_nav_links créé');
-      } catch (indexError) {
-        console.log('ℹ️ Index hero_nav_links déjà existant');
-      }
-    } catch (tableError) {
-      console.log(`❌ Erreur création table hero_nav_links: ${tableError.message}`);
-    }
+    // Note: La table hero_nav_links a été supprimée
+    // Les liens de navigation sont maintenant gérés via la table elements
 
     // 3. Inspection des données
     console.log('\n=== INSPECTION DES DONNEES ===\n');
@@ -84,7 +60,8 @@ async function inspectAndMigrateDatabase() {
       'sections',
       'elements',
       'fonts',
-      'hero_nav_links'
+      'social_links',
+      'nav_links'
     ];
 
     for (const table of tables) {

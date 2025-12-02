@@ -186,13 +186,26 @@ async function seedDatabase() {
         position: 1,
         is_visible: true,
         settings: {
-          bg_color: '#fff',
+          // --- Title group ---
           title: 'Présentation',
-          show_title: true,
-          title_color: '#333',
           title_font: defaultFontTitleId,
+          title_color: '#333',
           title_size: 32,
+          show_title: true,
+          
+          // --- Background group ---
+          bg_type: 'color', // 'color' | 'media' | 'youtube'
+          bg_color: '#fff',
+          bg_image: null,
+          bg_video: null,
+          bg_youtube: null,
+          
+          // --- Transparency group ---
+          bg_transparent: false,
+          
+          // --- Layout ---
           layout: '12-cols-grid',
+          align: 'center',
         },
         elements: [
           {
@@ -201,11 +214,13 @@ async function seedDatabase() {
             col_end: 11,
             settings: {
               content: 'Lorem ipsum dolor sit amet...',
-              size: '20px',
-              color: '#333',
-              align: 'center',
-              vertical_align: 'top',
               font_id: defaultFontTextId,
+              size: 20, // px
+              color: '#333',
+              bg_color: null,
+              align: 'center', // 'left' | 'center' | 'right'
+              vertical_align: 'top', // 'top' | 'center' | 'bottom'
+              padding: 0, // px
             },
           },
         ],
@@ -229,8 +244,12 @@ async function seedDatabase() {
             col_end: 8,
             settings: {
               media_url: '/uploads/test-media/banner-2.jpg',
+              media_type: 'image',
+              width: 'auto',
+              height: null, // px or null for auto
               align: 'left',
               vertical_align: 'center',
+              alt_text: 'Banner',
             },
           },
           {
@@ -239,11 +258,13 @@ async function seedDatabase() {
             col_end: 12,
             settings: {
               content: "Description associée à l'image.",
-              size: '18px',
+              font_id: defaultFontTextId,
+              size: 18, // px
               color: '#000',
+              bg_color: null,
               align: 'left',
               vertical_align: 'center',
-              font_id: defaultFontTextId,
+              padding: 0,
             },
           },
         ],
@@ -267,17 +288,22 @@ async function seedDatabase() {
             col_end: 5,
             settings: {
               media_url: '/assets/icon-consulting.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: 60, // px
+              align: 'center',
+              vertical_align: 'top',
               title: {
                 text: 'Consulting',
                 font_id: defaultFontTitleId,
-                size: '20px',
+                size: 20, // px
                 color: '#333',
                 bg_color: null,
               },
               description: {
                 text: 'Description du service 1',
                 font_id: defaultFontTextId,
-                size: '16px',
+                size: 16, // px
                 color: '#666',
                 bg_color: null,
               },
@@ -289,17 +315,22 @@ async function seedDatabase() {
             col_end: 9,
             settings: {
               media_url: '/assets/icon-support.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: 60, // px
+              align: 'center',
+              vertical_align: 'top',
               title: {
                 text: 'Support',
                 font_id: defaultFontTitleId,
-                size: '20px',
+                size: 20, // px
                 color: '#333',
                 bg_color: null,
               },
               description: {
                 text: 'Description du service 2',
                 font_id: defaultFontTextId,
-                size: '16px',
+                size: 16, // px
                 color: '#666',
                 bg_color: null,
               },
@@ -311,17 +342,22 @@ async function seedDatabase() {
             col_end: 12,
             settings: {
               media_url: '/assets/icon-event.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: 60, // px
+              align: 'center',
+              vertical_align: 'top',
               title: {
                 text: 'Événements',
                 font_id: defaultFontTitleId,
-                size: '20px',
+                size: 20, // px
                 color: '#333',
                 bg_color: null,
               },
               description: {
                 text: 'Description du service 3',
                 font_id: defaultFontTextId,
-                size: '16px',
+                size: 16, // px
                 color: '#666',
                 bg_color: null,
               },
@@ -346,49 +382,111 @@ async function seedDatabase() {
             type: 'gallery',
             col_start: 1,
             col_end: 6,
-            settings: { media_url: '/assets/icon-consulting.svg' },
+            settings: { 
+              media_url: '/assets/icon-consulting.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 1',
+            },
           },
           {
             type: 'gallery',
             col_start: 7,
             col_end: 12,
-            settings: { media_url: '/assets/placeholder-1.svg' },
+            settings: { 
+              media_url: '/assets/placeholder-1.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 2',
+            },
           },
           {
             type: 'gallery',
             col_start: 1,
             col_end: 6,
-            settings: { media_url: '/assets/placeholder-2.svg' },
+            settings: { 
+              media_url: '/assets/placeholder-2.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 3',
+            },
           },
           {
             type: 'gallery',
             col_start: 7,
             col_end: 12,
-            settings: { media_url: '/assets/placeholder-3.svg' },
+            settings: { 
+              media_url: '/assets/placeholder-3.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 4',
+            },
           },
           {
             type: 'gallery',
             col_start: 1,
             col_end: 6,
-            settings: { media_url: '/assets/placeholder-person1.svg' },
+            settings: { 
+              media_url: '/assets/placeholder-person1.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 5',
+            },
           },
           {
             type: 'gallery',
             col_start: 7,
             col_end: 12,
-            settings: { media_url: '/assets/placeholder-person2.svg' },
+            settings: { 
+              media_url: '/assets/placeholder-person2.svg',
+              media_type: 'image',
+              width: 'auto',
+              height: null,
+              align: 'center',
+              vertical_align: 'center',
+              alt_text: 'Image 6',
+            },
           },
           {
             type: 'youtube',
             col_start: 1,
             col_end: 6,
-            settings: { youtube_url: 'https://youtu.be/2WPplCREC1c' },
+            settings: { 
+              youtube_url: 'https://youtu.be/2WPplCREC1c',
+              align: 'center',
+              vertical_align: 'center',
+              autoplay: false,
+              mute: false,
+              loop: false,
+            },
           },
           {
             type: 'youtube',
             col_start: 7,
             col_end: 12,
-            settings: { youtube_url: 'https://youtu.be/xbZVTo_9Bfg' },
+            settings: { 
+              youtube_url: 'https://youtu.be/xbZVTo_9Bfg',
+              align: 'center',
+              vertical_align: 'center',
+              autoplay: false,
+              mute: false,
+              loop: false,
+            },
           },
         ],
       },
@@ -465,22 +563,55 @@ async function seedDatabase() {
         [
           pageId,
           JSON.stringify({
+            // --- Title group ---
             title: 'Bienvenue',
             title_font: defaultFontTitleId,
             title_color: '#000',
             title_size: 80,
+            show_title: true,
+            
+            // --- Background group ---
+            bg_type: 'media', // 'color' | 'media' | 'youtube'
             bg_color: '#f0f0f0',
-            bg_transparent: false,
-            layout: '12-cols-grid',
             bg_image: '/assets/header-bg-default.svg',
+            bg_video: null,
+            bg_youtube: null,
+            
+            // --- Transparency group ---
+            bg_transparent: false,
+            
+            // --- Layout ---
+            layout: '12-cols-grid',
             align: 'center',
             vertical_align: 'center',
+            
+            // --- Logo (hero-specific, position via elements) ---
+            logo_visible: true,
+            logo_align: 'left',
+            logo_vertical_align: 'center',
+            logo_width: 150,
+            
+            // --- Hero Title (hero-specific) ---
+            title_align: 'center',
+            title_vertical_align: 'center',
+            
+            // --- Navigation (hero-specific, position via elements) ---
+            nav_align: 'center',
+            nav_vertical_align: 'bottom',
+            nav_text_color: '#ffffff',
+            nav_bg_color: 'rgba(255,255,255,0.25)',
+            
+            // --- Social Links (hero-specific) ---
+            social_align: 'right',
+            social_vertical_align: 'top',
+            social_icon_size: 24,
+            social_icon_color: '#ffffff'
           }),
         ]
       )
     ).rows[0].id;
 
-    // Hero - Logo
+    // Hero - Logo element
     await client.query(
       `INSERT INTO elements (section_id,type,col_start,col_end,settings)
    VALUES ($1,'media',1,3,$2)`,
@@ -488,10 +619,12 @@ async function seedDatabase() {
         heroId,
         JSON.stringify({
           media_url: '/assets/logo-default.svg',
-          width: 'auto',
-          height: '80px',
-          align: 'left',
-          vertical_align: 'center',
+          media_type: 'image', // 'image' | 'video'
+          width: 'auto', // 'auto' | px value
+          height: 80, // px
+          align: 'left', // 'left' | 'center' | 'right'
+          vertical_align: 'center', // 'top' | 'center' | 'bottom'
+          alt_text: 'Logo',
         }),
       ]
     );
@@ -503,9 +636,23 @@ async function seedDatabase() {
         [
           pageId,
           JSON.stringify({
+            // --- Background group ---
+            bg_type: 'color',
             bg_color: '#333',
+            bg_image: null,
+            bg_video: null,
+            bg_youtube: null,
+            
+            // --- Transparency group ---
             bg_transparent: false,
+            
+            // --- Layout ---
             layout: '12-cols-grid',
+            
+            // --- Footer Content (footer-specific) ---
+            footer_content_bg: 'rgba(255, 255, 255, 0.1)',
+            footer_content_color: '#ffffff',
+            content_link_color: '#ffffff',
           }),
         ]
       )

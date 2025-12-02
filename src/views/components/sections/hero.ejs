@@ -1,127 +1,125 @@
 <%
-/**
- * Composant Section Hero - Version modulaire avec elements
- */
+// =====================================================
+// Hero Section - Version nettoyée
+// Lecture depuis: section.settings (JSONB) + elements
+// =====================================================
+const s = section.settings || {};
 
-// Trouver les éléments pertinents
-const logoElement = section.elements?.find(el => el.type === 'media' && el.settings?.media_url?.includes('logo')) || {};
+// --- SETTINGS (from JSONB) ---
+const sectionTitle = s.title || '';
+const titleFont = s.title_font;
+const titleSize = s.title_size || 80;
+const titleColor = s.title_color || '#ffffff';
+
+// Background
+const bg_color = s.bg_color || '#1a1a1a';
+const bg_image = s.bg_image;
+const bg_video = s.bg_video;
+const bg_youtube = s.bg_youtube;
+const is_transparent = s.bg_transparent || false;
+
+// Layout
+const align = s.align || 'center';
+const vertical_align = s.vertical_align || 'center';
+
+// --- ELEMENTS (from elements table) ---
+const logoElement = section.elements?.find(el => el.type === 'media' && el.settings?.media_url?.includes('logo')) || null;
 const navElements = section.elements?.filter(el => el.type === 'link' && el.settings?.link_type === 'navigation') || [];
 
-// Positions depuis les propriétés des éléments
-const logo_position_h = logoElement.settings?.align || 'left';
-const logo_position_v = logoElement.settings?.vertical_align || 'center';
-const nav_position_h = navElements.length > 0 ? navElements[0].settings?.align || 'center' : 'center';
-const nav_position_v = navElements.length > 0 ? navElements[0].settings?.vertical_align || 'bottom' : 'bottom';
+// Logo config (from element + settings visibility)
+const logo_visible = s.logo_visible !== false; // true par défaut
+const logo_url = logo_visible ? logoElement?.settings?.media_url : null;
+const logo_width = logoElement?.settings?.width || 150;
+const logo_align = s.logo_align || logoElement?.settings?.align || 'left';
+const logo_vertical_align = s.logo_vertical_align || logoElement?.settings?.vertical_align || 'center';
 
-// Fonction helper pour convertir les positions en classes CSS
+// Navigation config (from first nav element)
+const nav_align = navElements[0]?.settings?.align || 'center';
+const nav_vertical_align = navElements[0]?.settings?.vertical_align || 'bottom';
+const nav_text_color = navElements[0]?.settings?.text_color || '#ffffff';
+const nav_bg_color = navElements[0]?.settings?.bg_color || 'rgba(255,255,255,0.25)';
+
+// --- HELPERS ---
 function getPositionClasses(hPos, vPos) {
-  const colMap = {
-    'left': ['col-start-1', 'col-span-4'],
-    'center': ['col-start-5', 'col-span-4'],
-    'right': ['col-start-11', 'col-span-4']
+  const colMap = { 
+    'left': ['col-start-1', 'col-span-4'], 
+    'center': ['col-start-5', 'col-span-4'], 
+    'right': ['col-start-9', 'col-span-4'] 
   };
   const rowMap = { 'top': 'row-1', 'center': 'row-2', 'bottom': 'row-3' };
-
-  const cols = colMap[hPos] || ['col-start-1', 'col-span-4'];
-  const row = rowMap[vPos] || 'row-2';
-
-  return [...cols, row];
+  return [...(colMap[hPos] || colMap['center']), rowMap[vPos] || 'row-2'];
 }
 
-// Configuration du logo depuis l'élément
-const logo_url = logoElement.settings?.media_url;
-const logoClasses = ['hero-logo', ...getPositionClasses(logo_position_h, logo_position_v)];
+const logoClasses = ['hero-logo', ...getPositionClasses(logo_align, logo_vertical_align)];
+const navClasses = ['hero-nav', ...getPositionClasses(nav_align, nav_vertical_align)];
+const titleClasses = ['hero-content', ...getPositionClasses(align, vertical_align)];
 
-// Configuration des liens de navigation
-const navClasses = ['hero-nav', ...getPositionClasses(nav_position_h, nav_position_v)];
-
-// Configuration de la section depuis settings JSONB
-const sectionSettings = section.settings || {};
-const {
-  bg_color = '#1a1a1a',
-  bg_image,
-  bg_video,
-  bg_youtube,
-  is_transparent = false,
-  layout = 'center',
-  logo_width = logoElement.settings?.width || 150,
-  show_nav_links = section.show_nav_links || navElements.length > 0,
-  nav_text_color = section.nav_text_color || '#ffffff',
-  nav_bg_color = section.nav_bg_color || 'rgba(255,255,255,0.25)',
-  is_sticky = section.is_sticky || false,
-  title: sectionTitle,
-  title_color: sectionTitleColor,
-  align = 'center',
-  vertical_align = 'center'
-} = sectionSettings;
-
-// Styles pour le header
+// Build background styles
 const headerStyles = [];
-if (bg_color && !is_transparent) headerStyles.push(`background-color: ${bg_color}`);
+if (!is_transparent && bg_color) {
+  headerStyles.push(`background-color: ${bg_color}`);
+}
 if (bg_image) {
   headerStyles.push(`background-image: url(${bg_image})`);
   headerStyles.push(`background-size: cover`);
-  headerStyles.push(`background-repeat: no-repeat`);
   headerStyles.push(`background-position: center`);
+  headerStyles.push(`background-repeat: no-repeat`);
+}
+if (is_transparent) {
+  headerStyles.push('background: transparent');
 }
 
-// Classes pour le header
-const headerClasses = ['hero-section'];
-if (is_transparent) headerClasses.push('hero-transparent');
-if (is_sticky) headerClasses.push('hero-sticky');
-
-// Style inline pour le header
-const headerStyle = headerStyles.length > 0 ? headerStyles.join('; ') : '';
-
-
-// Configuration du titre depuis les settings de section
-const titleClasses = ['hero-content', ...getPositionClasses(align, vertical_align)];
-%><header class="<%= headerClasses.join(' ') %>" <% if (headerStyle) { %>style="<%= headerStyle %>"<% } %>>
+const bgStyle = headerStyles.length > 0 ? headerStyles.join('; ') : '';
+%>
+<header class="hero-section" <% if (bgStyle) { %>style="<%= bgStyle %>"<% } %>>
+  <!-- Arrière-plan média -->
   <% if (bg_video) { %>
     <video class="section-bg-video" autoplay muted loop playsinline>
       <source src="<%= bg_video %>" type="video/mp4">
     </video>
   <% } else if (bg_youtube) { %>
-    <%
+    <% 
       let videoId = '';
       try {
-        if (bg_youtube.includes('youtu.be/')) {
-          videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(bg_youtube);
-          videoId = url.searchParams.get('v');
-        }
+        if (bg_youtube.includes('youtu.be/')) videoId = bg_youtube.split('youtu.be/')[1].split('?')[0];
+        else if (bg_youtube.includes('youtube.com/watch')) videoId = new URL(bg_youtube).searchParams.get('v');
       } catch (e) {}
     %>
     <% if (videoId) { %>
-      <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0" frameborder="0" allowfullscreen></iframe>
     <% } %>
   <% } %>
 
   <div class="hero-grid">
-    <!-- Logo -->
+    <!-- Logo (from elements) -->
     <% if (logo_url) { %>
       <div class="<%= logoClasses.join(' ') %>" data-logo-width="<%= logo_width %>">
         <img src="<%= logo_url %>" alt="Logo">
       </div>
     <% } %>
 
-    <!-- Liens de navigation -->
-    <% if (show_nav_links && navElements && navElements.length > 0) { %>
-      <nav class="<%= navClasses.join(' ') %>" data-nav-bg="<%= nav_bg_color %>" data-nav-color="<%= nav_text_color %>">
+    <!-- Navigation (from elements) -->
+    <% if (navElements.length > 0) { %>
+      <nav class="<%= navClasses.join(' ') %>" style="background-color: <%= nav_bg_color %>; color: <%= nav_text_color %>;">
         <% navElements.forEach(navItem => { %>
-          <a href="#section-<%= navItem.settings?.target_section_id %>"><%= navItem.settings?.label %></a>
+          <a href="#section-<%= navItem.settings?.target_section_id %>" style="color: <%= nav_text_color %>;">
+            <%= navItem.settings?.label %>
+          </a>
         <% }); %>
       </nav>
     <% } %>
 
-    <!-- Contenu principal -->
-    <div class="<%= titleClasses.join(' ') %>">
-      <% if (sectionTitle) { %>
-        <h1 class="hero-content h1 font-title-default" <% if (sectionTitleColor) { %>style="--hero-title-color: <%= sectionTitleColor %>"<% } %>><%= sectionTitle %></h1>
-      <% } %>
-    </div>
+    <!-- Titre principal (from settings) -->
+    <% if (sectionTitle) { %>
+      <div class="<%= titleClasses.join(' ') %>">
+        <h1 class="hero-content h1 font-title-default" 
+            style="color: <%= titleColor %>; font-size: <%= titleSize %>px;">
+          <%= sectionTitle %>
+        </h1>
+      </div>
+    <% } %>
 
-    <!-- Réseaux sociaux -->
-    <%- include('../social-links', { socialLinks, location: 'hero', user }) %>
+    <!-- Réseaux sociaux (from socialLinks query) -->
+    <%- include('../social-links', { socialLinks: socialLinks || [], location: 'hero', user }) %>
   </div>
+</header>

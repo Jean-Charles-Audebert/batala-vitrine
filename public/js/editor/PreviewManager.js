@@ -10,40 +10,73 @@ class PreviewManager {
   }
 
   init() {
+    console.log('PreviewManager.init() appelé');
     this.iframe = document.getElementById('preview-iframe');
-    this.loadPreview();
+    console.log('Iframe trouvé:', !!this.iframe);
+    
+    if (this.iframe) {
+      console.log('Chargement immédiat de l\'aperçu');
+      this.iframe.src = '/api/preview';
+      this.iframe.onload = () => {
+        console.log('Aperçu chargé avec succès');
+      };
+      this.iframe.onerror = (e) => {
+        console.error('Erreur de chargement de l\'aperçu:', e);
+      };
+    } else {
+      console.error('Iframe non trouvé dans le DOM');
+    }
   }
 
   loadPreview() {
     const iframe = this.iframe;
     const previewFrame = document.getElementById('preview-frame');
 
-    // Afficher le placeholder de chargement
-    iframe.style.display = 'none';
-    previewFrame.insertAdjacentHTML('beforeend', '<div class="preview-placeholder" id="loading-placeholder"><i class="fas fa-spinner fa-spin"></i><p>Chargement de l\'aperçu...</p></div>');
+    console.log('loadPreview() appelé, iframe:', iframe, 'previewFrame:', previewFrame);
 
-    // Définir directement la source de l'iframe vers la route d'aperçu
+    // Test simple : charger directement l'URL dans l'iframe
+    console.log('Définition de iframe.src = /api/preview');
     iframe.src = '/api/preview';
 
     // Attendre que l'iframe soit chargé puis injecter les polices
     iframe.onload = () => {
+      console.log('Iframe chargé avec succès - contenu réel de l\'API');
       setTimeout(() => {
         this.injectFontsIntoIframe();
         this.hideLoadingPlaceholder();
         iframe.style.display = 'block';
       }, 500);
     };
+
+    iframe.onerror = (error) => {
+      console.error('Erreur de chargement de l\'iframe:', error);
+    };
   }
 
-  injectFontsIntoIframe() {
+  /**
+   * Injecte ou met à jour les polices dans l'iframe de prévisualisation
+   * @param {number} titleFontId - ID de la police pour les titres (optionnel, sinon prend depuis le select)
+   * @param {number} textFontId - ID de la police pour le texte (optionnel, sinon prend depuis le select)
+   */
+  injectFontsIntoIframe(titleFontId = null, textFontId = null) {
+    if (!this.iframe) return;
+
     try {
       const iframeDoc = this.iframe.contentDocument || this.iframe.contentWindow.document;
       if (!iframeDoc) return;
 
-      // Récupérer les polices sélectionnées dans les selects
-      const titleFontId = document.getElementById('page-title-font-id').value;
-      const textFontId = document.getElementById('page-text-font-id').value;
+      // Récupérer les IDs depuis les selects si non fournis
+      if (titleFontId === null) {
+        const titleFontSelect = document.getElementById('page-title-font-id');
+        titleFontId = titleFontSelect ? titleFontSelect.value : null;
+      }
+      if (textFontId === null) {
+        const textFontSelect = document.getElementById('page-text-font-id');
+        textFontId = textFontSelect ? textFontSelect.value : null;
+      }
 
+      const fontsData = this.fontsData || window.fontsData || [];
+      
       let titleFontFamily = 'Arial, sans-serif';
       let textFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
@@ -53,130 +86,57 @@ class PreviewManager {
       if (existingTitleLink) existingTitleLink.remove();
       if (existingTextLink) existingTextLink.remove();
 
-      // Trouver les polices et ajouter les liens si nécessaire
-      if (this.fontsData && this.fontsData.length > 0) {
-        this.fontsData.forEach(font => {
-          if (font.font_family) {
-            if (titleFontId == font.id) {
-              titleFontFamily = font.font_family;
-              if (font.font_url) {
-                const titleLink = iframeDoc.createElement('link');
-                titleLink.id = 'dynamic-title-font-link';
-                titleLink.rel = 'stylesheet';
-                titleLink.href = font.font_url;
-                iframeDoc.head.appendChild(titleLink);
-              }
-            }
-            if (textFontId == font.id) {
-              textFontFamily = font.font_family;
-              if (font.font_url) {
-                const textLink = iframeDoc.createElement('link');
-                textLink.id = 'dynamic-text-font-link';
-                textLink.rel = 'stylesheet';
-                textLink.href = font.font_url;
-                iframeDoc.head.appendChild(textLink);
-              }
-            }
+      // Trouver et appliquer les polices
+      fontsData.forEach(font => {
+        if (!font.font_family) return;
+
+        if (titleFontId == font.id) {
+          titleFontFamily = `"${font.font_family}", sans-serif`;
+          if (font.url) {
+            const titleLink = iframeDoc.createElement('link');
+            titleLink.id = 'dynamic-title-font-link';
+            titleLink.rel = 'stylesheet';
+            titleLink.href = font.url;
+            iframeDoc.head.appendChild(titleLink);
           }
-        });
+        }
+        
+        if (textFontId == font.id) {
+          textFontFamily = `"${font.font_family}", sans-serif`;
+          if (font.url) {
+            const textLink = iframeDoc.createElement('link');
+            textLink.id = 'dynamic-text-font-link';
+            textLink.rel = 'stylesheet';
+            textLink.href = font.url;
+            iframeDoc.head.appendChild(textLink);
+          }
+        }
+      });
+
+      // Créer ou mettre à jour la feuille de style dynamique
+      let styleElement = iframeDoc.getElementById('dynamic-font-styles');
+      if (!styleElement) {
+        styleElement = iframeDoc.createElement('style');
+        styleElement.id = 'dynamic-font-styles';
+        iframeDoc.head.appendChild(styleElement);
       }
 
-      // Injecter les variables CSS de polices dans l'iframe
-      const style = iframeDoc.createElement('style');
-      style.textContent = `
-        :root {
-          --font-family-title: ${titleFontFamily};
-          --font-family-text: ${textFontFamily};
+      styleElement.textContent = `
+        .hero-title, .section-title, h1, h2, h3, h4, h5, h6 {
+          font-family: ${titleFontFamily} !important;
+        }
+        body, p, .section-text, .hero-text {
+          font-family: ${textFontFamily} !important;
         }
       `;
-      iframeDoc.head.appendChild(style);
-
-      // Injecter aussi les styles des polices individuelles
-      if (this.fontsData && this.fontsData.length > 0) {
-        this.fontsData.forEach(font => {
-          if (font.font_family) {
-            const fontStyle = iframeDoc.createElement('style');
-            fontStyle.textContent = `
-              .font-${font.id} {
-                font-family: ${font.font_family} !important;
-              }
-            `;
-            iframeDoc.head.appendChild(fontStyle);
-          }
-        });
-      }
     } catch (error) {
       console.warn('Impossible d\'injecter les polices dans l\'iframe:', error);
     }
   }
 
-  updatePreviewFonts() {
-    if (!this.iframe || this.iframe.style.display === 'none') return;
-
-    try {
-      const iframeDoc = this.iframe.contentDocument || this.iframe.contentWindow.document;
-      if (!iframeDoc) return;
-
-      // Récupérer les polices sélectionnées dans les selects
-      const titleFontId = document.getElementById('page-title-font-id').value;
-      const textFontId = document.getElementById('page-text-font-id').value;
-
-      let titleFontFamily = 'Arial, sans-serif';
-      let textFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-
-      // Supprimer les anciens liens de polices
-      const existingTitleLink = iframeDoc.getElementById('dynamic-title-font-link');
-      const existingTextLink = iframeDoc.getElementById('dynamic-text-font-link');
-      if (existingTitleLink) existingTitleLink.remove();
-      if (existingTextLink) existingTextLink.remove();
-
-      // Trouver les polices et ajouter les liens si nécessaire
-      if (this.fontsData && this.fontsData.length > 0) {
-        this.fontsData.forEach(font => {
-          if (font.font_family) {
-            if (titleFontId == font.id) {
-              titleFontFamily = font.font_family;
-              if (font.font_url) {
-                const titleLink = iframeDoc.createElement('link');
-                titleLink.id = 'dynamic-title-font-link';
-                titleLink.rel = 'stylesheet';
-                titleLink.href = font.font_url;
-                iframeDoc.head.appendChild(titleLink);
-              }
-            }
-            if (textFontId == font.id) {
-              textFontFamily = font.font_family;
-              if (font.font_url) {
-                const textLink = iframeDoc.createElement('link');
-                textLink.id = 'dynamic-text-font-link';
-                textLink.rel = 'stylesheet';
-                textLink.href = font.font_url;
-                iframeDoc.head.appendChild(textLink);
-              }
-            }
-          }
-        });
-      }
-
-      // Supprimer l'ancien style de polices s'il existe
-      const existingStyle = iframeDoc.getElementById('dynamic-font-styles');
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-
-      // Injecter les nouvelles variables CSS de polices
-      const style = iframeDoc.createElement('style');
-      style.id = 'dynamic-font-styles';
-      style.textContent = `
-        :root {
-          --font-family-title: ${titleFontFamily};
-          --font-family-text: ${textFontFamily};
-        }
-      `;
-      iframeDoc.head.appendChild(style);
-    } catch (error) {
-      console.warn('Impossible de mettre à jour les polices dans l\'iframe:', error);
-    }
+  // Alias pour compatibilité
+  updatePreviewFonts(titleFontId = null, textFontId = null) {
+    this.injectFontsIntoIframe(titleFontId, textFontId);
   }
 
   updatePreviewDevice(device) {
@@ -189,6 +149,57 @@ class PreviewManager {
     // Ajouter la nouvelle classe
     if (device !== 'desktop') {
       iframe.classList.add(device);
+    }
+  }
+
+  /**
+   * Met à jour l'aperçu avec de nouveaux paramètres en temps réel
+   * @param {Object} settings - Les paramètres à appliquer
+   */
+  updatePreviewSettings(settings) {
+    if (!this.iframe) return;
+
+    try {
+      const iframeDoc = this.iframe.contentDocument || this.iframe.contentWindow.document;
+      if (!iframeDoc) return;
+
+      // Appliquer les polices si elles ont changé
+      if (settings.titleFontId !== undefined || settings.textFontId !== undefined) {
+        this.applyFontsToPreview(settings.titleFontId, settings.textFontId, iframeDoc);
+      }
+
+      // Appliquer les couleurs d'arrière-plan si elles ont changé
+      if (settings.bg_color !== undefined) {
+        this.applyBackgroundToPreview(settings.bg_color, iframeDoc);
+      }
+
+      console.log('Aperçu mis à jour avec les paramètres:', settings);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'aperçu:', error);
+    }
+  }
+
+  /**
+   * Applique les polices à l'aperçu (utilise la méthode unifiée)
+   */
+  applyFontsToPreview(titleFontId, textFontId) {
+    this.injectFontsIntoIframe(titleFontId, textFontId);
+  }
+
+  /**
+   * Applique la couleur d'arrière-plan à l'aperçu
+   */
+  applyBackgroundToPreview(bgColor, iframeDoc) {
+    const body = iframeDoc.body;
+    if (body && bgColor) {
+      body.style.backgroundColor = bgColor;
+    }
+  }
+
+  refresh() {
+    if (this.iframe) {
+      // Recharger l'iframe pour obtenir les dernières données
+      this.iframe.src = this.iframe.src;
     }
   }
 
