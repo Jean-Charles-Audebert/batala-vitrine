@@ -18,7 +18,6 @@
   <% if (titleFont && titleFont.url) { %>
     <link rel="stylesheet" href="<%= titleFont.url %>">
   <% } %>
-
   <% if (textFont && textFont.url) { %>
     <link rel="stylesheet" href="<%= textFont.url %>">
   <% } %>
@@ -28,130 +27,87 @@
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/sections.css">
   <link rel="stylesheet" href="/css/page.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
   
-  <!-- CSS Variables pour thème global -->
+  <!-- CSS Variables -->
   <style>
     :root {
-      <% if (titleFont && titleFont.font_family) { %>
-        --default-font-title: '<%= titleFont.font_family %>', sans-serif;
-      <% } else { %>
-        --default-font-title: Arial, sans-serif;
-      <% } %>
-      
-      <% if (textFont && textFont.font_family) { %>
-        --default-font-text: '<%= textFont.font_family %>', sans-serif;
-      <% } else { %>
-        --default-font-text: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      <% } %>
+      --default-font-title: <%= titleFont?.font_family ? `'${titleFont.font_family}'` : 'Arial' %>, sans-serif;
+      --default-font-text: <%= textFont?.font_family ? `'${textFont.font_family}'` : '-apple-system' %>, sans-serif;
     }
-    
     body {
       background-color: <%= page.settings?.bg_color || page.bg_color || '#f5f5f5' %>;
     }
   </style>
 </head>
 <body class="vitrine-page">
+  <!-- PAGE BACKGROUND MEDIA -->
   <%
-    let bgImageStyle = '';
-    if (page.bg_image) {
-      bgImageStyle = `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${page.bg_image}');background-repeat:${page.bg_image_repeat || 'no-repeat'};background-size:${page.bg_image_size || 'cover'};background-position:center;background-attachment:fixed;`;
-    }
+    const bgImageStyle = page.bg_image 
+      ? `position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;pointer-events:none;background-image:url('${page.bg_image}');background-repeat:${page.bg_image_repeat || 'no-repeat'};background-size:${page.bg_image_size || 'cover'};background-position:${page.bg_position || 'center'};background-attachment:fixed;`
+      : '';
+    const isLocalVideo = page.bg_image && isVideoFilePath(page.bg_image);
   %>
-  <% if (bgImageStyle) { %>
+  
+  <!-- Local video background -->
+  <% if (isLocalVideo) { %>
+    <video class="section-bg-video global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
+      <source src="<%= page.bg_image %>" type="video/mp4">
+    </video>
+  <% } else if (bgImageStyle) { %>
     <div class="global-bg-image" style="<%= bgImageStyle %>"></div>
   <% } %>
+  
+  <!-- Remote video background -->
   <% if (page.bg_video) { %>
     <video class="section-bg-video global-bg-video" autoplay muted loop playsinline style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-1;pointer-events:none;">
       <source src="<%= page.bg_video %>" type="video/mp4">
     </video>
-  <% } else if (page.bg_video_youtube) { %>
-    <% /* Extraction ID YouTube */ %>
-    <% let videoId = '';
-      try {
-        if (page.bg_video_youtube.includes('youtu.be/')) {
-          videoId = page.bg_video_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (page.bg_video_youtube.includes('youtube.com/watch')) {
-          const url = new URL(page.bg_video_youtube);
-          videoId = url.searchParams.get('v');
-        } else if (page.bg_video_youtube.includes('youtube.com/embed/')) {
-          videoId = page.bg_video_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-        } else if (page.bg_video_youtube.includes('youtube.com/shorts/')) {
-          videoId = page.bg_video_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
-        }
-      } catch (e) {}
-    %>
+  <% } %>
+  
+  <!-- YouTube background -->
+  <% if (page.bg_video_youtube) { %>
+    <% const videoId = extractYouTubeIdServer(page.bg_video_youtube); %>
     <% if (videoId) { %>
       <iframe class="section-bg-youtube global-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></iframe>
     <% } %>
   <% } %>
   
-  <!-- SECTIONS V2 -->
+  <!-- MAIN CONTENT -->
   <div class="main-content-wrapper">
     <% sections.forEach(section => { %>
-      <% 
-        const sectionType = section.layout?.type || section.type || 'content';
-        const sectionLayout = section.layout || {};
-      %>
+      <% const sectionType = section.layout?.type || section.type || 'content'; %>
+      
+      <!-- Skip footer (rendered at end) -->
       <% if (sectionType === 'footer') { return; } %>
+      
+      <!-- Render hero -->
       <% if (sectionType === 'hero') { %>
         <section id="section-<%= section.id %>" class="section-wrapper section-hero-wrapper">
           <%- include('../components/sections/hero', { section, socialLinks }) %>
         </section>
       <% } else { %>
+        <!-- Render standard/other sections -->
         <section id="section-<%= section.id %>" class="section-wrapper">
           <%- include('../components/sections/standard', { section }) %>
         </section>
       <% } %>
     <% }) %>
   </div>
-  <% sections.forEach(section => { if (section.type === 'footer') { %>
-    <section id="section-<%= section.id %>" class="section-wrapper">
-      <%- include('../components/sections/footer', { section, user, socialLinks }) %>
-    </section>
-  <% } }) %>
   
-  <!-- FAB Auth -->
+  <!-- FOOTER SECTION -->
+  <% sections.forEach(section => { %>
+    <% if (section.type === 'footer') { %>
+      <section id="section-<%= section.id %>" class="section-wrapper">
+        <%- include('../components/sections/footer', { section, user, socialLinks }) %>
+      </section>
+    <% } %>
+  <% }) %>
+  
+  <!-- AUTH FAB -->
   <%- include('../components/auth-fab', { user }) %>
   
-  <!-- Scripts -->
+  <!-- SCRIPTS -->
   <script src="/js/index.js"></script>
-  <script src="/js/image-upload.js"></script>
-  <script src="/js/contact-form.js"></script>
-  
-  <!-- Gallery Video Handler -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Handle video thumbnail clicks
-      document.addEventListener('click', function(e) {
-        const videoThumbWrapper = e.target.closest('.video-thumb-wrapper');
-        if (videoThumbWrapper) {
-          e.preventDefault();
-          const videoId = videoThumbWrapper.dataset.videoId;
-          if (videoId) {
-            // Replace thumbnail with YouTube iframe
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1`;
-            iframe.frameBorder = '0';
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-            iframe.allowFullscreen = true;
-            iframe.className = 'youtube-iframe';
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.style.borderRadius = 'var(--border-radius-md)';
-            
-            videoThumbWrapper.innerHTML = '';
-            videoThumbWrapper.appendChild(iframe);
-          }
-        }
-      });
-    });
-  </script>
-  
-  <% if (user) { %>
-    <!-- Indique au JS que l'utilisateur est connecté (admin unique) -->
-    <script>window.userIsAdmin = true;</script>
-  <% } %>
 </body>
 </html>

@@ -18,7 +18,7 @@
     const modal = createMediaPickerModal(callback, mediaType, fieldName);
     document.body.appendChild(modal);
 
-    modal.classList.add('active');
+    modal.classList.add('show');
     modal.setAttribute('aria-hidden', 'false');
   }
 
@@ -60,6 +60,11 @@
                 <p>Cliquez pour sélectionner un fichier</p>
                 <small>Maximum 5 MB</small>
               </label>
+              <div style="margin-top: 15px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('mediaPickerFile').click()">
+                  📁 Parcourir l'ordinateur
+                </button>
+              </div>
               <div id="uploadStatus" class="upload-status"></div>
               <div id="uploadPreview" class="upload-preview" style="display: none;">
                 <img id="previewImage" alt="Preview" style="max-width: 100%; max-height: 200px;">
@@ -138,6 +143,7 @@
       try {
         const response = await fetch('/api/upload', {
           method: 'POST',
+          credentials: 'include',
           body: formData
         });
 
@@ -167,7 +173,7 @@
     // Boutons fermer
     modal.querySelectorAll('[data-close-picker]').forEach(btn => {
       btn.addEventListener('click', () => {
-        modal.classList.remove('active');
+        modal.classList.remove('show');
         setTimeout(() => modal.remove(), 300);
       });
     });
@@ -196,7 +202,7 @@
       }
 
       callback(mediaUrl);
-      modal.classList.remove('active');
+      modal.classList.remove('show');
       setTimeout(() => modal.remove(), 300);
     });
 

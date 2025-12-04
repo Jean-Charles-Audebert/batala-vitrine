@@ -30,8 +30,6 @@ class SiteEditor {
 
       // Pré-remplir le formulaire global
       this.populateGlobalForm();
-
-      console.log('Éditeur initialisé avec succès');
     } catch (error) {
       console.error('Erreur lors de l\'initialisation de l\'éditeur:', error);
     }

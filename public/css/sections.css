@@ -12,6 +12,9 @@
   position: relative;
   width: 100%;
   overflow: hidden;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
 .hero-section.hero-transparent {

@@ -119,8 +119,6 @@ class SectionManager {
 
     const formData = window.formGenerator.collectFormData();
     
-    console.log('📤 Données du formulaire collectées:', formData);
-
     const sectionData = {
       settings: formData,
       is_visible: true,
@@ -134,15 +132,11 @@ class SectionManager {
       url += `/${this.currentSectionId}`;
       method = 'PUT';
       sectionData.id = this.currentSectionId;
-      console.log(`🔄 Mise à jour de la section ${this.currentSectionId}`);
     } else {
       // Type uniquement pour la création
       const sectionType = document.getElementById('section-type').value;
       sectionData.type = sectionType;
-      console.log('➕ Création d\'une nouvelle section');
     }
-
-    console.log(`📡 ${method} ${url}`, sectionData);
 
     try {
       const response = await fetch(url, {

@@ -1,6 +1,8 @@
 import { buildPageData, loadFonts } from '../services/pageBuilder.js';
 import { logger } from '../utils/logger.js';
 import { query } from '../config/db.js';
+import { isVideoFilePath, extractYouTubeIdServer } from '../utils/mediaHelper.js';
+import { mapSocialLinkIcons } from '../utils/socialIconDetector.js';
 
 export const showHome = async (req, res) => {
   try {
@@ -37,7 +39,10 @@ export const showHome = async (req, res) => {
       title: 'Accueil',
       ...pageData,
       fonts,
-      socialLinks,
+      socialLinks: mapSocialLinkIcons(socialLinks),
+      // Passer les helpers EJS
+      isVideoFilePath,
+      extractYouTubeIdServer,
       user: req.user || null,
       navigationLinks
     });

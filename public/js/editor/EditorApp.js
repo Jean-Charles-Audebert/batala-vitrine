@@ -1,6 +1,9 @@
 // Classe principale de l'application éditeur
 // Orchestre tous les modules pour l'interface d'édition
 
+import { MediaHandler } from '../utils/MediaHandler.js';
+import { detectSocialIcon, detectPlatformName } from '../utils/socialIconDetector.js';
+
 class EditorApp {
   constructor(previewManager, formGenerator, sectionManager, elementManager) {
     this.previewManager = previewManager;
@@ -12,15 +15,18 @@ class EditorApp {
     this.sections = window.pageData.sections || [];
     this.page = window.pageData.page || {};
     this.fonts = window.pageData.fonts || [];
+    this.socialLinks = [];
 
     // Timeout pour la sauvegarde automatique
     this.saveTimeout = null;
+
+    // Gestionnaire de média de fond de page
+    this.pageMediaHandler = null;
 
     this.init();
   }
 
   init() {
-    console.log('EditorApp.init() appelé');
     // Retarder l'initialisation pour s'assurer que le DOM est prêt
     window.setTimeout(async () => {
       this.previewManager.init();
@@ -29,8 +35,24 @@ class EditorApp {
       this.updateUI();
       // Charger les polices dans les selects
       await this.refreshFontSelects();
-      console.log('Application éditeur initialisée');
+      // Charger les réseaux sociaux
+      await this.loadSocialLinks();
+      // Initialiser le gestionnaire de média de fond
+      this.initPageMediaHandler();
     }, 100);
+  }
+
+  /**
+   * Initialise le gestionnaire de média de fond de page
+   */
+  initPageMediaHandler() {
+    this.pageMediaHandler = new MediaHandler({
+      inputId: 'page-bg-image',
+      selectBtnSelector: '.select-bg-media',
+      clearBtnSelector: '.clear-bg-media',
+      onUpdate: () => this.updatePreview(),
+      onSave: () => this.savePageSettings()
+    });
   }
 
   bindEvents() {
@@ -51,6 +73,7 @@ class EditorApp {
 
     // Paramètres de la page
     this.bindPageSettingsEvents();
+    this.setupPageSettingsAutoSave();
 
     // Délégation d'événements pour les boutons dynamiques
     document.addEventListener('click', (e) => {
@@ -59,6 +82,7 @@ class EditorApp {
       this.handleModalButtons(e);
       this.handleElementTypeButtons(e);
       this.handleFontButtons(e);
+      this.handlePageSettingsEvents(e);
     });
   }
 
@@ -182,10 +206,7 @@ class EditorApp {
   }
 
   handleElementButtons(e) {
-    console.log('handleElementButtons appelé pour:', e.target.className);
-
     if (e.target.closest('.add-element-btn')) {
-      console.log('Bouton add-element-btn cliqué');
       const sectionId = parseInt(e.target.closest('.add-element-btn').dataset.sectionId);
       this.showAddElementModal(sectionId);
     }
@@ -196,7 +217,6 @@ class EditorApp {
     }
 
     if (e.target.closest('.element-delete-btn')) {
-      console.log('Bouton element-delete-btn cliqué');
       const elementId = parseInt(e.target.closest('.element-delete-btn').dataset.elementId);
       this.sectionManager.deleteElement(elementId);
     }
@@ -278,19 +298,28 @@ class EditorApp {
   // Méthodes de modales
   async saveAll() {
     try {
-      console.log('Sauvegarde de toute la page...');
-
       // Collecter les données de la page depuis le formulaire
+      const titleEl = document.getElementById('page-title');
+      const emailEl = document.getElementById('page-contact-email');
+      const bgColorEl = document.getElementById('page-bg-color');
+      const bgImageEl = document.getElementById('page-bg-image');
+      const bgYoutubeEl = document.getElementById('page-bg-video-youtube');
+      const opacityEl = document.getElementById('page-bg-opacity');
+      const positionEl = document.getElementById('page-bg-position');
+      
+      // Vérifier que les éléments essentiels existent
+      if (!titleEl || !emailEl || !bgColorEl) {
+        throw new Error('Éléments de formulaire manquants. Veuillez recharger la page.');
+      }
+      
       const pageData = {
-        title: document.getElementById('page-title').value,
-        contact_email: document.getElementById('page-contact-email').value,
-        default_font_title: document.getElementById('page-title-font-id').value || null,
-        default_font_text: document.getElementById('page-text-font-id').value || null,
-        bg_color: document.getElementById('page-bg-color').value,
-        bg_image: document.getElementById('page-bg-image').value,
-        bg_video_youtube: document.getElementById('page-bg-video-youtube').value,
-        bg_opacity: parseFloat(document.getElementById('page-bg-opacity').value) || 1.0,
-        bg_position: document.getElementById('page-bg-position').value
+        title: titleEl.value,
+        contact_email: emailEl.value,
+        bg_color: bgColorEl.value,
+        bg_image: bgImageEl?.value || '',
+        bg_video_youtube: bgYoutubeEl?.value || '',
+        bg_opacity: parseFloat(opacityEl?.value) || 1.0,
+        bg_position: positionEl?.value || 'center'
       };
 
       // Sauvegarder la page
@@ -305,7 +334,6 @@ class EditorApp {
       }
 
       alert('Page sauvegardée avec succès !');
-      console.log('Sauvegarde terminée');
 
       // Rafraîchir l'aperçu
       this.previewManager.refresh();
@@ -377,6 +405,7 @@ class EditorApp {
   closeModals() {
     document.querySelectorAll('.modal').forEach(modal => {
       modal.classList.remove('show');
+      modal.classList.add('hidden');
     });
   }
 
@@ -393,6 +422,7 @@ class EditorApp {
   async showFontsModal() {
     const modal = document.getElementById('fonts-modal');
     if (modal) {
+      modal.classList.remove('hidden');
       modal.classList.add('show');
       // Charger les polices existantes
       await this.loadExistingFonts();
@@ -467,6 +497,187 @@ class EditorApp {
 
     } catch (error) {
       console.error('Erreur rechargement des polices:', error);
+    }
+  }
+
+  async loadSocialLinks() {
+    try {
+      const response = await this.apiCall('/api/social-links');
+      this.socialLinks = response;
+      this.displaySocialLinks();
+    } catch (error) {
+      console.error('Erreur chargement réseaux sociaux:', error);
+      const container = document.getElementById('social-links-container');
+      if (container) {
+        container.innerHTML = '<p style="color: #dc3545;">Erreur lors du chargement des réseaux sociaux</p>';
+      }
+    }
+  }
+
+  displaySocialLinks() {
+    const container = document.getElementById('social-links-container');
+    if (!container) return;
+
+    if (this.socialLinks.length === 0) {
+      container.innerHTML = `
+        <p style="color: #999; font-size: 0.85rem; margin: 0;">Aucun réseau social configuré</p>
+        <button type="button" class="btn btn-sm btn-primary add-social-link-btn" style="margin-top: 0.5rem;">
+          <i class="fas fa-plus"></i> Ajouter un lien
+        </button>
+      `;
+      return;
+    }
+
+    const html = `
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        ${this.socialLinks.map(link => `
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #f8f9fa; border-radius: 4px;">
+            <i class="${detectSocialIcon(link.url, link.platform)}" style="font-size: 1.2rem; color: #3b82f6; min-width: 1.5rem;"></i>
+            <span style="flex: 1; font-size: 0.85rem; word-break: break-word;">${link.label || link.platform}</span>
+            <button type="button" class="btn btn-xs btn-danger delete-social-link-btn" data-link-id="${link.id}" style="padding: 0.25rem 0.5rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `).join('')}
+        <button type="button" class="btn btn-sm btn-primary add-social-link-btn" style="margin-top: 0.5rem;">
+          <i class="fas fa-plus"></i> Ajouter un lien
+        </button>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Attacher les handlers de suppression
+    container.querySelectorAll('.delete-social-link-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const linkId = btn.dataset.linkId;
+        this.deleteSocialLink(linkId);
+      });
+    });
+
+    // Attacher le handler d'ajout
+    container.querySelector('.add-social-link-btn')?.addEventListener('click', () => {
+      this.showAddSocialLinkModal();
+    });
+  }
+
+  showAddSocialLinkModal() {
+    const html = `
+      <div class="modal show" id="add-social-link-modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Ajouter un réseau social</h3>
+            <button class="modal-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="social-link-url">URL ou Lien</label>
+              <input type="url" id="social-link-url" placeholder="https://www.facebook.com/..." class="form-control" required>
+              <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                Ex: https://www.facebook.com/votre-page ou https://www.youtube.com/@votre-chaine
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="social-link-label">Libellé (optionnel)</label>
+              <input type="text" id="social-link-label" placeholder="Facebook" class="form-control">
+              <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                Si laissé vide, sera détecté automatiquement
+              </small>
+            </div>
+            <div class="form-group">
+              <label>Aperçu de l'icône</label>
+              <div style="padding: 1rem; background: #f8f9fa; border-radius: 4px; text-align: center;">
+                <i id="social-link-icon-preview" class="fas fa-link" style="font-size: 2rem; color: #3b82f6;"></i>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-close-social-modal>Annuler</button>
+            <button type="button" class="btn btn-primary" id="save-social-link-btn">
+              <i class="fas fa-plus"></i> Ajouter
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const existingModal = document.getElementById('add-social-link-modal');
+    if (existingModal) existingModal.remove();
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    const modal = document.getElementById('add-social-link-modal');
+
+    // Gestion du changement d'URL pour aperçu d'icône
+    const urlInput = document.getElementById('social-link-url');
+    const labelInput = document.getElementById('social-link-label');
+    const iconPreview = document.getElementById('social-link-icon-preview');
+
+    urlInput.addEventListener('input', () => {
+      const iconClass = detectSocialIcon(urlInput.value);
+      const platformName = detectPlatformName(urlInput.value);
+      iconPreview.className = iconClass;
+      if (!labelInput.value) {
+        labelInput.value = platformName;
+      }
+    });
+
+    // Boutons
+    modal.querySelector('.modal-close').addEventListener('click', () => {
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      setTimeout(() => modal.remove(), 300);
+    });
+
+    modal.querySelector('[data-close-social-modal]').addEventListener('click', () => {
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      setTimeout(() => modal.remove(), 300);
+    });
+
+    document.getElementById('save-social-link-btn').addEventListener('click', () => {
+      this.saveSocialLink(urlInput.value, labelInput.value);
+      modal.classList.remove('show');
+      modal.classList.add('hidden');
+      setTimeout(() => modal.remove(), 300);
+    });
+  }
+
+  async saveSocialLink(url, label) {
+    if (!url) {
+      alert('Veuillez entrer une URL');
+      return;
+    }
+
+    try {
+      const platform = detectPlatformName(url);
+      const icon = detectSocialIcon(url);
+
+      const data = {
+        url,
+        label: label || platform,
+        platform,
+        location: 'footer',
+        is_visible: true
+      };
+
+      await this.apiCall('/api/social-links', 'POST', data);
+      alert('Réseau social ajouté avec succès !');
+      await this.loadSocialLinks();
+    } catch (error) {
+      console.error('Erreur ajout réseau social:', error);
+      alert('Erreur lors de l\'ajout du réseau social');
+    }
+  }
+
+  async deleteSocialLink(linkId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce réseau social ?')) return;
+
+    try {
+      await this.apiCall(`/api/social-links/${linkId}`, 'DELETE');
+      await this.loadSocialLinks();
+    } catch (error) {
+      console.error('Erreur suppression réseau social:', error);
+      alert('Erreur lors de la suppression');
     }
   }
 
@@ -573,15 +784,16 @@ class EditorApp {
 
       await this.apiCall('/api/fonts/upload', 'POST', formData, true);
 
-      // Fermer la modale et rafraîchir
-      this.closeModals();
       alert(`Police "${name}" importée avec succès !`);
+      
+      // Réinitialiser les champs
+      nameInput.value = '';
+      familyInput.value = '';
+      fileInput.value = '';
 
-      // Recharger les listes de polices dans les paramètres
+      // Recharger la liste des polices dans la modale et dans les paramètres
+      await this.loadExistingFonts();
       await this.refreshFontSelects();
-
-      // Rafraîchir la page pour recharger les polices
-      window.location.reload();
 
     } catch (error) {
       console.error('Erreur upload police:', error);
@@ -608,75 +820,10 @@ class EditorApp {
   }
 
   bindPageSettingsEvents() {
-    // Bouton de gestion des polices
-    const manageFontsBtn = document.querySelector('.manage-fonts-btn');
-    if (manageFontsBtn) {
-      manageFontsBtn.addEventListener('click', () => {
-        this.showFontsModal();
-      });
-    }
-
-    // Gestion des types de média de fond (radio buttons)
-    const bgMediaTypeRadios = document.querySelectorAll('input[name="bg-media-type"]');
-    const bgImageField = document.getElementById('bg-image-field');
-    const bgYoutubeField = document.getElementById('bg-youtube-field');
+    // Les listeners de page settings sont maintenant gérés par handlePageSettingsEvents()
     
-    bgMediaTypeRadios.forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        const selectedType = e.target.value;
-        
-        // Masquer tous les champs
-        if (bgImageField) bgImageField.style.display = 'none';
-        if (bgYoutubeField) bgYoutubeField.style.display = 'none';
-        
-        // Afficher le champ correspondant
-        if (selectedType === 'image' && bgImageField) {
-          bgImageField.style.display = 'block';
-        } else if (selectedType === 'youtube' && bgYoutubeField) {
-          bgYoutubeField.style.display = 'block';
-        } else if (selectedType === 'none') {
-          // Effacer les valeurs
-          const bgImageInput = document.getElementById('page-bg-image');
-          const bgYoutubeInput = document.getElementById('page-bg-video-youtube');
-          if (bgImageInput) bgImageInput.value = '';
-          if (bgYoutubeInput) bgYoutubeInput.value = '';
-          this.savePageSettings();
-        }
-      });
-    });
-
-    // Sélection de médias pour le fond
-    const selectBgMediaBtn = document.querySelector('.select-bg-media');
-    if (selectBgMediaBtn) {
-      selectBgMediaBtn.addEventListener('click', () => {
-        this.openMediaPicker((url) => {
-          const bgImageInput = document.getElementById('page-bg-image');
-          const clearBtn = document.querySelector('.clear-bg-media');
-          
-          if (bgImageInput) {
-            bgImageInput.value = url;
-          }
-          if (clearBtn) {
-            clearBtn.style.display = url ? 'inline-block' : 'none';
-          }
-          
-          this.savePageSettings();
-        }, 'both'); // Accepter images et vidéos
-      });
-    }
-
-    // Suppression du média de fond
-    const clearBgMediaBtn = document.querySelector('.clear-bg-media');
-    if (clearBgMediaBtn) {
-      clearBgMediaBtn.addEventListener('click', () => {
-        const bgImageInput = document.getElementById('page-bg-image');
-        if (bgImageInput) {
-          bgImageInput.value = '';
-        }
-        clearBgMediaBtn.style.display = 'none';
-        this.savePageSettings();
-      });
-    }
+    // Charger la liste des admins
+    this.loadAdminsList();
 
     // Upload du favicon
     const faviconUpload = document.getElementById('favicon-upload');
@@ -691,7 +838,8 @@ class EditorApp {
         try {
           const response = await fetch('/api/upload/favicon', {
             method: 'POST',
-            body: formData
+            body: formData,
+            credentials: 'include'
           });
 
           const result = await response.json();
@@ -720,9 +868,6 @@ class EditorApp {
       });
     }
 
-    // Charger la liste des admins
-    this.loadAdminsList();
-
     // Bouton d'ajout d'admin
     const addAdminBtn = document.getElementById('add-admin-btn');
     if (addAdminBtn) {
@@ -730,8 +875,57 @@ class EditorApp {
         this.showAdminModal();
       });
     }
+  }
 
-    // Écouteurs pour la sauvegarde automatique des paramètres de page
+  handlePageSettingsEvents(e) {
+    // Bouton de gestion des polices
+    if (e.target.closest('.manage-fonts-btn')) {
+      this.showFontsModal();
+      return;
+    }
+
+    // Bouton d'upload du favicon
+    if (e.target.closest('.favicon-upload-btn')) {
+      document.getElementById('favicon-upload').click();
+      return;
+    }
+
+    // Les handlers select/clear de média sont maintenant gérés par MediaHandler
+    // (voir initPageMediaHandler)
+
+    // Changement du type de média de fond (radio buttons)
+    if (e.target.closest('input[name="bg-media-type"]')) {
+      const selectedType = e.target.value;
+      const bgImageField = document.getElementById('bg-image-field');
+      const bgYoutubeField = document.getElementById('bg-youtube-field');
+      
+      // Masquer tous les champs
+      if (bgImageField) bgImageField.style.display = 'none';
+      if (bgYoutubeField) bgYoutubeField.style.display = 'none';
+      
+      // Afficher le champ correspondant
+      if (selectedType === 'image' && bgImageField) {
+        bgImageField.style.display = 'block';
+      } else if (selectedType === 'youtube' && bgYoutubeField) {
+        bgYoutubeField.style.display = 'block';
+      } else if (selectedType === 'none') {
+        // Effacer les valeurs
+        const bgImageInput = document.getElementById('page-bg-image');
+        const bgYoutubeInput = document.getElementById('page-bg-video-youtube');
+        if (bgImageInput) bgImageInput.value = '';
+        if (bgYoutubeInput) bgYoutubeInput.value = '';
+        // Mettre à jour l'aperçu immédiatement
+        this.updatePreview();
+        this.savePageSettings();
+      }
+      return;
+    }
+  }
+
+  /**
+   * Écouteurs pour la sauvegarde automatique des paramètres de page
+   */
+  setupPageSettingsAutoSave() {
     const pageSettingsFields = [
       'page-title',
       'page-contact-email',
@@ -784,6 +978,18 @@ class EditorApp {
         settings.bg_color = bgColorInput.value;
       }
 
+      // Récupérer l'image de fond
+      const bgImageInput = document.getElementById('page-bg-image');
+      if (bgImageInput && bgImageInput.value) {
+        settings.bg_image = bgImageInput.value;
+      }
+
+      // Récupérer la vidéo YouTube de fond
+      const bgVideoInput = document.getElementById('page-bg-video-youtube');
+      if (bgVideoInput && bgVideoInput.value) {
+        settings.bg_video_youtube = bgVideoInput.value;
+      }
+
       // Envoyer les paramètres au PreviewManager
       if (this.previewManager) {
         this.previewManager.updatePreviewSettings(settings);
@@ -812,58 +1018,73 @@ class EditorApp {
       const data = {};
 
       // Titre (obligatoire)
-      const title = document.getElementById('page-title').value;
+      const titleEl = document.getElementById('page-title');
+      const title = titleEl?.value || '';
       if (title && title.trim()) {
         data.title = title.trim();
       }
 
       // Email de contact
-      const email = document.getElementById('page-contact-email').value;
+      const emailEl = document.getElementById('page-contact-email');
+      const email = emailEl?.value || '';
       if (email && email.trim()) {
         data.contact_email = email.trim();
       }
 
       // Couleur de fond
-      const bgColor = document.getElementById('page-bg-color').value;
+      const bgColorEl = document.getElementById('page-bg-color');
+      const bgColor = bgColorEl?.value || '';
       if (bgColor && /^#[0-9A-Fa-f]{6}$/.test(bgColor)) {
         data.bg_color = bgColor;
       }
 
       // Média de fond
-      const bgMedia = document.getElementById('page-bg-image').value;
+      const bgImageEl = document.getElementById('page-bg-image');
+      const bgMedia = bgImageEl?.value || '';
       const trimmedBgMedia = bgMedia && bgMedia.trim();
       if (trimmedBgMedia) {
         data.bg_image = trimmedBgMedia;
       }
 
       // YouTube de fond
-      const bgYoutube = document.getElementById('page-bg-video-youtube').value;
+      const bgYoutubeEl = document.getElementById('page-bg-video-youtube');
+      const bgYoutube = bgYoutubeEl?.value || '';
       const trimmedBgYoutube = bgYoutube && bgYoutube.trim();
       if (trimmedBgYoutube) {
         data.bg_video_youtube = trimmedBgYoutube;
       }
 
       // Opacité
-      const opacity = cleanValue(document.getElementById('page-bg-opacity').value, 'float');
+      const opacityEl = document.getElementById('page-bg-opacity');
+      const opacity = cleanValue(opacityEl?.value, 'float');
       if (opacity !== undefined && opacity >= 0 && opacity <= 1) {
         data.bg_opacity = opacity;
       }
 
       // Position
-      const position = document.getElementById('page-bg-position').value;
-      if (position && ['center', 'top', 'bottom', 'left', 'right'].includes(position)) {
-        data.bg_position = position;
+      const positionEl = document.getElementById('page-bg-position');
+      if (positionEl) {
+        const position = positionEl.value;
+        if (position && ['center', 'top', 'bottom', 'left', 'right'].includes(position)) {
+          data.bg_position = position;
+        }
       }
 
-      // Polices (convertir en nombres)
-      const titleFontId = cleanValue(document.getElementById('page-title-font-id').value, 'number');
-      if (titleFontId !== undefined) {
-        data.title_font_id = titleFontId;
+      // Polices (convertir en nombres) - peuvent ne pas exister dans le DOM
+      const titleFontEl = document.getElementById('page-title-font-id');
+      if (titleFontEl) {
+        const titleFontId = cleanValue(titleFontEl.value, 'number');
+        if (titleFontId !== undefined) {
+          data.title_font_id = titleFontId;
+        }
       }
 
-      const textFontId = cleanValue(document.getElementById('page-text-font-id').value, 'number');
-      if (textFontId !== undefined) {
-        data.text_font_id = textFontId;
+      const textFontEl = document.getElementById('page-text-font-id');
+      if (textFontEl) {
+        const textFontId = cleanValue(textFontEl.value, 'number');
+        if (textFontId !== undefined) {
+          data.text_font_id = textFontId;
+        }
       }
 
       // Nettoyer les données : supprimer les propriétés vides ou null
@@ -873,13 +1094,8 @@ class EditorApp {
         }
       });
 
-      // DEBUG: Log des données collectées
-      console.log('Données nettoyées:', data);
-      console.log('Nombre de champs à sauvegarder:', Object.keys(data).length);
-
       // Vérifier qu'il y a au moins une donnée à sauvegarder
       if (Object.keys(data).length === 0) {
-        console.log('Aucune donnée à sauvegarder');
         return;
       }
 
@@ -892,11 +1108,8 @@ class EditorApp {
       });
 
       if (!hasChanges) {
-        console.log('Aucune modification détectée, sauvegarde ignorée');
         return;
       }
-
-      console.log('Envoi des données à l\'API:', JSON.stringify(data));
 
       const response = await fetch('/api/page', {
         method: 'PUT',
@@ -907,16 +1120,13 @@ class EditorApp {
         body: JSON.stringify(data)
       });
 
-      console.log('Réponse API - Status:', response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Erreur API détaillée:', errorData);
+        console.error('Erreur API page:', errorData);
         throw new Error(errorData.error || 'Erreur lors de la sauvegarde');
       }
 
       const result = await response.json();
-      console.log('Succès API:', result);
 
       // Mettre à jour les données locales
       this.page = { ...this.page, ...data };
@@ -1275,5 +1485,5 @@ class EditorApp {
   }
 }
 
-// Exposer globalement pour les modules
-window.EditorApp = EditorApp;
+// Exporter pour les modules ESM
+export { EditorApp };

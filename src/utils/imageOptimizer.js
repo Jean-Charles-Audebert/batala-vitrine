@@ -69,11 +69,13 @@ export async function optimizeImage(inputPath, outputPath, preset = "card") {
 
 /**
  * Détecte automatiquement le preset selon le nom du champ
- * @param {string} fieldName - Nom du champ (ex: "header_logo", "media_path", "bg_image")
+ * @param {string} fieldName - Nom du champ (ex: "header_logo", "media_path", "bg_image", "favicon")
  * @returns {string} - Nom du preset
  */
 export function detectPresetFromField(fieldName) {
-  if (fieldName.includes("logo")) {
+  if (fieldName === "favicon" || fieldName.includes("favicon")) {
+    return "favicon";
+  } else if (fieldName.includes("logo")) {
     return "logo";
   } else if (fieldName.includes("bg") || fieldName.includes("background")) {
     return "background";
@@ -95,6 +97,13 @@ export function detectPresetFromField(fieldName) {
  */
 export async function createOptimizedVersion(originalPath, fieldName = "media_path") {
   const ext = path.extname(originalPath).toLowerCase();
+  
+  // Ne pas optimiser les vidéos (Sharp ne supporte que les images)
+  const videoExtensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.m4v'];
+  if (videoExtensions.includes(ext)) {
+    logger.info(`[ImageOptimizer] Vidéo détectée, pas d'optimisation: ${path.basename(originalPath)}`);
+    return originalPath;
+  }
   
   // Ne pas optimiser les GIF (pour préserver les animations) ni les SVG (format vectoriel)
   if (ext === ".gif" || ext === ".svg") {

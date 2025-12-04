@@ -3,11 +3,16 @@ import { requireAuth } from "../middlewares/requireAuth.js";
 import { upload, handleMulterError } from "../config/upload.js";
 import { query } from "../config/db.js";
 import { logger } from "../utils/logger.js";
-import { createOptimizedVersion } from "../utils/imageOptimizer.js";
+import { handleImageUpload, handleFaviconUpload } from "../controllers/uploadController.js";
 import { buildPageData, buildEditorData } from "../services/pageBuilder.js";
-import { getSocialIcon } from "../utils/socialIcons.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs/promises";
+
+// Définir __dirname pour ESM
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Fonction pour générer un mot de passe aléatoire sécurisé
 function generateSecurePassword() {
@@ -92,7 +97,6 @@ router.get("/preview", async (req, res) => {
       title: 'Aperçu',
       ...pageData,
       user: null, // Pas d'utilisateur pour l'aperçu
-      getSocialIcon
     });
 
   } catch (error) {
@@ -106,7 +110,6 @@ router.get("/preview", async (req, res) => {
       fonts: [],
       socialLinks: [],
       user: null,
-      getSocialIcon
     });
   }
 });
@@ -225,50 +228,7 @@ router.post(
   requireAuth,
   upload.single("image"),
   handleMulterError,
-  async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          message: "Aucun fichier fourni.",
-        });
-      }
-
-      const fieldName = req.body.fieldName || "media_path"; // Nom du champ pour détecter le preset
-      const uploadedFilePath = path.join(__dirname, "../../public/uploads", req.file.filename);
-
-      logger.info(`Image uploadée : ${req.file.filename} (${req.file.size} bytes), champ: ${fieldName}`);
-
-      // Créer version optimisée SANS suffixe (fichier uploadé a -original)
-      let optimizedPath;
-      try {
-        optimizedPath = await createOptimizedVersion(uploadedFilePath, fieldName);
-        logger.info(`Image optimisée créée: ${path.basename(optimizedPath)}`);
-      } catch (optError) {
-        logger.error("Erreur optimisation image (fichier conservé non optimisé):", optError);
-        // On continue même si l'optimisation échoue
-        optimizedPath = uploadedFilePath;
-      }
-
-      // Retourner le chemin de la version OPTIMISÉE (sans -original) pour stocker en BDD
-      const optimizedFilename = path.basename(optimizedPath);
-      const relativePath = `/uploads/${optimizedFilename}`;
-
-      res.status(200).json({
-        success: true,
-        message: "Image uploadée et optimisée avec succès.",
-        path: relativePath,
-        filename: req.file.filename,
-        size: req.file.size,
-      });
-    } catch (error) {
-      logger.error("Erreur upload image:", error);
-      res.status(500).json({
-        success: false,
-        message: "Erreur lors de l'upload de l'image.",
-      });
-    }
-  }
+  handleImageUpload
 );
 
 // Route API pour récupérer la liste des admins (JSON)
@@ -364,53 +324,9 @@ router.delete("/admins/:id", requireAuth, async (req, res) => {
 router.post(
   "/upload/favicon",
   requireAuth,
-  async (req, res, next) => {
-    // Multer avec gestion d'erreur inline
-    upload.single("favicon")(req, res, async (err) => {
-      if (err) {
-        logger.error("Erreur multer favicon:", err);
-        return res.status(400).json({
-          success: false,
-          message: err.message || "Erreur lors de l'upload"
-        });
-      }
-
-      try {
-        if (!req.file) {
-          return res.status(400).json({
-            success: false,
-            message: "Aucun fichier fourni.",
-          });
-        }
-
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        
-        const uploadedFile = path.join(process.cwd(), 'public/uploads', req.file.filename);
-        const faviconPath = path.join(process.cwd(), 'public/icons/favicon.ico');
-
-        // Copier le fichier vers favicon.ico
-        await fs.copyFile(uploadedFile, faviconPath);
-        
-        // Supprimer le fichier temporaire
-        await fs.unlink(uploadedFile);
-
-        logger.info(`Favicon mis à jour: ${req.file.filename}`);
-
-        res.json({
-          success: true,
-          message: "Favicon mis à jour avec succès",
-          url: "/icons/favicon.ico"
-        });
-      } catch (error) {
-        logger.error("Erreur upload favicon:", error);
-        res.status(500).json({
-          success: false,
-          message: "Erreur lors de l'upload du favicon.",
-        });
-      }
-    });
-  }
+  upload.single("favicon"),
+  handleMulterError,
+  handleFaviconUpload
 );
 
 // Route API pour supprimer un fichier uploadé
@@ -473,105 +389,6 @@ router.delete("/upload", requireAuth, async (req, res) => {
       success: false,
       message: "Erreur lors de la suppression du fichier.",
     });
-  }
-});
-
-// Routes GET pour données nécessaires à la modale hero
-router.get("/fonts", requireAuth, async (req, res) => {
-  try {
-    const result = await query(`SELECT id, name, font_family, source FROM fonts ORDER BY name`);
-    res.json(result.rows);
-  } catch (error) {
-    logger.error("Erreur chargement fonts:", error);
-    res.status(500).json({ error: "Erreur chargement fonts" });
-  }
-});
-
-// Route pour charger le HTML des polices dans l'editor
-router.get("/admin/fonts", requireAuth, async (req, res) => {
-  try {
-    const { rows: fonts } = await query('SELECT * FROM fonts ORDER BY source, name', []);
-    
-    let html = '';
-    if (fonts && fonts.length > 0) {
-      fonts.forEach(font => {
-        html += `
-        <div class="font-item" data-font-id="${font.id}">
-          <div class="font-info">
-            <span class="font-name" style="font-family: '${font.font_family || 'inherit'}';">${font.name}</span>
-            <span class="font-source">${font.source === 'google' ? 'Google Fonts' : 'Uploadée'}</span>
-          </div>
-          <div class="font-actions">
-            <button class="btn btn-sm btn-danger" data-action="delete-font" data-font-id="${font.id}">
-              <img src="/icons/trash.svg" alt="" class="icon">
-            </button>
-          </div>
-        </div>`;
-      });
-    } else {
-      html = '<p class="empty-state">Aucune police trouvée</p>';
-    }
-    
-    res.send(html);
-  } catch (error) {
-    logger.error("Erreur chargement HTML polices:", error);
-    res.status(500).send('<p class="error">Erreur lors du chargement des polices</p>');
-  }
-});
-
-// Route pour supprimer une police
-router.delete("/fonts/:id", requireAuth, async (req, res) => {
-  try {
-    const fontId = parseInt(req.params.id);
-    
-    // Récupérer les infos de la police avant suppression
-    const { rows: fonts } = await query('SELECT * FROM fonts WHERE id = $1', [fontId]);
-    if (fonts.length === 0) {
-      return res.status(404).json({ error: 'Police non trouvée' });
-    }
-    
-    const font = fonts[0];
-    
-    // Supprimer de la base de données
-    await query('DELETE FROM fonts WHERE id = $1', [fontId]);
-    
-    // Supprimer le fichier physique si c'est une police uploadée
-    if (font.file_path && font.source === 'upload') {
-      try {
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const fullPath = path.join(process.cwd(), 'public', font.file_path);
-        await fs.unlink(fullPath);
-        logger.info(`Fichier police supprimé: ${fullPath}`);
-      } catch (fileError) {
-        logger.warn(`Impossible de supprimer le fichier police: ${fileError.message}`);
-      }
-    }
-    
-    res.json({ success: true, message: 'Police supprimée avec succès' });
-  } catch (error) {
-    logger.error("Erreur suppression police:", error);
-    res.status(500).json({ error: 'Erreur lors de la suppression de la police' });
-  }
-});
-
-router.get("/social-links", requireAuth, async (req, res) => {
-  try {
-    const location = req.query.location || 'footer'; // 'header', 'footer', 'both', ou 'header,both'
-    const locations = location.split(',');
-    
-    const placeholders = locations.map((_, i) => `$${i + 1}`).join(',');
-    const result = await query(
-      `SELECT id, platform, url, label, is_visible 
-       FROM social_links 
-       WHERE location IN (${placeholders}) AND is_visible = TRUE
-       ORDER BY position`,
-      locations
-    );
-    res.json(result.rows);
-  } catch (error) {
-    logger.error("Erreur chargement social links:", error);
-    res.status(500).json({ error: "Erreur chargement social links" });
   }
 });
 

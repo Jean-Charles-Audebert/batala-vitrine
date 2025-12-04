@@ -77,19 +77,21 @@ export const getSection = async (req, res) => {
  */
 export const createSection = async (req, res) => {
   try {
-    const validatedData = createSectionSchema.parse(req.body);
+    const { title, show_title, is_visible, position, layout, type, settings } = req.body;
 
     const { rows } = await query(`
-      INSERT INTO sections (title, show_title, is_visible, position, layout, settings)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO sections (page_id, type, title, show_title, is_visible, position, layout, settings)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `, [
-      validatedData.title,
-      validatedData.show_title ?? true,
-      validatedData.is_visible ?? true,
-      validatedData.position ?? 0,
-      validatedData.layout,
-      validatedData.settings
+      1,  // page_id - pour l'instant toujours 1 (une seule page par site)
+      type || 'standard',
+      title || '',
+      show_title ?? true,
+      is_visible ?? true,
+      position ?? 0,
+      layout || '',
+      JSON.stringify(settings || {})
     ]);
 
     res.status(201).json({
@@ -97,18 +99,11 @@ export const createSection = async (req, res) => {
       data: rows[0]
     });
   } catch (error) {
-    if (error.name === 'ZodError') {
-      return res.status(400).json({
-        success: false,
-        error: 'Données invalides',
-        details: error.errors
-      });
-    }
-
     logger.error('Erreur création section:', error);
     res.status(500).json({
       success: false,
-      error: 'Erreur serveur'
+      error: 'Erreur serveur',
+      details: error.message
     });
   }
 };
@@ -120,19 +115,41 @@ export const createSection = async (req, res) => {
 export const updateSection = async (req, res) => {
   try {
     const { id } = req.params;
-    const validatedData = updateSectionSchema.parse(req.body);
+    const { title, show_title, is_visible, position, layout, type, settings } = req.body;
 
     const updateFields = [];
     const values = [];
     let paramIndex = 1;
 
-    Object.keys(validatedData).forEach(key => {
-      if (validatedData[key] !== undefined) {
-        updateFields.push(`${key} = $${paramIndex}`);
-        values.push(validatedData[key]);
-        paramIndex++;
-      }
-    });
+    // Construire les champs à mettre à jour
+    if (title !== undefined) {
+      updateFields.push(`title = $${paramIndex++}`);
+      values.push(title);
+    }
+    if (show_title !== undefined) {
+      updateFields.push(`show_title = $${paramIndex++}`);
+      values.push(show_title);
+    }
+    if (is_visible !== undefined) {
+      updateFields.push(`is_visible = $${paramIndex++}`);
+      values.push(is_visible);
+    }
+    if (position !== undefined) {
+      updateFields.push(`position = $${paramIndex++}`);
+      values.push(position);
+    }
+    if (layout !== undefined) {
+      updateFields.push(`layout = $${paramIndex++}`);
+      values.push(layout);
+    }
+    if (type !== undefined) {
+      updateFields.push(`type = $${paramIndex++}`);
+      values.push(type);
+    }
+    if (settings !== undefined) {
+      updateFields.push(`settings = $${paramIndex++}`);
+      values.push(JSON.stringify(settings));
+    }
 
     if (updateFields.length === 0) {
       return res.status(400).json({
@@ -162,18 +179,11 @@ export const updateSection = async (req, res) => {
       data: rows[0]
     });
   } catch (error) {
-    if (error.name === 'ZodError') {
-      return res.status(400).json({
-        success: false,
-        error: 'Données invalides',
-        details: error.errors
-      });
-    }
-
     logger.error('Erreur mise à jour section:', error);
     res.status(500).json({
       success: false,
-      error: 'Erreur serveur'
+      error: 'Erreur serveur',
+      details: error.message
     });
   }
 };

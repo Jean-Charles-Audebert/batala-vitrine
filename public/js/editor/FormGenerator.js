@@ -87,7 +87,21 @@ class FormGenerator {
 
   createFormField(fieldKey, fieldSchema, fieldValue) {
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = `form-group ${fieldSchema.type === 'textarea' || fieldSchema.type === 'array' ? 'full-width' : ''}`;
+    
+    // Déterminer les classes CSS
+    let classNames = 'form-group';
+    
+    // Champs qui doivent prendre toute la largeur
+    if (fieldSchema.type === 'textarea' || fieldSchema.type === 'array') {
+      classNames += ' full-width';
+    } 
+    // Champs courts qui peuvent être compactés
+    else if (fieldSchema.type === 'color' || fieldSchema.type === 'checkbox' || 
+             fieldSchema.type === 'number' || fieldSchema.type === 'select') {
+      classNames += ' compact';
+    }
+    
+    fieldDiv.className = classNames;
 
     // Gestion showIf : rendre invisible si condition non remplie
     if (fieldSchema.showIf) {

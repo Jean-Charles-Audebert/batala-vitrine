@@ -18,6 +18,10 @@
   <main class="site-main">
     <% pageData.sections.forEach(section => { %>
       <% if (section.is_visible) { %>
+        <% if (section.type === 'hero') { %>
+          <!-- Render template hero spécifique -->
+          <%- include('../components/sections/hero', { section }) %>
+        <% } else { %>
         <section class="section-block" id="section-<%= section.id %>" data-section-id="<%= section.id %>" data-section-type="<%= section.type %>">
           <div class="section-container">
             <!-- Titre de section (optionnel) -->
@@ -85,6 +89,7 @@
             </div>
           </div>
         </section>
+        <% } %>
       <% } %>
     <% }); %>
   </main>

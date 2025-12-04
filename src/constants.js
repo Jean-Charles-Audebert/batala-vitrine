@@ -87,6 +87,12 @@ export const IMAGE_PRESETS = {
     height: 150,
     fit: "cover",
   },
+  favicon: {
+    width: 64,
+    height: 64,
+    fit: "contain",
+    background: { r: 255, g: 255, b: 255, alpha: 1 },
+  },
 };
 
 // Formats d'images valides

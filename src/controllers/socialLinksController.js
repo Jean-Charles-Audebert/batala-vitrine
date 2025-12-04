@@ -9,14 +9,25 @@ import { logger } from '../utils/logger.js';
 /**
  * Récupérer tous les liens sociaux
  */
-export const getAllSocialLinks = async () => {
+export const getAllSocialLinks = async (location = null) => {
   try {
-    const { rows } = await query(`
+    let sql = `
       SELECT id, platform, url, label, icon_svg, position, is_visible, location
       FROM social_links
       WHERE is_visible = TRUE
-      ORDER BY position ASC
-    `);
+    `;
+    
+    const params = [];
+    if (location) {
+      const locations = location.split(',').map(l => l.trim());
+      const placeholders = locations.map((_, i) => `$${i + 1}`).join(',');
+      sql += ` AND location IN (${placeholders})`;
+      params.push(...locations);
+    }
+    
+    sql += ` ORDER BY position ASC`;
+    
+    const { rows } = await query(sql, params);
     return rows;
   } catch (error) {
     logger.error('Erreur récupération social links', error);

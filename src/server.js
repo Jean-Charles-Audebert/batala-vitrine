@@ -90,7 +90,11 @@ if (process.env.NODE_ENV === "development") {
 
 // Injecter des helpers globaux dans tous les templates
 import { getOriginalPath } from "./utils/viewHelpers.js";
+import { extractYouTubeIdServer, isVideoFilePath } from "./utils/mediaHelper.js";
+
 app.locals.getOriginalPath = getOriginalPath;
+app.locals.extractYouTubeIdServer = extractYouTubeIdServer;
+app.locals.isVideoFilePath = isVideoFilePath;
 
 // --- Middleware pour layout admin ---
 app.use((req, res, next) => {

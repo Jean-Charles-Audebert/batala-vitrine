@@ -1,17 +1,27 @@
-// Point d'entrée principal de l'éditeur
-// Importe tous les modules nécessaires
+// Point d'entrée principal de l'éditeur (Module ESM)
+// Importe EditorApp et initialise l'éditeur
 
-// Les modules définissent des variables globales:
+import { EditorApp } from './editor/EditorApp.js';
+
+// Les modules sont chargés comme scripts classiques et définissent des variables globales:
 // - PreviewManager
 // - FormGenerator
 // - SectionManager
 // - ElementManager
+// - SidebarManager
+// - ElementCreator
+// - SectionFormManager
+// - ElementFormManager
 
 console.log('Éditeur chargé - modules disponibles:', {
-  PreviewManager: typeof PreviewManager,
-  FormGenerator: typeof FormGenerator,
-  SectionManager: typeof SectionManager,
-  ElementManager: typeof ElementManager
+  PreviewManager: typeof window.PreviewManager,
+  FormGenerator: typeof window.FormGenerator,
+  SectionManager: typeof window.SectionManager,
+  ElementManager: typeof window.ElementManager,
+  SidebarManager: typeof window.SidebarManager,
+  ElementCreator: typeof window.ElementCreator,
+  SectionFormManager: typeof window.SectionFormManager,
+  ElementFormManager: typeof window.ElementFormManager
 });
 
 // Initialiser l'application éditeur quand le DOM est prêt
@@ -23,21 +33,32 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('Iframe preview trouvé:', previewIframe);
 
   // Créer les instances des gestionnaires
-  const previewManager = new PreviewManager();
-  const formGenerator = new FormGenerator();
-  const sectionManager = new SectionManager(previewManager);
-  const elementManager = new ElementManager();
+  const previewManager = new window.PreviewManager();
+  const formGenerator = new window.FormGenerator();
+  const sectionManager = new window.SectionManager(previewManager);
+  const elementManager = new window.ElementManager();
+  const sidebarManager = new window.SidebarManager();
+  const elementCreator = new window.ElementCreator();
+  const sectionFormManager = new window.SectionFormManager(window.sectionSchemas || {});
+  const elementFormManager = new window.ElementFormManager(window.elementSchemas || {});
 
-  // Exposer formGenerator et elementManager globalement
+  // Exposer les managers globalement
   window.formGenerator = formGenerator;
   window.elementManager = elementManager;
+  window.sidebarManager = sidebarManager;
+  window.elementCreator = elementCreator;
+  window.sectionFormManager = sectionFormManager;
+  window.elementFormManager = elementFormManager;
 
   // Initialiser l'application principale
   const editorApp = new EditorApp(previewManager, formGenerator, sectionManager, elementManager);
+
+  // Exposer EditorApp et les utilitaires globalement
+  window.editorApp = editorApp;
 
   // Donner accès à EditorApp pour les appels API
   sectionManager.editorApp = editorApp;
   elementManager.editorApp = editorApp;
 
-  console.log('Éditeur initialisé avec modules modulaires');
+  console.log('Éditeur initialisé avec modules modulaires - v2 hiérarchie imbriquée');
 });

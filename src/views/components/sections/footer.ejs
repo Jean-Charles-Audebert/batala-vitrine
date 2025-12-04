@@ -44,21 +44,7 @@ if (is_transparent) sectionClasses.push('section-transparent');
 <footer class="<%= sectionClasses.join(' ') %>" data-section-id="<%= id %>" <% if (bgStyle.length > 0) { %>style="<%= bgStyle.join('; ') %>"<% } %>>
   <!-- Arrière-plan média -->
   <% if (bg_youtube) { %>
-    <%
-      let videoId = '';
-      try {
-        if (bg_youtube.includes('youtu.be/')) {
-          videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(bg_youtube);
-          videoId = url.searchParams.get('v');
-        } else if (bg_youtube.includes('youtube.com/embed/')) {
-          videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-        } else if (bg_youtube.includes('youtube.com/shorts/')) {
-          videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
-        }
-      } catch (e) {}
-    %>
+    <% const videoId = extractYouTubeIdServer(bg_youtube); %>
     <% if (videoId) { %>
       <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0" frameborder="0" allowfullscreen style="pointer-events: none;"></iframe>
     <% } %>

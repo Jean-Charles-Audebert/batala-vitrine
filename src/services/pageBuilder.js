@@ -4,6 +4,7 @@
  */
 
 import { query } from '../config/db.js';
+import { mapSocialLinkIcons } from '../utils/socialIconDetector.js';
 
 /**
  * Construit les données complètes de la page pour l'affichage public
@@ -22,7 +23,9 @@ export async function buildPageData() {
 export async function buildEditorData() {
   const pageData = await loadPageData();
   const sections = await loadSectionsWithElements(false); // all sections
-  const socialLinks = await loadSocialLinks();
+  let socialLinks = await loadSocialLinks();
+  // Mapper les icônes pour chaque lien social
+  socialLinks = mapSocialLinkIcons(socialLinks);
   const fonts = await loadFonts();
 
   return {

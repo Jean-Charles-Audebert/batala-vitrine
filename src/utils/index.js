@@ -3,7 +3,6 @@
  */
 export { logger } from "./logger.js";
 export { hashPassword, verifyPassword } from "./password.js";
-export { getSocialIcon, getAvailableSocialNetworks } from "./socialIcons.js";
 export {
   asyncHandler,
   handleControllerError,

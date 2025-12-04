@@ -19,7 +19,7 @@ const showEdit = typeof user !== 'undefined' && user;
         aria-label="<%= link.label %> (ouvre dans un nouvel onglet)"
         title="<%= link.label %>"
       >
-        <i class="<%= link.icon_name %>"></i>
+        <i class="<%= link.icon || 'fas fa-link' %>"></i>
       </a>
     <% }); %>
   </div>

@@ -110,11 +110,15 @@ CREATE INDEX idx_elements_section_id ON elements(section_id);
 
 CREATE TABLE social_links (
   id SERIAL PRIMARY KEY,
-  label TEXT NOT NULL,
+  platform TEXT NOT NULL,        -- ex: "Facebook", "Instagram", "YouTube"
   url TEXT NOT NULL,
-  icon_name TEXT NOT NULL,     -- ex: "fa-brands fa-facebook"
+  label TEXT NOT NULL,           -- Libellé affiché
+  location TEXT DEFAULT 'footer', -- 'footer', 'header', 'both'
   position INT DEFAULT 0,
-  settings JSONB DEFAULT '{}'  -- couleurs, taille, hover, etc.
+  is_visible BOOLEAN DEFAULT TRUE,
+  icon_svg TEXT,                 -- SVG ou icône stockée (optionnel)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE nav_links (

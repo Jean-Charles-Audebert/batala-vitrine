@@ -3,6 +3,7 @@
  */
 import { Router } from 'express';
 import { requireAuth } from '../middlewares/requireAuth.js';
+import { mapSocialLinkIcons } from '../utils/socialIconDetector.js';
 import { 
   getAllSocialLinks, 
   createSocialLink, 
@@ -15,10 +16,13 @@ const router = Router();
 // Protection par auth
 router.use(requireAuth);
 
-// GET /api/social-links - Liste tous les liens sociaux
+// GET /api/social-links - Liste tous les liens sociaux avec icônes mappées
 router.get('/social-links', async (req, res) => {
   try {
-    const links = await getAllSocialLinks();
+    const location = req.query.location || null;
+    let links = await getAllSocialLinks(location);
+    // Mapper les icônes pour chaque lien
+    links = mapSocialLinkIcons(links);
     res.json(links);
   } catch (error) {
     res.status(500).json({ error: error.message });

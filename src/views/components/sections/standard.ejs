@@ -44,21 +44,7 @@ if (is_transparent) sectionClasses.push('section-transparent');
 <section class="<%= sectionClasses.join(' ') %>" data-section-id="<%= id %>" <% if (sectionStyles.length > 0) { %>style="<%= sectionStyles.join('; ') %>"<% } %>>
   <!-- Arrière-plan média -->
   <% if (bg_youtube) { %>
-    <%
-      let videoId = '';
-      try {
-        if (bg_youtube.includes('youtu.be/')) {
-          videoId = bg_youtube.split('youtu.be/')[1].split('?')[0].split('&')[0];
-        } else if (bg_youtube.includes('youtube.com/watch')) {
-          const url = new URL(bg_youtube);
-          videoId = url.searchParams.get('v');
-        } else if (bg_youtube.includes('youtube.com/embed/')) {
-          videoId = bg_youtube.split('embed/')[1].split('?')[0].split('&')[0];
-        } else if (bg_youtube.includes('youtube.com/shorts/')) {
-          videoId = bg_youtube.split('shorts/')[1].split('?')[0].split('&')[0];
-        }
-      } catch (e) {}
-    %>
+    <% const videoId = extractYouTubeIdServer(bg_youtube); %>
     <% if (videoId) { %>
       <iframe class="section-bg-youtube" src="https://www.youtube.com/embed/<%= videoId %>?autoplay=1&mute=1&loop=1&playlist=<%= videoId %>&controls=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     <% } %>
@@ -138,15 +124,7 @@ if (is_transparent) sectionClasses.push('section-transparent');
               <% if (settings.video_url) { %>
                 <div class="video-wrapper">
                   <%
-                    let mediaVideoId = '';
-                    try {
-                      if (settings.video_url.includes('youtu.be/')) {
-                        mediaVideoId = settings.video_url.split('youtu.be/')[1].split('?')[0].split('&')[0];
-                      } else if (settings.video_url.includes('youtube.com/watch')) {
-                        const url = new URL(settings.video_url);
-                        mediaVideoId = url.searchParams.get('v');
-                      }
-                    } catch (e) {}
+                    const mediaVideoId = extractYouTubeIdServer(settings.video_url);
                   %>
                   <% if (mediaVideoId) { %>
                     <iframe src="https://www.youtube.com/embed/<%= mediaVideoId %>?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -165,16 +143,7 @@ if (is_transparent) sectionClasses.push('section-transparent');
                   <% if (settings.media_type === 'youtube' || settings.video_url) { %>
                     <div class="video-wrapper">
                       <%
-                        let cardVideoId = '';
-                        try {
-                          const videoUrl = settings.video_url || settings.media_url;
-                          if (videoUrl.includes('youtu.be/')) {
-                            cardVideoId = videoUrl.split('youtu.be/')[1].split('?')[0].split('&')[0];
-                          } else if (videoUrl.includes('youtube.com/watch')) {
-                            const url = new URL(videoUrl);
-                            cardVideoId = url.searchParams.get('v');
-                          }
-                        } catch (e) {}
+                        const cardVideoId = extractYouTubeIdServer(settings.video_url || settings.media_url);
                       %>
                       <% if (cardVideoId) { %>
                         <iframe src="https://www.youtube.com/embed/<%= cardVideoId %>?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -229,20 +198,8 @@ if (is_transparent) sectionClasses.push('section-transparent');
         <div class="gallery-videos">
           <% galleryVideos.forEach(element => { %>
             <%
-              let youtubeId = '';
-              try {
-                const youtubeUrl = element.settings.url || element.settings.video_url || element.settings.youtube_url;
-                if (youtubeUrl.includes('youtu.be/')) {
-                  youtubeId = youtubeUrl.split('youtu.be/')[1].split('?')[0].split('&')[0];
-                } else if (youtubeUrl.includes('youtube.com/watch')) {
-                  const url = new URL(youtubeUrl);
-                  youtubeId = url.searchParams.get('v');
-                } else if (youtubeUrl.includes('youtube.com/embed/')) {
-                  youtubeId = youtubeUrl.split('embed/')[1].split('?')[0].split('&')[0];
-                } else if (youtubeUrl.includes('youtube.com/shorts/')) {
-                  youtubeId = youtubeUrl.split('shorts/')[1].split('?')[0].split('&')[0];
-                }
-              } catch (e) {}
+              const youtubeUrl = element.settings.url || element.settings.video_url || element.settings.youtube_url;
+              const youtubeId = extractYouTubeIdServer(youtubeUrl);
             %>
             <% if (youtubeId) { %>
               <div class="gallery-video">

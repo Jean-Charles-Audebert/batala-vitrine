@@ -80,14 +80,14 @@ async function seedDatabase() {
 
       // social_links dynamiques - récupérer les liens existants et créer les éléments
       const { rows: socials } = await client.query(
-        `SELECT id, label, url, icon_name, settings FROM social_links ORDER BY position ASC`
+        `SELECT id, platform, label, url FROM social_links ORDER BY position ASC`
       );
       for (const s of socials) {
         const socialEl = {
           link_type: 'social',
           label: s.label,
           url: s.url,
-          icon_name: s.icon_name,
+          platform: s.platform,
           color: s.settings?.color || '#fff',
           hover_color: s.settings?.hover_color || '#ccc',
           size: s.settings?.size || '44px',
@@ -524,33 +524,33 @@ async function seedDatabase() {
     // Social links par défaut - insérés une seule fois
     const socialLinks = [
       {
-        label: 'Facebook',
+        platform: 'Facebook',
+        label: 'Suivez-nous sur Facebook',
         url: 'https://facebook.com',
-        icon_name: 'fa-brands fa-facebook',
+        location: 'footer',
         position: 1,
-        settings: { color: '#fff', hover_color: '#3b5998', size: '44px' },
       },
       {
-        label: 'Instagram',
+        platform: 'Instagram',
+        label: 'Suivez-nous sur Instagram',
         url: 'https://instagram.com',
-        icon_name: 'fa-brands fa-instagram',
+        location: 'footer',
         position: 2,
-        settings: { color: '#fff', hover_color: '#d6249f', size: '44px' },
       },
       {
-        label: 'YouTube',
+        platform: 'YouTube',
+        label: 'Abonnez-vous à notre chaîne YouTube',
         url: 'https://youtube.com',
-        icon_name: 'fa-brands fa-youtube',
+        location: 'footer',
         position: 3,
-        settings: { color: '#fff', hover_color: '#FF0000', size: '44px' },
       },
     ];
 
     for (const s of socialLinks) {
       await client.query(
-        `INSERT INTO social_links (label,url,icon_name,position,settings)
-           VALUES ($1,$2,$3,$4,$5)`,
-        [s.label, s.url, s.icon_name, s.position, JSON.stringify(s.settings)]
+        `INSERT INTO social_links (platform, label, url, location, position, is_visible)
+           VALUES ($1, $2, $3, $4, $5, TRUE)`,
+        [s.platform, s.label, s.url, s.location, s.position]
       );
     }
     logger.info(`Inserted ${socialLinks.length} social links`);

@@ -1,0 +1,333 @@
+<!-- Sidebar unifiée avec hiérarchie imbriquée : Paramètres → Sections → Éléments -->
+<div class="sidebar">
+  <div class="sidebar-blocks">
+    
+    <!-- ============================================================
+         BLOC PARAMÈTRES GÉNÉRAUX (dépliable)
+         ============================================================ -->
+    <div class="sidebar-block" id="settings-block">
+      <div class="block-header" data-toggle="settings-block">
+        <i class="fas fa-cog block-icon"></i>
+        <h3 class="block-title">Paramètres généraux</h3>
+        <button class="block-toggle" aria-expanded="true">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+      
+      <div class="block-content settings-content">
+        <div class="settings-form">
+          <!-- === Titre du site === -->
+          <div class="form-group">
+            <label for="page-title">Titre du site</label>
+            <input type="text" id="page-title" value="<%= pageData.page.title || '' %>">
+          </div>
+
+          <!-- === Email de contact === -->
+          <div class="form-group">
+            <label for="page-contact-email">Email de contact</label>
+            <input type="email" id="page-contact-email" value="<%= pageData.page.contact_email || '' %>">
+          </div>
+
+          <!-- === Séparation === -->
+          <div class="form-section-divider">
+            <span>Fond de page</span>
+          </div>
+
+          <!-- === Couleur de fond === -->
+          <div class="form-group">
+            <label for="page-bg-color">Couleur de fond</label>
+            <%
+              let bgColor = pageData.page.bg_color || '#f5f5f5';
+              // Normaliser les couleurs courtes (#fff -> #ffffff)
+              if (bgColor.match(/^#[0-9a-f]{3}$/i)) {
+                bgColor = '#' + bgColor.substring(1).split('').map(x => x+x).join('');
+              }
+            %>
+            <input type="color" id="page-bg-color" value="<%= bgColor %>">
+          </div>
+
+          <!-- === Type de média de fond === -->
+          <div class="form-group">
+            <label>Type de média</label>
+            <div class="radio-group compact">
+              <label>
+                <input type="radio" name="bg-media-type" value="none" <%= (!pageData.page.bg_image && !pageData.page.bg_video_youtube) ? 'checked' : '' %>>
+                <span>Aucun</span>
+              </label>
+              <label>
+                <input type="radio" name="bg-media-type" value="image" <%= (pageData.page.bg_image) ? 'checked' : '' %>>
+                <span>Image/Vidéo</span>
+              </label>
+              <label>
+                <input type="radio" name="bg-media-type" value="youtube" <%= (pageData.page.bg_video_youtube) ? 'checked' : '' %>>
+                <span>YouTube</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- === Champ Image === -->
+          <div class="form-group bg-media-field" id="bg-image-field" <% if (!pageData.page.bg_image) { %>style="display: none;"<% } %>>
+            <label for="page-bg-image">Image/Vidéo</label>
+            <div class="media-upload-field compact">
+              <input type="text" id="page-bg-image" name="bg_image" value="<%= pageData.page.bg_image || '' %>" placeholder="/uploads/..." readonly>
+              <button type="button" class="btn btn-xs btn-secondary select-bg-media" title="Parcourir">
+                <i class="fas fa-folder-open"></i>
+              </button>
+              <button type="button" class="btn btn-xs btn-danger clear-bg-media" <% if (!pageData.page.bg_image) { %>style="display: none;"<% } %> title="Effacer">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- === Champ YouTube === -->
+          <div class="form-group bg-media-field" id="bg-youtube-field" <% if (!pageData.page.bg_video_youtube) { %>style="display: none;"<% } %>>
+            <label for="page-bg-video-youtube">URL YouTube</label>
+            <input type="text" id="page-bg-video-youtube" value="<%= pageData.page.bg_video_youtube || '' %>" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+
+          <!-- === Opacité === -->
+          <div class="form-group">
+            <label for="page-bg-opacity">Opacité (0-1)</label>
+            <input type="number" id="page-bg-opacity" min="0" max="1" step="0.1" value="<%= pageData.page.bg_opacity || 1.0 %>">
+          </div>
+
+          <!-- === Position === -->
+          <div class="form-group">
+            <label for="page-bg-position">Position du fond</label>
+            <select id="page-bg-position">
+              <option value="center" <%= (pageData.page.bg_position === 'center') ? 'selected' : '' %>>Centre</option>
+              <option value="top" <%= (pageData.page.bg_position === 'top') ? 'selected' : '' %>>Haut</option>
+              <option value="bottom" <%= (pageData.page.bg_position === 'bottom') ? 'selected' : '' %>>Bas</option>
+            </select>
+          </div>
+
+          <!-- === Séparation === -->
+          <div class="form-section-divider">
+            <span>Polices</span>
+          </div>
+
+          <!-- === Gestion des polices === -->
+          <div class="form-group">
+            <label for="page-title-font-id">Police du titre</label>
+            <select id="page-title-font-id">
+              <option value="">— Par défaut —</option>
+              <% if (pageData.fonts && Array.isArray(pageData.fonts)) { %>
+                <% pageData.fonts.forEach(font => { %>
+                  <option value="<%= font.id %>" <%= (pageData.page.default_font_title == font.id) ? 'selected' : '' %>>
+                    <%= font.name %>
+                  </option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="page-text-font-id">Police du texte</label>
+            <select id="page-text-font-id">
+              <option value="">— Par défaut —</option>
+              <% if (pageData.fonts && Array.isArray(pageData.fonts)) { %>
+                <% pageData.fonts.forEach(font => { %>
+                  <option value="<%= font.id %>" <%= (pageData.page.default_font_text == font.id) ? 'selected' : '' %>>
+                    <%= font.name %>
+                  </option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+
+          <!-- === Bouton pour ajouter des polices === -->
+          <div class="form-group">
+            <button type="button" class="btn btn-xs btn-primary manage-fonts-btn" style="width: 100%;">
+              <i class="fas fa-plus"></i> Ajouter des polices
+            </button>
+          </div>
+
+          <!-- === Séparation === -->
+          <div class="form-section-divider">
+            <span>Gestion des admins</span>
+          </div>
+
+          <!-- === Administrateurs === -->
+          <div class="form-group">
+            <label>Administrateurs</label>
+            <div id="admins-list-container" style="margin-bottom: 0.5rem;">
+              <div style="text-align: center; padding: 0.5rem; color: #999; font-size: 0.85rem;">
+                <i class="fas fa-spinner fa-spin"></i> Chargement...
+              </div>
+            </div>
+            <button type="button" class="btn btn-xs btn-primary" id="add-admin-btn" style="width: 100%;">
+              <i class="fas fa-user-plus"></i> Ajouter
+            </button>
+          </div>
+
+          <!-- === Séparation === -->
+          <div class="form-section-divider">
+            <span>Réseaux sociaux</span>
+          </div>
+
+          <!-- === Réseaux sociaux === -->
+          <div class="form-group">
+            <label>Gestion des réseaux sociaux</label>
+            <div id="social-links-container" style="text-align: center; padding: 0.5rem; color: #999; font-size: 0.85rem;">
+              <i class="fas fa-spinner fa-spin"></i> Chargement...
+            </div>
+          </div>
+
+          <!-- === Favicon === -->
+          <div class="form-section-divider">
+            <span>Autres réglages</span>
+          </div>
+
+          <div class="form-group">
+            <label>Favicon du site</label>
+            <div class="favicon-preview-compact">
+              <img id="favicon-preview" src="/icons/favicon.ico?t=<%= Date.now() %>" alt="Favicon" style="width: 24px; height: 24px; border: 1px solid #ddd; border-radius: 2px;">
+              <input type="file" id="favicon-upload" accept="image/x-icon,image/png,image/jpeg,image/svg+xml" style="display: none;">
+              <button type="button" class="btn btn-xs btn-secondary favicon-upload-btn">
+                <i class="fas fa-upload"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         BLOC SECTIONS (dépliable)
+         ============================================================ -->
+    <div class="sidebar-block" id="sections-block">
+      <div class="block-header" data-toggle="sections-block">
+        <i class="fas fa-layer-group block-icon"></i>
+        <h3 class="block-title">Sections</h3>
+        <button class="block-toggle" aria-expanded="true">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+
+      <div class="block-content sections-content">
+        <button class="btn btn-primary btn-block" id="add-section-btn" style="margin-bottom: 1rem;">
+          <i class="fas fa-plus"></i> Ajouter une section
+        </button>
+
+        <div class="sections-list" id="sections-list">
+          <% pageData.sections.forEach((section, sectionIdx) => { %>
+            <!-- ========== SECTION ITEM ========== -->
+            <div class="section-item" data-section-id="<%= section.id %>">
+              
+              <!-- Section Header (dépliable) -->
+              <div class="section-header" data-toggle-section="<%= section.id %>">
+                <button class="section-toggle" aria-expanded="false">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <span class="section-type-badge"><%= section.type %></span>
+                <span class="section-title-text"><%= section.settings?.title || 'Sans titre' %></span>
+              </div>
+
+              <!-- Section Content (dépliée avec champs + éléments) -->
+              <div class="section-content collapsed">
+                
+                <!-- === PARAMÈTRES DE LA SECTION === -->
+                <div class="section-settings-area">
+                  <!-- Conteneur des champs de section (généré dynamiquement) -->
+                  <div class="section-fields-container" data-section-id="<%= section.id %>" data-section-type="<%= section.type %>">
+                    <div style="text-align: center; padding: 0.5rem; color: #999; font-size: 0.85rem;">
+                      <i class="fas fa-spinner fa-spin"></i> Chargement...
+                    </div>
+                  </div>
+                </div>
+
+                <!-- === ÉLÉMENTS DE LA SECTION === -->
+                <div class="section-elements-area">
+                  <div class="elements-header">
+                    <h4>Éléments</h4>
+                    <% if (section.type !== 'hero' && section.type !== 'footer') { %>
+                      <button class="btn btn-xs btn-secondary add-element-btn" data-section-id="<%= section.id %>" title="Ajouter un élément">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    <% } %>
+                  </div>
+
+                  <!-- Liste des éléments -->
+                  <div class="elements-list" data-section-id="<%= section.id %>">
+                    <% 
+                      let elements = section.elements || [];
+                      
+                      // Trier si la section contient à la fois des éléments gallery et youtube
+                      if (elements.length > 0) {
+                        const hasGallery = elements.some(e => e.type === 'gallery');
+                        const hasYoutube = elements.some(e => e.type === 'youtube');
+                        
+                        if (hasGallery && hasYoutube) {
+                          // Les gallery (images) avant les youtube (videos)
+                          elements = [...elements].sort((a, b) => {
+                            if (a.type === 'gallery' && b.type !== 'gallery') return -1;
+                            if (a.type !== 'gallery' && b.type === 'gallery') return 1;
+                            return 0;
+                          });
+                        }
+                      }
+                      
+                      if (elements.length === 0) { 
+                    %>
+                      <div class="no-elements-message">
+                        <p style="font-size: 0.85rem; color: #999; margin: 0.5rem 0;">Aucun élément</p>
+                      </div>
+                    <% } else { %>
+                      <% elements.forEach((element, elemIdx) => { %>
+                        <!-- ========== ELEMENT ITEM ========== -->
+                        <div class="element-item" data-element-id="<%= element.id %>" data-element-index="<%= elemIdx %>">
+                          
+                          <!-- Element Header (dépliable) -->
+                          <div class="element-header" data-toggle-element="<%= element.id %>">
+                            <button class="element-toggle" aria-expanded="false">
+                              <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <span class="element-type-badge"><%= element.type %></span>
+                            <span class="element-title-text">
+                              <%
+                                let elementDisplayText = element.type;
+                                if (element.settings) {
+                                  // Pour les gallery: afficher "Gallery image"
+                                  if (element.type === 'gallery' && element.settings.media_type === 'image') {
+                                    elementDisplayText = element.settings.media_type;
+                                  }
+                                  // Pour les cards: afficher le titre imbriqué
+                                  else if (element.type === 'card' && element.settings.title && element.settings.title.text) {
+                                    elementDisplayText = element.type + ' ' + element.settings.title.text;
+                                  }
+                                  // Pour les autres: afficher title ou content
+                                  else if (element.settings.title) {
+                                    elementDisplayText = element.settings.title;
+                                  } else if (element.settings.content) {
+                                    elementDisplayText = element.settings.content;
+                                  }
+                                }
+                                // Limiter à 40 caractères
+                                elementDisplayText = String(elementDisplayText).substring(0, 40);
+                              %>
+                              <%= elementDisplayText %>
+                            </span>
+                          </div>
+
+                          <!-- Element Content (dépliée avec champs) -->
+                          <div class="element-content collapsed">
+                            <!-- Conteneur des champs d'élément (généré dynamiquement) -->
+                            <div class="element-fields-container" data-element-id="<%= element.id %>" data-element-type="<%= element.type %>">
+                              <div style="text-align: center; padding: 0.5rem; color: #999; font-size: 0.85rem;">
+                                <i class="fas fa-spinner fa-spin"></i> Chargement des champs...
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      <% }); %>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

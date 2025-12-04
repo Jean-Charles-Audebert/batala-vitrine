@@ -1,0 +1,130 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - img "Logo" [ref=e7]
+      - navigation [ref=e8]:
+        - link "Présentation" [ref=e9] [cursor=pointer]:
+          - /url: "#section-1"
+        - link "Image + Texte" [ref=e10] [cursor=pointer]:
+          - /url: "#section-2"
+        - link "Nos services" [ref=e11] [cursor=pointer]:
+          - /url: "#section-3"
+        - link "Galerie" [ref=e12] [cursor=pointer]:
+          - /url: "#section-4"
+      - heading "Bienvenue" [level=1] [ref=e14]
+      - generic [ref=e15]:
+        - link "Suivez-nous sur Facebook (ouvre dans un nouvel onglet)" [ref=e16] [cursor=pointer]:
+          - /url: https://facebook.com
+        - link "Suivez-nous sur Instagram (ouvre dans un nouvel onglet)" [ref=e18] [cursor=pointer]:
+          - /url: https://instagram.com
+        - link "Abonnez-vous à notre chaîne YouTube (ouvre dans un nouvel onglet)" [ref=e20] [cursor=pointer]:
+          - /url: https://youtube.com
+    - generic [ref=e24] [cursor=pointer]:
+      - heading "Présentation" [level=2] [ref=e26]
+      - generic [ref=e30]: Lorem ipsum dolor sit amet...
+    - generic [ref=e33] [cursor=pointer]:
+      - heading "Image + Texte" [level=2] [ref=e35]
+      - generic [ref=e36]:
+        - img "Média" [ref=e39]
+        - generic [ref=e42]: Description associée à l'image.
+    - generic [ref=e45] [cursor=pointer]:
+      - heading "Nos services" [level=2] [ref=e47]
+      - generic [ref=e48]:
+        - article [ref=e50]:
+          - img "[object Object]" [ref=e52]
+          - generic [ref=e53]:
+            - heading "Consulting" [level=3] [ref=e54]
+            - paragraph [ref=e55]: Description du service 1
+        - article [ref=e57]:
+          - img "[object Object]" [ref=e59]
+          - generic [ref=e60]:
+            - heading "Support" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Description du service 2
+        - article [ref=e64]:
+          - img "[object Object]" [ref=e66]
+          - generic [ref=e67]:
+            - heading "Événements" [level=3] [ref=e68]
+            - paragraph [ref=e69]: Description du service 3
+    - generic [ref=e72] [cursor=pointer]:
+      - heading "Galerie" [level=2] [ref=e74]
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - link [ref=e78]:
+            - /url: /assets/icon-consulting.svg
+          - link [ref=e80]:
+            - /url: /assets/placeholder-2.svg
+          - link [ref=e82]:
+            - /url: /assets/placeholder-person1.svg
+          - link [ref=e84]:
+            - /url: /assets/placeholder-1.svg
+          - link [ref=e86]:
+            - /url: /assets/placeholder-3.svg
+          - link [ref=e88]:
+            - /url: /assets/placeholder-person2.svg
+        - generic [ref=e89]:
+          - iframe [ref=e91]:
+            - generic "YouTube Video Player" [ref=f1e3]:
+              - generic [ref=f1e5]:
+                - link "Photo image of Batala LR" [ref=f1e8] [cursor=pointer]:
+                  - /url: https://www.youtube.com/channel/UC2nkR0cyMLRxYs1yk1ktHgQ?embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+                - link "Batala La Rochelle 25 ans" [ref=f1e11] [cursor=pointer]:
+                  - /url: https://www.youtube.com/watch?v=2WPplCREC1c
+                - button "Copy link" [ref=f1e13] [cursor=pointer]:
+                  - generic [ref=f1e14]:
+                    - img
+                  - generic [ref=f1e15]: Copy link
+              - button "Play" [ref=f1e18] [cursor=pointer]:
+                - img
+              - link "Watch on YouTube" [ref=f1e19] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=2WPplCREC1c&embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+                - generic [ref=f1e20]: Watch on
+                - generic [ref=f1e21]:
+                  - img
+          - iframe [ref=e93]:
+            - generic "YouTube Video Player" [ref=f2e3]:
+              - generic [ref=f2e5]:
+                - link "Photo image of Batala LR" [ref=f2e8] [cursor=pointer]:
+                  - /url: https://www.youtube.com/channel/UC2nkR0cyMLRxYs1yk1ktHgQ?embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+                - link "Fête du Coquillage 2025" [ref=f2e11] [cursor=pointer]:
+                  - /url: https://www.youtube.com/watch?v=xbZVTo_9Bfg
+                - button "Copy link" [ref=f2e13] [cursor=pointer]:
+                  - generic [ref=f2e14]:
+                    - img
+                  - generic [ref=f2e15]: Copy link
+              - button "Play" [ref=f2e18] [cursor=pointer]:
+                - img
+              - link "Watch on YouTube" [ref=f2e19] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=xbZVTo_9Bfg&embeds_referring_euri=http%3A%2F%2Flocalhost%3A3000%2F
+                - generic [ref=f2e20]: Watch on
+                - generic [ref=f2e21]:
+                  - img
+  - generic [ref=e96]:
+    - generic [ref=e97]:
+      - navigation "Liens de navigation" [ref=e99]:
+        - link "Présentation" [ref=e100] [cursor=pointer]:
+          - /url: "#section-1"
+        - link "Image + Texte" [ref=e101] [cursor=pointer]:
+          - /url: "#section-2"
+        - link "Nos services" [ref=e102] [cursor=pointer]:
+          - /url: "#section-3"
+        - link "Galerie" [ref=e103] [cursor=pointer]:
+          - /url: "#section-4"
+      - button "Contactez-nous" [ref=e105] [cursor=pointer]
+      - generic [ref=e107]:
+        - link "Suivez-nous sur Facebook (ouvre dans un nouvel onglet)" [ref=e108] [cursor=pointer]:
+          - /url: https://facebook.com
+        - link "Suivez-nous sur Instagram (ouvre dans un nouvel onglet)" [ref=e110] [cursor=pointer]:
+          - /url: https://instagram.com
+        - link "Abonnez-vous à notre chaîne YouTube (ouvre dans un nouvel onglet)" [ref=e112] [cursor=pointer]:
+          - /url: https://youtube.com
+    - paragraph [ref=e115]:
+      - text: © 2025
+      - link "caixaDev" [ref=e116] [cursor=pointer]:
+        - /url: https://caixadev.dev
+      - text: . Tous droits réservés.
+  - navigation "Navigation administrateur" [ref=e117]:
+    - button "Connexion à l'interface administrateur" [ref=e118] [cursor=pointer]
+```

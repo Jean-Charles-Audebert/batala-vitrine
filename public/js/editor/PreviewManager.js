@@ -10,15 +10,12 @@ class PreviewManager {
   }
 
   init() {
-    console.log('PreviewManager.init() appelé');
     this.iframe = document.getElementById('preview-iframe');
-    console.log('Iframe trouvé:', !!this.iframe);
     
     if (this.iframe) {
-      console.log('Chargement immédiat de l\'aperçu');
       this.iframe.src = '/api/preview';
       this.iframe.onload = () => {
-        console.log('Aperçu chargé avec succès');
+        // Iframe chargé
       };
       this.iframe.onerror = (e) => {
         console.error('Erreur de chargement de l\'aperçu:', e);
@@ -32,15 +29,10 @@ class PreviewManager {
     const iframe = this.iframe;
     const previewFrame = document.getElementById('preview-frame');
 
-    console.log('loadPreview() appelé, iframe:', iframe, 'previewFrame:', previewFrame);
-
-    // Test simple : charger directement l'URL dans l'iframe
-    console.log('Définition de iframe.src = /api/preview');
     iframe.src = '/api/preview';
 
     // Attendre que l'iframe soit chargé puis injecter les polices
     iframe.onload = () => {
-      console.log('Iframe chargé avec succès - contenu réel de l\'API');
       setTimeout(() => {
         this.injectFontsIntoIframe();
         this.hideLoadingPlaceholder();
@@ -173,7 +165,10 @@ class PreviewManager {
         this.applyBackgroundToPreview(settings.bg_color, iframeDoc);
       }
 
-      console.log('Aperçu mis à jour avec les paramètres:', settings);
+      // Si l'image ou la vidéo de fond a changé, rafraîchir l'aperçu
+      if (settings.bg_image !== undefined || settings.bg_video_youtube !== undefined) {
+        this.refresh();
+      }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'aperçu:', error);
     }
