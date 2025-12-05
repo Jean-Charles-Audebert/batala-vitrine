@@ -1,0 +1,113 @@
+<!-- 
+  Composant réutilisable : Contrôles de fond (couleur, image/vidéo, YouTube, opacité, position)
+  
+  Paramètres :
+  - data: objet contenant les données du fond
+    - data.bg_color: couleur hex (ex: '#ffffff')
+    - data.bg_image: chemin image
+    - data.bg_video_youtube: URL YouTube
+    - data.bg_opacity: nombre 0-1
+    - data.bg_position: 'center', 'top', 'bottom'
+    - data.bg_type: 'none', 'image', 'youtube' (optionnel, calculé si absent)
+    
+  - prefix: préfixe pour les IDs et noms (ex: 'page', 'section-1')
+    - Génère des IDs comme: '<prefix>-bg-color', '<prefix>-bg-image', etc.
+    
+  - showDivider: booléen optionnel (default: true) - affiche un séparateur au-dessus
+  - dividerLabel: texte du séparateur (default: "Fond de page")
+-->
+
+<% 
+  // Paramètres locaux
+  const prefix = locals.prefix || 'page';
+  const showDivider = locals.showDivider !== false;
+  const dividerLabel = locals.dividerLabel || 'Fond de page';
+  const data = locals.data || {};
+  
+  // Normaliser la couleur
+  let bgColor = data.bg_color || '#f5f5f5';
+  if (bgColor.match(/^#[0-9a-f]{3}$/i)) {
+    bgColor = '#' + bgColor.substring(1).split('').map(x => x+x).join('');
+  }
+  
+  // Déterminer le type de média sélectionné
+  let bgType = data.bg_type || 'none';
+  if (data.bg_image && !data.bg_video_youtube) bgType = 'image';
+  if (data.bg_video_youtube) bgType = 'youtube';
+%>
+
+<% if (showDivider) { %>
+  <!-- === Séparation === -->
+  <div class="form-section-divider">
+    <span><%= dividerLabel %></span>
+  </div>
+<% } %>
+
+<!-- === Couleur de fond === -->
+<div class="form-group">
+  <label for="<%= prefix %>-bg-color">Couleur de fond</label>
+  <input type="color" id="<%= prefix %>-bg-color" value="<%= bgColor %>">
+</div>
+
+<!-- === Type de média de fond === -->
+<div class="form-group">
+  <label>Type de média</label>
+  <div class="radio-group compact">
+    <label>
+      <input type="radio" name="<%= prefix %>-bg-media-type" value="none" <%= (bgType === 'none') ? 'checked' : '' %>>
+      <span>Aucun</span>
+    </label>
+    <label>
+      <input type="radio" name="<%= prefix %>-bg-media-type" value="image" <%= (bgType === 'image') ? 'checked' : '' %>>
+      <span>Image/Vidéo</span>
+    </label>
+    <label>
+      <input type="radio" name="<%= prefix %>-bg-media-type" value="youtube" <%= (bgType === 'youtube') ? 'checked' : '' %>>
+      <span>YouTube</span>
+    </label>
+  </div>
+</div>
+
+<!-- === Champ Image === -->
+<div class="form-group bg-media-field" id="<%= prefix %>-bg-image-field" <% if (bgType !== 'image') { %>style="display: none;"<% } %>>
+  <label for="<%= prefix %>-bg-image">Image/Vidéo</label>
+  <div class="media-upload-field compact">
+    <input type="text" id="<%= prefix %>-bg-image" name="<%= prefix %>_bg_image" value="<%= data.bg_image || '' %>" placeholder="/uploads/..." readonly>
+    <button type="button" class="btn btn-xs btn-secondary select-bg-media" title="Parcourir" data-prefix="<%= prefix %>">
+      <i class="fas fa-folder-open"></i>
+    </button>
+    <button type="button" class="btn btn-xs btn-danger clear-bg-media" <% if (!data.bg_image) { %>style="display: none;"<% } %> title="Effacer" data-prefix="<%= prefix %>">
+      <i class="fas fa-trash"></i>
+    </button>
+  </div>
+</div>
+
+<!-- === Champ YouTube === -->
+<div class="form-group bg-media-field" id="<%= prefix %>-bg-youtube-field" <% if (bgType !== 'youtube') { %>style="display: none;"<% } %>>
+  <label for="<%= prefix %>-bg-video-youtube">URL YouTube</label>
+  <input type="text" id="<%= prefix %>-bg-video-youtube" name="<%= prefix %>_bg_video_youtube" value="<%= data.bg_video_youtube || '' %>" placeholder="https://www.youtube.com/watch?v=...">
+</div>
+
+<!-- === Opacité === -->
+<div class="form-group">
+  <label for="<%= prefix %>-bg-opacity">Opacité (0-1)</label>
+  <input type="number" id="<%= prefix %>-bg-opacity" name="<%= prefix %>_bg_opacity" min="0" max="1" step="0.1" value="<%= data.bg_opacity || 1.0 %>">
+</div>
+
+<!-- === Position === -->
+<div class="form-group">
+  <label for="<%= prefix %>-bg-position">Position du fond</label>
+  <select id="<%= prefix %>-bg-position" name="<%= prefix %>_bg_position">
+    <option value="center" <%= (data.bg_position === 'center') ? 'selected' : '' %>>Centre</option>
+    <option value="top" <%= (data.bg_position === 'top') ? 'selected' : '' %>>Haut</option>
+    <option value="bottom" <%= (data.bg_position === 'bottom') ? 'selected' : '' %>>Bas</option>
+  </select>
+</div>
+
+<!-- 
+  Note: Les event listeners pour ce composant sont gérés externement
+  pour éviter les doublons quand le composant est inclus plusieurs fois.
+  
+  Pour les Paramètres généraux : utilisez /js/page-background-controls.js
+  Pour les sections : c'est géré par SectionFormManager.js / BackgroundControlsGenerator.js
+-->

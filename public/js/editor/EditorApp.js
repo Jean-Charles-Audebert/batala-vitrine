@@ -35,6 +35,8 @@ class EditorApp {
       this.updateUI();
       // Charger les polices dans les selects
       await this.refreshFontSelects();
+      // Attacher les event listeners pour les changements en temps réel
+      this.setupPageSettingsAutoSave();
       // Charger les réseaux sociaux
       await this.loadSocialLinks();
       // Initialiser le gestionnaire de média de fond
@@ -73,7 +75,6 @@ class EditorApp {
 
     // Paramètres de la page
     this.bindPageSettingsEvents();
-    this.setupPageSettingsAutoSave();
 
     // Délégation d'événements pour les boutons dynamiques
     document.addEventListener('click', (e) => {
@@ -298,6 +299,12 @@ class EditorApp {
   // Méthodes de modales
   async saveAll() {
     try {
+      // Annuler toute auto-save en cours
+      if (this.saveTimeout) {
+        window.clearTimeout(this.saveTimeout);
+        console.log('🛑 Auto-save annulée');
+      }
+
       // Collecter les données de la page depuis le formulaire
       const titleEl = document.getElementById('page-title');
       const emailEl = document.getElementById('page-contact-email');
@@ -306,6 +313,8 @@ class EditorApp {
       const bgYoutubeEl = document.getElementById('page-bg-video-youtube');
       const opacityEl = document.getElementById('page-bg-opacity');
       const positionEl = document.getElementById('page-bg-position');
+      const titleFontEl = document.getElementById('page-title-font-id');
+      const textFontEl = document.getElementById('page-text-font-id');
       
       // Vérifier que les éléments essentiels existent
       if (!titleEl || !emailEl || !bgColorEl) {
@@ -321,6 +330,14 @@ class EditorApp {
         bg_opacity: parseFloat(opacityEl?.value) || 1.0,
         bg_position: positionEl?.value || 'center'
       };
+
+      // Ajouter les polices si elles sont sélectionnées
+      if (titleFontEl?.value) {
+        pageData.default_font_title = parseInt(titleFontEl.value);
+      }
+      if (textFontEl?.value) {
+        pageData.default_font_text = parseInt(textFontEl.value);
+      }
 
       // Sauvegarder la page
       await this.apiCall('/api/page', 'PUT', pageData);
@@ -926,6 +943,7 @@ class EditorApp {
    * Écouteurs pour la sauvegarde automatique des paramètres de page
    */
   setupPageSettingsAutoSave() {
+    // Mise à jour en temps réel de l'aperçu SEULEMENT (pas de sauvegarde auto)
     const pageSettingsFields = [
       'page-title',
       'page-contact-email',
@@ -941,15 +959,9 @@ class EditorApp {
     pageSettingsFields.forEach(fieldId => {
       const element = document.getElementById(fieldId);
       if (element) {
-        // Mise à jour en temps réel de l'aperçu
+        // Mise à jour en temps réel de l'aperçu uniquement
         element.addEventListener('input', () => this.updatePreview());
         element.addEventListener('change', () => this.updatePreview());
-
-        // Sauvegarde automatique avec délai
-        element.addEventListener('change', () => {
-          window.clearTimeout(this.saveTimeout);
-          this.saveTimeout = window.setTimeout(() => this.savePageSettings(), 1000);
-        });
       }
     });
   }
@@ -1075,7 +1087,7 @@ class EditorApp {
       if (titleFontEl) {
         const titleFontId = cleanValue(titleFontEl.value, 'number');
         if (titleFontId !== undefined) {
-          data.title_font_id = titleFontId;
+          data.default_font_title = titleFontId;
         }
       }
 
@@ -1083,7 +1095,7 @@ class EditorApp {
       if (textFontEl) {
         const textFontId = cleanValue(textFontEl.value, 'number');
         if (textFontId !== undefined) {
-          data.text_font_id = textFontId;
+          data.default_font_text = textFontId;
         }
       }
 

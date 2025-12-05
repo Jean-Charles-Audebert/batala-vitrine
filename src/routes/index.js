@@ -10,6 +10,9 @@ const router = express.Router();
 // Route publique - page vitrine avec sections visibles uniquement
 router.get("/", optionalAuth, showHome);
 
+// API endpoint pour preview dans l'éditeur
+router.get("/api/preview", optionalAuth, showHome);
+
 // Route d'édition - toutes les sections (authentification requise)
 router.get("/editor", requireAuth, showEditorPage);
 

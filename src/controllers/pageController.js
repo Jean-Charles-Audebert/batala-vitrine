@@ -70,7 +70,7 @@ export const updatePage = async (req, res) => {
     // Récupérer l'ancienne valeur de bg_image pour supprimer le fichier si nécessaire
     let oldBgMediaUrl = null;
     if (settingsData.bg_image !== undefined) {
-      const { rows } = await query('SELECT settings FROM page ORDER BY id LIMIT 1');
+      const { rows } = await query('SELECT settings FROM page ORDER BY id DESC LIMIT 1');
       if (rows.length > 0 && rows[0].settings) {
         oldBgMediaUrl = rows[0].settings.bg_image;
       }
@@ -93,7 +93,7 @@ export const updatePage = async (req, res) => {
     // Si on a des données settings, mettre à jour le JSONB
     if (Object.keys(settingsData).length > 0) {
       // Récupérer les settings actuels
-      const { rows: currentRows } = await query('SELECT settings FROM page ORDER BY id LIMIT 1');
+      const { rows: currentRows } = await query('SELECT settings FROM page ORDER BY id DESC LIMIT 1');
       const currentSettings = currentRows.length > 0 && currentRows[0].settings ? currentRows[0].settings : {};
 
       // Fusionner les settings
@@ -114,7 +114,7 @@ export const updatePage = async (req, res) => {
     const { rows } = await query(`
       UPDATE page
       SET ${updateFields.join(', ')}, updated_at = NOW()
-      WHERE id = (SELECT id FROM page ORDER BY id LIMIT 1)
+      WHERE id = (SELECT id FROM page ORDER BY id DESC LIMIT 1)
       RETURNING *
     `, values);
 

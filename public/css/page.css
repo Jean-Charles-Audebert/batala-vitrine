@@ -10,9 +10,7 @@
    VARIABLES SPÉCIFIQUES PAGE PUBLIQUE
    ============================================ */
 :root {
-  /* Polices par défaut (surchargées dynamiquement) */
-  --default-font-title: Arial, sans-serif;
-  --default-font-text: Arial, sans-serif;
+  /* Polices par défaut (définies dynamiquement par le template, ne pas redéfinir ici) */
 
   /* Couleurs principales */
   --color-primary: #2196f3;

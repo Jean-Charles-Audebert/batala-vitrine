@@ -11,20 +11,24 @@
 
   <!-- Fonts -->
   <% if (pageData.page.default_font_title && pageData.fonts) { %>
-    <% const titleFont = pageData.fonts.find(f => f.id == pageData.page.default_font_title); %>
+    <% const titleFontId = parseInt(pageData.page.default_font_title); %>
+    <% const titleFont = pageData.fonts.find(f => parseInt(f.id) === titleFontId); %>
     <% if (titleFont && titleFont.url) { %>
       <link rel="stylesheet" href="<%= titleFont.url %>">
     <% } %>
   <% } %>
 
   <% if (pageData.page.default_font_text && pageData.fonts) { %>
-    <% const textFont = pageData.fonts.find(f => f.id == pageData.page.default_font_text); %>
+    <% const textFontId = parseInt(pageData.page.default_font_text); %>
+    <% const textFont = pageData.fonts.find(f => parseInt(f.id) === textFontId); %>
     <% if (textFont && textFont.url) { %>
       <link rel="stylesheet" href="<%= textFont.url %>">
     <% } %>
   <% } %>
 
   <!-- Styles -->
+  <!-- Variables CSS MUST be loaded FIRST -->
+  <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/core.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/sections.css">
@@ -33,6 +37,20 @@
 
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+
+  <!-- CSS Variables -->
+  <style>
+    <%
+      const titleFontId = pageData.page.default_font_title ? parseInt(pageData.page.default_font_title) : null;
+      const textFontId = pageData.page.default_font_text ? parseInt(pageData.page.default_font_text) : null;
+      const titleFont = titleFontId && pageData.fonts ? pageData.fonts.find(f => parseInt(f.id) === titleFontId) : null;
+      const textFont = textFontId && pageData.fonts ? pageData.fonts.find(f => parseInt(f.id) === textFontId) : null;
+    %>
+    :root {
+      --default-font-title: <%- titleFont?.font_family ? `"${titleFont.font_family}"` : 'Arial' %>, sans-serif !important;
+      --default-font-text: <%- textFont?.font_family ? `"${textFont.font_family}"` : '-apple-system' %>, sans-serif !important;
+    }
+  </style>
 </head>
 <body>
   <div class="editor-container">

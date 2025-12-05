@@ -1,0 +1,58 @@
+/**
+ * CSS Variables dynamiques
+ * Fichier: public/css/variables.css
+ * Contient: Variables globales pour fonts et couleurs
+ * Note: Ce fichier doit être chargé EN PREMIER
+ */
+
+:root {
+  /* Polices par défaut - à surcharger dynamiquement */
+  --default-font-title: Arial, sans-serif;
+  --default-font-text: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Couleurs principales */
+  --color-primary: #2196f3;
+  --color-primary-dark: #1976d2;
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+  --color-bg-light: #fafafa;
+  --color-bg-white: #ffffff;
+
+  /* Tailles de police */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* Espacement */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 2.5rem;
+  --spacing-3xl: 3rem;
+
+  /* Z-index */
+  --z-negative: -1;
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 500;
+  --z-fixed: 1000;
+  --z-modal: 2000;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-base: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}

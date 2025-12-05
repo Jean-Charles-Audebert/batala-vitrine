@@ -11,8 +11,10 @@
   
   <!-- Fonts -->
   <%
-    const titleFont = (page.default_font_title && fonts) ? fonts.find(f => f.id == page.default_font_title) : null;
-    const textFont = (page.default_font_text && fonts) ? fonts.find(f => f.id == page.default_font_text) : null;
+    const titleFontId = page.default_font_title ? parseInt(page.default_font_title) : null;
+    const textFontId = page.default_font_text ? parseInt(page.default_font_text) : null;
+    const titleFont = (titleFontId && fonts) ? fonts.find(f => parseInt(f.id) === titleFontId) : null;
+    const textFont = (textFontId && fonts) ? fonts.find(f => parseInt(f.id) === textFontId) : null;
   %>
   
   <% if (titleFont && titleFont.url) { %>
@@ -23,6 +25,8 @@
   <% } %>
   
   <!-- Styles -->
+  <!-- Variables CSS MUST be loaded FIRST -->
+  <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/core.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="stylesheet" href="/css/sections.css">
@@ -32,11 +36,11 @@
   <!-- CSS Variables -->
   <style>
     :root {
-      --default-font-title: <%= titleFont?.font_family ? `'${titleFont.font_family}'` : 'Arial' %>, sans-serif;
-      --default-font-text: <%= textFont?.font_family ? `'${textFont.font_family}'` : '-apple-system' %>, sans-serif;
+      --default-font-title: <%- titleFont?.font_family ? `"${titleFont.font_family}"` : 'Arial' %>, sans-serif !important;
+      --default-font-text: <%- textFont?.font_family ? `"${textFont.font_family}"` : '-apple-system' %>, sans-serif !important;
     }
     body {
-      background-color: <%= page.settings?.bg_color || page.bg_color || '#f5f5f5' %>;
+      background-color: <%- page.settings?.bg_color || page.bg_color || '#f5f5f5' %>;
     }
   </style>
 </head>

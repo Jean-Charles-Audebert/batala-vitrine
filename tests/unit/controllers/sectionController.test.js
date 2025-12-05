@@ -13,17 +13,8 @@ import { query } from '../../../src/config/db.js';
  */
 
 describe('sectionController - tests d\'intégration', () => {
-  let testPageId;
-
-  beforeAll(async () => {
-    // Créer une page de test
-    const { rows } = await query(`
-      INSERT INTO page (title, contact_email, settings)
-      VALUES ($1, $2, $3)
-      RETURNING id
-    `, ['Test Page', 'test@example.com', JSON.stringify({})]);
-    testPageId = rows[0].id;
-  });
+  // Utiliser la page seeded (id: 1) au lieu de créer une nouvelle
+  const testPageId = 1;
 
   describe('getAllSections', () => {
     it('doit retourner un tableau de sections', async () => {

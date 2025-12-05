@@ -60,11 +60,11 @@ class PreviewManager {
       // Récupérer les IDs depuis les selects si non fournis
       if (titleFontId === null) {
         const titleFontSelect = document.getElementById('page-title-font-id');
-        titleFontId = titleFontSelect ? titleFontSelect.value : null;
+        titleFontId = titleFontSelect ? parseInt(titleFontSelect.value) || null : null;
       }
       if (textFontId === null) {
         const textFontSelect = document.getElementById('page-text-font-id');
-        textFontId = textFontSelect ? textFontSelect.value : null;
+        textFontId = textFontSelect ? parseInt(textFontSelect.value) || null : null;
       }
 
       const fontsData = this.fontsData || window.fontsData || [];
@@ -82,7 +82,7 @@ class PreviewManager {
       fontsData.forEach(font => {
         if (!font.font_family) return;
 
-        if (titleFontId == font.id) {
+        if (parseInt(titleFontId) === parseInt(font.id)) {
           titleFontFamily = `"${font.font_family}", sans-serif`;
           if (font.url) {
             const titleLink = iframeDoc.createElement('link');
@@ -93,7 +93,7 @@ class PreviewManager {
           }
         }
         
-        if (textFontId == font.id) {
+        if (parseInt(textFontId) === parseInt(font.id)) {
           textFontFamily = `"${font.font_family}", sans-serif`;
           if (font.url) {
             const textLink = iframeDoc.createElement('link');
@@ -177,7 +177,7 @@ class PreviewManager {
   /**
    * Applique les polices à l'aperçu (utilise la méthode unifiée)
    */
-  applyFontsToPreview(titleFontId, textFontId) {
+  applyFontsToPreview(titleFontId, textFontId, iframeDoc) {
     this.injectFontsIntoIframe(titleFontId, textFontId);
   }
 

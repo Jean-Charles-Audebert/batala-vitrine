@@ -41,7 +41,8 @@ export async function buildEditorData() {
  * Charge les données de la table page
  */
 async function loadPageData() {
-  const { rows } = await query('SELECT * FROM page LIMIT 1');
+  // Récupérer la page la plus récente ou celle avec les données les plus complètes
+  const { rows } = await query('SELECT * FROM page ORDER BY id DESC LIMIT 1');
   const page = rows[0] || {};
 
   // Parser les settings si c'est une string JSON
